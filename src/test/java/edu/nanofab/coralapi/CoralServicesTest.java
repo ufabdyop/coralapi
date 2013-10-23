@@ -4,6 +4,10 @@
  */
 package edu.nanofab.coralapi;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 
@@ -41,13 +45,27 @@ import javax.mail.Quota.Resource;
 public class CoralServicesTest extends TestCase {
     String projectTestName = "testproject_1";
     String memberTestName = "testmem_1";
+    String allowedHostname = "vagrant-centos63-32";
     public CoralServicesTest(String testName) {
         super(testName);
+    }
+    
+    protected void guardAgainstRunningOnLive() throws Exception {
+        Process results = Runtime.getRuntime().exec("hostname");
+        InputStream stdout = results.getInputStream();
+        BufferedReader reader = new BufferedReader (new InputStreamReader(stdout));
+        String hostname = reader.readLine();
+        if (hostname.equals(allowedHostname)) {
+        } else {
+        	System.err.println("Hostname should be " + allowedHostname + "!");
+        }
+        assertTrue("only allow tests to run on vm called" + allowedHostname, hostname.equals(allowedHostname));
     }
     
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        guardAgainstRunningOnLive();
     }
     
     @Override
