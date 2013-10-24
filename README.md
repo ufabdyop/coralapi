@@ -24,122 +24,98 @@ We need the API to meet the following requirements:
 -   All Communication is Encrypted over SSL
 -   Authentication is required (http basic auth should work:
     [http://stackoverflow.com/questions/319530/restful-authentication](http://stackoverflow.com/questions/319530/restful-authentication))
--   Must Provide Distinct URLs for each resource ([See: RESTful
-    Routing](http://mvccontrib.codeplex.com/wikipage?title=SimplyRestfulRouting&referringTitle=Documentation&ProjectName=mvccontrib) )
+-   Must Provide Distinct URLs for each resource ([See: RESTful Routing](http://mvccontrib.codeplex.com/wikipage?title=SimplyRestfulRouting&referringTitle=Documentation&ProjectName=mvccontrib) )
 -   Must support the following functionality:
 
--    AddEquipmentRoleToMember(String member, String roleName, String
-    resource)
--    RemoveEquipmentRoleFromMember(String member, String roleName,
-    String resource)
--    AddProjectRoleToMember(String member, String roleName, String
-    resource)
--    RemoveProjectRoleFromMember(String member, String roleName, String
-    resource)
--    AddSafetyFlagToMember(String member )
--    RemoveSafetyFlagFromMember(String member)
--    AddMemberProjects(String member, String[] projects)
--    RemoveMemberProjects(String member, String[] projects)
--    CreateNewMember(Member member)
--    CreateNewProject(Project project)
--    AddProjectMembers(String project, String[] members)
--    RemoveProjectMembers(String project, String[] members)
--   enable( tool, agent, member, project, account )
--   disable(tool)
--   qualify(tool, member, role)
--   disqualify(tool, member, role)
--   reserve( tool, agent, member, project, account, begin time, end
-    time(or length) )
--   deleteReservation( tool, member, time, length )
--   costRecovery (month, year)          
--   more, eventually
+    -   AddEquipmentRoleToMember(String member, String roleName, String resource)
+    -   RemoveEquipmentRoleFromMember(String member, String roleName, String resource)
+    -   AddProjectRoleToMember(String member, String roleName, String resource)
+    -   RemoveProjectRoleFromMember(String member, String roleName, String resource)
+    -   AddSafetyFlagToMember(String member )
+    -   RemoveSafetyFlagFromMember(String member)
+    -   AddMemberProjects(String member, String[] projects)
+    -   RemoveMemberProjects(String member, String[] projects)
+    -   CreateNewMember(Member member)
+    -   CreateNewProject(Project project)
+    -   AddProjectMembers(String project, String[] members)
+    -   RemoveProjectMembers(String project, String[] members)
+    -   enable( tool, agent, member, project, account )
+    -   disable(tool)
+    -   qualify(tool, member, role)
+    -   disqualify(tool, member, role)
+    -   reserve( tool, agent, member, project, account, begin time, end time(or length) )
+    -   deleteReservation( tool, member, time, length )
+    -   costRecovery (month, year)          
+    -   more, eventually
 
 -   Resources(nouns) in the system:
 
--   Member
--   Tool
--   Reservation
--   Enable
--   Project
--   Account
--   EquipmentRole
--   perhaps more eventually, like Lab, Supply, LabRole, Rate, Rundata,
-    ...
+    -   Member
+    -   Tool
+    -   Reservation
+    -   Enable
+    -   Project
+    -   Account
+    -   EquipmentRole
+    -   perhaps more eventually, like Lab, Supply, LabRole, Rate, Rundata, ...
 
 -   Actions(verbs) supported on the resources:
+    -   Member
+        -   Create (PUT)
+        -   Read (or View or Show) (GET)
+        -   Update (POST)
+        -   Delete (DELETE) (Do we need this one?)
+        -   List (GET)
 
--   Member
+    -   Tool
+        -   Read (View or Show) (GET)
+        -   List (GET)
 
--   Create (PUT)
--   Read (or View or Show) (GET)
--   Update (POST)
--   Delete (DELETE) (Do we need this one?)
--   List (GET)
+    -   Reservation
+        -   Create (PUT)
+        -   Read (or View or Show) (GET)
+        -   Update (POST)
+        -   Delete (DELETE)
+        -   List (GET)
 
--   Tool
+    -   Enable
+        -   Create (PUT)
+        -   Read (or View or Show) (GET)
+        -   Update (POST)
+        -   Delete (DELETE)
+        -   List (GET)
 
--   Read (View or Show) (GET)
--   List (GET)
+    -   Project
+        -   Create (PUT)
+        -   Read (or View or Show) (GET)
+        -   Update (POST)
+        -   Delete (DELETE) (Do we need this one?)
+        -   List (GET)
 
--   Reservation
+    -   Account
+        -   Create (PUT)
+        -   Read (or View or Show) (GET)
+        -   Update (POST)
+        -   Delete (DELETE) (Do we need this one?)
+        -   List (GET)
 
--   Create (PUT)
--   Read (or View or Show) (GET)
--   Update (POST)
--   Delete (DELETE)
--   List (GET)
+    -   EquipmentRole
+        -   Create (PUT)
+        -   Read (or View or Show) (GET)
+        -   Update (POST)
+        -   Delete (DELETE)
+        -   List (GET)
 
--   Enable
-
--   Create (PUT)
--   Read (or View or Show) (GET)
--   Update (POST)
--   Delete (DELETE)
--   List (GET)
-
--   Project
-
--   Create (PUT)
--   Read (or View or Show) (GET)
--   Update (POST)
--   Delete (DELETE) (Do we need this one?)
--   List (GET)
-
--   Account
-
--   Create (PUT)
--   Read (or View or Show) (GET)
--   Update (POST)
--   Delete (DELETE) (Do we need this one?)
--   List (GET)
-
--   EquipmentRole
-
--   Create (PUT)
--   Read (or View or Show) (GET)
--   Update (POST)
--   Delete (DELETE)
--   List (GET)
-
--   URLs (examples)
-
--   https://server/coral/api/v0.1/member
-
--   supporting PUT, GET(list)
-
--   https://server/coral/api/v0.1/member/ryant
-
--   supporting POST, GET
--   POST and GET would send/receive json representations of member
-
--   https://server/coral/api/v0.1/reservation
-
--   supporting POST, GET (list of reservations)
-
--   https://server/coral/api/v0.1/reservation/someID
-    (base64 encoding of DB id?)
-
--   supporting POST, GET, DELETE
+  -   URLs (examples)
+    -   https://server/coral/api/v0.1/member
+        -   supporting PUT, GET(list)
+    -   https://server/coral/api/v0.1/member/ryant
+        -   supporting POST, GET
+        -   POST and GET would send/receive json representations of member
+    -   https://server/coral/api/v0.1/reservation
+        -   supporting POST, GET (list of reservations)
+    -   https://server/coral/api/v0.1/reservation/someID (base64 encoding of DB id?)
+        -   supporting POST, GET, DELETE
 
 -   The server should respond with appropriate messages for errors or
     successes (404s, 201s, etc. See
