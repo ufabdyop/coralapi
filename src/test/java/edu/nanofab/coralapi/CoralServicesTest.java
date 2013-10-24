@@ -43,10 +43,9 @@ import javax.mail.Quota.Resource;
  * @author neil
  */
 public class CoralServicesTest extends TestCase {
-    String projectTestName = "testproject_1";
-    String memberTestName = "testmem_1";
-    String allowedHostname = "vagrant-centos63-32";
-    public CoralServicesTest(String testName) {
+    FixtureHelper data = new FixtureHelper();
+    protected String allowedHostname = "vagrant-centos63-32";
+	public CoralServicesTest(String testName) {
         super(testName);
     }
     
@@ -59,7 +58,7 @@ public class CoralServicesTest extends TestCase {
         } else {
         	System.err.println("Hostname should be " + allowedHostname + "!");
         }
-        assertTrue("only allow tests to run on vm called" + allowedHostname, hostname.equals(allowedHostname));
+        assertTrue("only allow tests to run on vm called " + allowedHostname, hostname.equals(allowedHostname));
     }
     
     @Override
@@ -72,62 +71,6 @@ public class CoralServicesTest extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
     }
-
-    public Member newMember(String name) throws Exception{
-        Member newMember = new Member();
-        newMember.name = name;
-        newMember.project = "Bootstrap project";
-        return newMember;
-    }
-    public Project newProject(String name) throws Exception{
-    	Project newProject = new Project();
-    	newProject.account = "Bootstrap account";
-    	newProject.name = name;
-    	return newProject;
-    }
-    public void deleteMember(String name){
-    	String query_ ="DELETE FROM rscmgr.member WHERE name='"+name+"'";
-    	System.out.println(query_);
-    	query(query_);
-    }
-    public void deleteProject(String name){
-    	String query_ ="DELETE FROM rscmgr.project WHERE name='"+name+"'";
-    	System.out.println(query_);
-    	query(query_);
-    }    
-    public void query(String query_){
-        Connection con = null;
-        java.sql.Statement st = null;
-    
-        String url = "jdbc:postgresql://localhost/coral";
-        String user = "coraldba";
-        String password = "coraldba";
-
-        try {
-            con = DriverManager.getConnection(url, user, password);
-            st = con.createStatement();
-            st.execute(query_);
-
-        } catch (SQLException ex) {
-            Logger lgr = Logger.getLogger(CoralServicesTest.class.getName());
-            lgr.log(Level.SEVERE, ex.getMessage(), ex);
-
-        } finally {
-            try {
-                if (st != null) {
-                    st.close();
-                }
-                if (con != null) {
-                    con.close();
-                }
-
-            } catch (SQLException ex) {
-                Logger lgr = Logger.getLogger(CoralServicesTest.class.getName());
-                lgr.log(Level.WARNING, ex.getMessage(), ex);
-            }
-        }
-    }
-    
     public void testGetProjects() throws ProjectNotFoundSignal{
     	System.out.println("Get ALL PROJECTS");
     	CoralServices instance = new CoralServices();
@@ -139,37 +82,38 @@ public class CoralServicesTest extends TestCase {
      * Test of CreateNewMember method, of class CoralServices.
      */
     public void testCreateNewMember() throws Exception {
-        this.deleteMember(this.memberTestName);
+        data.deleteMember("testuser");
     	System.out.println("TESTING CREATING NEW MEMBER");
-    	Member member = newMember(this.memberTestName);
+    	Member member = new Member();
+    	member.name = "testuser";
+    	member.project = "Bootstrap project";
         CoralServices instance = new CoralServices();
-        instance.CreateNewMember(member);   
+        instance.CreateNewMember(member);
     }
 
     /**
      * Test of CreateNewProject method, of class CoralServices.
      */
     public void testCreateNewProject() throws Exception {
-        this.deleteProject(this.projectTestName);
+        data.deleteProject("Bootstrap project");
     	System.out.println("Test Create New Project");
-        Project project = this.newProject(this.projectTestName);
+        Project project = new Project();
+        project.name = "Bootstrap project";
+        project.account = "Bootstrap account";
         CoralServices instance = new CoralServices();
         instance.CreateNewProject(project);
     }
+    
     public void testAddProjectMembers() throws Exception {
-    	this.deleteMember("testmem_18");
-    	this.deleteMember("testmem_19");    	
+    	data.deleteMember("testmem_18");
     	System.out.println("Test Add Project Members");
     	CoralServices instance = new CoralServices();
-    	Member member1 = newMember("testmem_18");
-    	Member member2 = newMember("testmem_19");
-    	String[] members = {"testmem_18", "testmem_19"};
-    	
-    	instance.CreateNewMember(member1);
-    	instance.CreateNewMember(member2);
-    	
+    	Member member1 = new Member();
+    	member1.name = "testmem_18";
+    	member1.project = "Bootstrap project";
+    	String[] members = {"testmem_18"};
+        instance.CreateNewMember(member1);
     	instance.AddProjectMembers("Maintenance", members);
-    	
     	instance.RemoveProjectMembers("Maintenance", members);
     }
     public void testRemoveProjectMembers() throws Exception {
@@ -183,14 +127,18 @@ public class CoralServicesTest extends TestCase {
     	}
     }
     public void testGetMember() throws Exception {
-        this.deleteMember(this.memberTestName);
+        data.deleteMember("testuser");
     	System.out.println("Test Get Member");
-    	Member member = newMember(this.memberTestName);
+    	Member member = new Member();
+    	member.name = "testuser";
+    	member.project = "Bootstrap project";
         CoralServices instance = new CoralServices();
         instance.CreateNewMember(member);  
-        Member mem = instance.getMember(this.memberTestName);
-        Assert.assertEquals(this.memberTestName, mem.name);
+        Member mem = instance.getMember("testuser");
+        Assert.assertEquals("testuser", mem.name);
     }
+    
+    /*
     public void testAddMemberProjects() throws Exception {
     	this.deleteMember("testmem_1");
     	this.deleteProject("testproject_1");
@@ -230,5 +178,6 @@ public class CoralServicesTest extends TestCase {
     	CoralServices instance = new CoralServices();
     	instance.enable("TMV Super");
     }
+    */
 }
 
