@@ -16,6 +16,8 @@ import junit.framework.TestCase;
 
 import org.opencoral.corba.MemberAdapter;
 import org.opencoral.corba.ProjectAdapter;
+import org.opencoral.idl.Account;
+import org.opencoral.idl.AccountNotFoundSignal;
 import org.opencoral.idl.InvalidAccountSignal;
 import org.opencoral.idl.InvalidAgentSignal;
 import org.opencoral.idl.InvalidMemberSignal;
@@ -108,7 +110,6 @@ public class CoralServicesTest extends TestCase {
         Project fetched = instance.getProject(project.name);
         assertEquals(fetched.name, project.name);
     }
-    
     public void testGetProjectThrowsExceptionForMissingProject() {
     	boolean exceptionThrown = false;
     	try {
@@ -121,6 +122,32 @@ public class CoralServicesTest extends TestCase {
     	assertTrue(exceptionThrown);
     }
 
+    public void testGetAccountThrowsExceptionForMissingProject() {
+    	boolean exceptionThrown = false;
+    	try {
+	    	data.deleteAccount("test unit account");
+	    	CoralServices instance = new CoralServices();
+	    	instance.getAccount("test unit account");
+    	} catch (InvalidAccountSignal e) {
+    		exceptionThrown = true;
+		}
+    	assertTrue(exceptionThrown);
+    }
+
+    
+    /**
+     * Test of CreateNewAccount method, of class CoralServices.
+     */
+    public void testCreateNewAccount() throws Exception {
+        data.deleteAccount("unit test account");
+        Account account = new Account();
+        account.name = "unit test account";
+        CoralServices instance = new CoralServices();
+        instance.CreateNewAccount(account);
+        Account fetched = instance.getAccount(account.name);
+        assertEquals(fetched.name, account.name);
+    }
+    
     
     public void testAddProjectMembers() throws Exception {
     	data.deleteMember("testmem_18");
@@ -138,7 +165,6 @@ public class CoralServicesTest extends TestCase {
     	instance.AddProjectMembers("Bootstrap project", members);
     	Members fetchedMembers = instance.GetProjectMembers("Bootstrap project");
     	assertTrue(fetchedMembers.contains(member1));
-    	
     	//instance.RemoveProjectMembers("Bootstrap project", members);
     }
     

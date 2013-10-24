@@ -10,8 +10,10 @@ import java.util.List;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.opencoral.constants.Constants;
+import org.opencoral.corba.AccountAdapter;
 import org.opencoral.corba.MemberAdapter;
 import org.opencoral.corba.ProjectAdapter;
+import org.opencoral.idl.Account;
 import org.opencoral.idl.Activity;
 import org.opencoral.idl.InvalidAccountSignal;
 import org.opencoral.idl.InvalidAgentSignal;
@@ -34,6 +36,7 @@ import org.opencoral.idl.Equipment.EquipmentManagerHelper;
 import org.opencoral.idl.Resource.ResourceManager;
 import org.opencoral.idl.Resource.ResourceManagerHelper;
 import org.opencoral.util.ResourceRoles;
+import org.opencoral.util.Tstamp;
 
 import edu.nanofab.coralapi.collections.Members;
 import edu.utah.nanofab.CoralManagerConnector;
@@ -148,6 +151,19 @@ public class CoralServices {
     	if (project.type != null) proAdapter.setValue("type", project.type);
     	proAdapter.setValue("active", (project.active)?"true":"false");
     	return proAdapter;
+    }
+    private AccountAdapter accountToAccountAdapter(Account account) throws Exception {
+    	AccountAdapter adapter = new AccountAdapter();
+
+		if (account.edate != null) adapter.setEdate(new Tstamp(account.edate));
+		if (account.bdate != null) adapter.setBdate(new Tstamp(account.bdate));
+		if (account.type != null) adapter.setValue("type", account.type);
+		if (account.organization != null) adapter.setValue("organization", account.organization);
+		if (account.description != null) adapter.setValue("description", account.description);
+		if (account.name != null) adapter.setValue("name", account.name);
+		adapter.setValue("active", (account.active ? "true" : "false"));
+
+    	return adapter;
     }
     public Project[] getProjects() throws ProjectNotFoundSignal{
     	ResourceManager rscmgr = this.getResourceManager();
@@ -319,6 +335,16 @@ public class CoralServices {
 		}
 		logger.debug("size of resultset: " + matches.size());
 		return matches;
+	}
+	public void CreateNewAccount(Account account) throws Exception {
+		ResourceManager rscmgr = this.getResourceManager();
+		AccountAdapter adapter = this.accountToAccountAdapter(account);
+		rscmgr.addAccount((Account)adapter.getObject(), this.ticketString);
+	}
+
+	public Account getAccount(String name) throws InvalidAccountSignal {
+		ResourceManager rscmgr = this.getResourceManager();
+		return rscmgr.getAccount(name);
 	}
 	
 

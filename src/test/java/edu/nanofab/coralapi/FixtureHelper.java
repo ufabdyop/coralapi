@@ -68,4 +68,10 @@ public class FixtureHelper {
             }
         }
     }
+
+	public void deleteAccount(String name) {
+    	String query_ ="DELETE FROM rscmgr.account WHERE name='"+name+"'";
+    	System.out.println(query_);
+    	query(query_);
+	}
 }
