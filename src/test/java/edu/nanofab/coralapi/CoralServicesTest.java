@@ -29,11 +29,14 @@ import org.opencoral.idl.Project;
 import org.opencoral.idl.ProjectNotFoundSignal;
 import org.opencoral.idl.ResourceUnavailableSignal;
 
+import edu.nanofab.coralapi.collections.Members;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -102,20 +105,43 @@ public class CoralServicesTest extends TestCase {
         project.account = "Bootstrap account";
         CoralServices instance = new CoralServices();
         instance.CreateNewProject(project);
+        Project fetched = instance.getProject(project.name);
+        assertEquals(fetched.name, project.name);
     }
+    
+    public void testGetProjectThrowsExceptionForMissingProject() {
+    	boolean exceptionThrown = false;
+    	try {
+	    	data.deleteProject("Bootstrap project");
+	    	CoralServices instance = new CoralServices();
+	    	instance.getProject("Bootstrap project");
+    	} catch (ProjectNotFoundSignal e) {
+    		exceptionThrown = true;
+    	}
+    	assertTrue(exceptionThrown);
+    }
+
     
     public void testAddProjectMembers() throws Exception {
     	data.deleteMember("testmem_18");
-    	System.out.println("Test Add Project Members");
+    	data.deleteProject("Bootstrap project");
     	CoralServices instance = new CoralServices();
     	Member member1 = new Member();
     	member1.name = "testmem_18";
     	member1.project = "Bootstrap project";
     	String[] members = {"testmem_18"};
+        Project p = new Project();
+        p.name = "Bootstrap project";
+        p.account = "Bootstrap account";
+        instance.CreateNewProject(p);
         instance.CreateNewMember(member1);
-    	instance.AddProjectMembers("Maintenance", members);
-    	instance.RemoveProjectMembers("Maintenance", members);
+    	instance.AddProjectMembers("Bootstrap project", members);
+    	Members fetchedMembers = instance.GetProjectMembers("Bootstrap project");
+    	assertTrue(fetchedMembers.contains(member1));
+    	
+    	//instance.RemoveProjectMembers("Bootstrap project", members);
     }
+    
     public void testRemoveProjectMembers() throws Exception {
     	System.out.println("Test Remove Project Members");
     	String[] members = {"testmem_10"};

@@ -36,7 +36,7 @@
       <groupId>opencoral</groupId>
       <artifactId>opencoral-utahnanofab</artifactId>
       <version>0.0.1</version>
-    </dependency>    
+    </dependency>
     <dependency>
      <groupId>edu.utah.nanofab</groupId>
     <artifactId>CoralManagerConnector</artifactId>
@@ -47,6 +47,23 @@
       <artifactId>postgresql</artifactId>
       <version>1.0.0.3</version>
     </dependency>    
+
+    <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.16</version>
+    </dependency>
+    <!-- Logging Dependencies -->
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.6.1</version>
+    </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>1.6.1</version>
+    </dependency>
   </dependencies>
 
   <repositories>

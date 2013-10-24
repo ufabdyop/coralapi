@@ -4,19 +4,18 @@
  */
 package edu.nanofab.coralapi;
 import java.io.IOException;
-import edu.utah.nanofab.CoralManagerConnector;
-import java.util.Date;
-import java.util.Properties;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
+import org.opencoral.constants.Constants;
+import org.opencoral.corba.MemberAdapter;
+import org.opencoral.corba.ProjectAdapter;
 import org.opencoral.idl.Activity;
-import org.opencoral.idl.Equipment.EquipmentManager;
-import org.opencoral.idl.Equipment.EquipmentManagerHelper;
-import org.opencoral.idl.AccountNotFoundSignal;
-import org.opencoral.idl.ActiveWorksOnSignal;
 import org.opencoral.idl.InvalidAccountSignal;
 import org.opencoral.idl.InvalidAgentSignal;
-import org.opencoral.idl.InvalidDateSignal;
 import org.opencoral.idl.InvalidMemberSignal;
-import org.opencoral.idl.InvalidNicknameSignal;
 import org.opencoral.idl.InvalidProcessSignal;
 import org.opencoral.idl.InvalidProjectSignal;
 import org.opencoral.idl.InvalidResourceSignal;
@@ -27,21 +26,17 @@ import org.opencoral.idl.MemberDuplicateSignal;
 import org.opencoral.idl.MemberNotFoundSignal;
 import org.opencoral.idl.NotAuthorizedSignal;
 import org.opencoral.idl.Project;
-import org.opencoral.idl.ProjectDuplicateSignal;
 import org.opencoral.idl.ProjectNotFoundSignal;
+import org.opencoral.idl.Relation;
 import org.opencoral.idl.ResourceUnavailableSignal;
-import org.opencoral.idl.Role;
-import org.opencoral.idl.Timestamp;
-import org.opencoral.idl.Reservation.ReservationManager;
-import org.opencoral.constants.Constants;
-import org.opencoral.idl.Reservation.ReservationManagerHelper;
+import org.opencoral.idl.Equipment.EquipmentManager;
+import org.opencoral.idl.Equipment.EquipmentManagerHelper;
 import org.opencoral.idl.Resource.ResourceManager;
 import org.opencoral.idl.Resource.ResourceManagerHelper;
 import org.opencoral.util.ResourceRoles;
-import org.opencoral.util.Tstamp;
-import org.opencoral.corba.ActivityAdapter;
-import org.opencoral.corba.MemberAdapter;
-import org.opencoral.corba.ProjectAdapter;
+
+import edu.nanofab.coralapi.collections.Members;
+import edu.utah.nanofab.CoralManagerConnector;
 
 /**
  *
@@ -51,10 +46,14 @@ public class CoralServices {
     private String coralUser="coral";
     private String iorUrl="http://vagrant-coral-dev/IOR/";
     private String ticketString = "";
+	public static Logger logger = Logger.getLogger(CoralServices.class.getName()) ;
     public static CoralManagerConnector connector = null;
     public static ResourceManager resourceManager = null;
     public static EquipmentManager equipmentManager = null;
            
+    public CoralServices() {
+        BasicConfigurator.configure();
+    }
     private void reconnectToCoral() {
             connector = new CoralManagerConnector();
             connector.setCoralUser(this.coralUser);
@@ -153,6 +152,15 @@ public class CoralServices {
     public Project[] getProjects() throws ProjectNotFoundSignal{
     	ResourceManager rscmgr = this.getResourceManager();
 		return rscmgr.getAllProjects();
+    }
+    public Project getProject(String name) throws ProjectNotFoundSignal {
+    	ResourceManager rscmgr = this.getResourceManager();
+		try {
+			return rscmgr.getProject(name);
+		} catch (InvalidProjectSignal e) {
+			ProjectNotFoundSignal notfound = new ProjectNotFoundSignal(name);
+			throw notfound;
+		} 
     }
     public void CreateNewMember(Member member) throws Exception {
             ResourceManager rscmgr = this.getResourceManager();
@@ -290,6 +298,28 @@ public class CoralServices {
 //	reserve( tool, agent, member, project, account, begin time, end time(or length) ) 
 //	deleteReservation( tool, member, time, length )
 //	costRecovery (month, year)          
+	public Members GetProjectMembers(String projectName) {
+		Members matches = new Members();
+    	ResourceManager rscmgr = this.getResourceManager();
+		Relation[] relations;
+		try {
+			relations = rscmgr.getMemberInfoForProject(projectName, true);
+			for (Relation relation : relations ) {
+				String memberName = relation.master;
+				try {
+					logger.debug("Adding " + memberName + " to resultset");
+					matches.add(rscmgr.getMember(memberName));
+					logger.debug("Added " + memberName + " to resultset");
+				} catch (InvalidMemberSignal e) {
+					logger.debug("Error fetching member from Relation: " + memberName + ". Not including in the result set.");
+				}
+			}
+		} catch (MemberNotFoundSignal e) {
+			logger.debug("No members found for projectName: " + projectName + ". Returning empty list.");
+		}
+		logger.debug("size of resultset: " + matches.size());
+		return matches;
+	}
 	
 
 }
