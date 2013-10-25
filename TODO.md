@@ -1,5 +1,7 @@
+* TDD: Create web interface for routing http requests to api calls.
 * TDD: getMembersForProject should only include active members
 * TDD: signed in user not allowed to delete account/project user is on 
+* Remove direct DB queries from tests
 
 Interface Change:
 
