@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
 import org.opencoral.constants.Constants;
 import org.opencoral.corba.AccountAdapter;
 import org.opencoral.corba.MemberAdapter;
@@ -34,6 +32,8 @@ import org.opencoral.idl.Resource.ResourceManager;
 import org.opencoral.idl.Resource.ResourceManagerHelper;
 import org.opencoral.util.ResourceRoles;
 import org.opencoral.util.Tstamp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.nanofab.coralapi.collections.Members;
 import edu.nanofab.coralapi.resource.Member;
@@ -47,13 +47,14 @@ public class CoralServices {
     private String coralUser="coral";
     private String iorUrl="http://vagrant-coral-dev/IOR/";
     private String ticketString = "";
-	public static Logger logger = Logger.getLogger(CoralServices.class.getName()) ;
+	public static Logger logger ;
     public static CoralManagerConnector connector = null;
     public static ResourceManager resourceManager = null;
     public static EquipmentManager equipmentManager = null;
            
     public CoralServices() {
-        BasicConfigurator.configure();
+        System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
+        logger = LoggerFactory.getLogger(CoralServices.class);
     }
     private void reconnectToCoral() {
             connector = new CoralManagerConnector();

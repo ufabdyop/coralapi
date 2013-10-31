@@ -4,7 +4,7 @@
 
   <groupId>edu.nanofab</groupId>
   <artifactId>CoralAPI</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   
   <distributionManagement>
@@ -53,17 +53,12 @@
         <artifactId>log4j</artifactId>
         <version>1.2.16</version>
     </dependency>
-    <!-- Logging Dependencies -->
     <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>1.6.1</version>
-    </dependency>
-    <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
-        <version>1.6.1</version>
-    </dependency>
+	<groupId>org.slf4j</groupId>
+	<artifactId>slf4j-simple</artifactId>
+	<version>1.7.5</version>
+</dependency>
+            
   </dependencies>
 
   <repositories>
