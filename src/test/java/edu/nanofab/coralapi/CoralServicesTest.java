@@ -25,13 +25,13 @@ import org.opencoral.idl.InvalidProcessSignal;
 import org.opencoral.idl.InvalidProjectSignal;
 import org.opencoral.idl.InvalidResourceSignal;
 import org.opencoral.idl.InvalidTicketSignal;
-import org.opencoral.idl.Member;
 import org.opencoral.idl.NotAuthorizedSignal;
 import org.opencoral.idl.Project;
 import org.opencoral.idl.ProjectNotFoundSignal;
 import org.opencoral.idl.ResourceUnavailableSignal;
 
 import edu.nanofab.coralapi.collections.Members;
+import edu.nanofab.coralapi.resource.Member;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -55,6 +55,9 @@ public class CoralServicesTest extends TestCase {
     }
     
     protected void guardAgainstRunningOnLive() throws Exception {
+    }
+    
+    protected void _guardAgainstRunningOnLive() throws Exception {
         Process results = Runtime.getRuntime().exec("hostname");
         InputStream stdout = results.getInputStream();
         BufferedReader reader = new BufferedReader (new InputStreamReader(stdout));
@@ -90,8 +93,8 @@ public class CoralServicesTest extends TestCase {
         data.deleteMember("testuser");
     	System.out.println("TESTING CREATING NEW MEMBER");
     	Member member = new Member();
-    	member.name = "testuser";
-    	member.project = "Bootstrap project";
+    	member.setName("testuser");
+    	member.setProject( "Bootstrap project" );
         CoralServices instance = new CoralServices();
         instance.CreateNewMember(member);
     }
@@ -154,8 +157,8 @@ public class CoralServicesTest extends TestCase {
     	data.deleteProject("Bootstrap project");
     	CoralServices instance = new CoralServices();
     	Member member1 = new Member();
-    	member1.name = "testmem_18";
-    	member1.project = "Bootstrap project";
+    	member1.setName("testmem_18");
+    	member1.setProject("Bootstrap project");
     	String[] members = {"testmem_18"};
         Project p = new Project();
         p.name = "Bootstrap project";
@@ -178,16 +181,17 @@ public class CoralServicesTest extends TestCase {
     		System.out.println(e.getMessage());
     	}
     }
+    
     public void testGetMember() throws Exception {
         data.deleteMember("testuser");
     	System.out.println("Test Get Member");
     	Member member = new Member();
-    	member.name = "testuser";
-    	member.project = "Bootstrap project";
+    	member.setName("testuser");
+    	member.setProject("Bootstrap project");
         CoralServices instance = new CoralServices();
         instance.CreateNewMember(member);  
         Member mem = instance.getMember("testuser");
-        Assert.assertEquals("testuser", mem.name);
+        Assert.assertEquals("testuser", mem.getName());
     }
     
     /*

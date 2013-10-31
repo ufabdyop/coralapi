@@ -1,6 +1,7 @@
 package edu.nanofab.coralapi.collections;
 
-import org.opencoral.idl.Member;
+import edu.nanofab.coralapi.resource.Member;
+
 
 public class Members extends MembersProxySet {
 	@Override
@@ -16,6 +17,7 @@ public class Members extends MembersProxySet {
 	}
 
 	public boolean membersEqual(Member member, Member m) {
-		return m.name.equals(member.name);
+		System.out.println("checking if " + member.getName() + " is equal to " + m.getName());
+		return m.equals(member);
 	}
 }

@@ -13,8 +13,6 @@ import org.opencoral.constants.Constants;
 import org.opencoral.corba.AccountAdapter;
 import org.opencoral.corba.MemberAdapter;
 import org.opencoral.corba.ProjectAdapter;
-import org.opencoral.idl.Account;
-import org.opencoral.idl.Activity;
 import org.opencoral.idl.InvalidAccountSignal;
 import org.opencoral.idl.InvalidAgentSignal;
 import org.opencoral.idl.InvalidMemberSignal;
@@ -23,7 +21,6 @@ import org.opencoral.idl.InvalidProjectSignal;
 import org.opencoral.idl.InvalidResourceSignal;
 import org.opencoral.idl.InvalidRoleSignal;
 import org.opencoral.idl.InvalidTicketSignal;
-import org.opencoral.idl.Member;
 import org.opencoral.idl.MemberDuplicateSignal;
 import org.opencoral.idl.MemberNotFoundSignal;
 import org.opencoral.idl.NotAuthorizedSignal;
@@ -39,6 +36,7 @@ import org.opencoral.util.ResourceRoles;
 import org.opencoral.util.Tstamp;
 
 import edu.nanofab.coralapi.collections.Members;
+import edu.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.CoralManagerConnector;
 
 /**
@@ -110,36 +108,6 @@ public class CoralServices {
 
             return resourceManager;
     }
-    private MemberAdapter MemtoMemAP(Member mem) throws Exception{
-    	MemberAdapter memAP = new MemberAdapter();
-    	memAP.setValue("name", mem.name);
-    	if (mem.address1 != null) memAP.setValue("address1", mem.address1);
-    	if (mem.address2 != null) memAP.setValue("address2", mem.address2);
-    	if (mem.advisor != null) memAP.setValue("advisor", mem.advisor);
-    	if (mem.altFax != null) memAP.setValue("altFax", mem.altFax);
-    	if (mem.altOffice != null) memAP.setValue("altOffice", mem.altOffice);
-    	if (mem.altPhone != null) memAP.setValue("altPhone", mem.altPhone);
-    	if (mem.city != null) memAP.setValue("city", mem.city);
-    	if (mem.disability != null) memAP.setValue("disability", mem.disability);
-    	if (mem.email != null) memAP.setValue("email", mem.email);
-    	if (mem.ethnicity != null) memAP.setValue("ethnicity", mem.ethnicity);
-    	if (mem.fax != null) memAP.setValue("fax", mem.fax);
-    	if (mem.firstName != null) memAP.setValue("firstName", mem.firstName);
-    	if (mem.lastName != null) memAP.setValue("lastName", mem.lastName);
-    	if (mem.mailCode != null) memAP.setValue("mailCode", mem.mailCode);
-    	if (mem.password != null) memAP.setValue("password", mem.password);
-    	if (mem.phone != null) memAP.setValue("phone", mem.phone);
-    	if (mem.project != null) memAP.setValue("project", mem.project);
-    	if (mem.race != null) memAP.setValue("race", mem.race);
-    	if (mem.state != null) memAP.setValue("state", mem.state);
-    	if (mem.type != null) memAP.setValue("type", mem.type);
-    	if (mem.univid != null) memAP.setValue("univid", mem.univid);
-    	if (mem.url != null) memAP.setValue("url", mem.url);
-    	if (mem.zipcode != null) memAP.setValue("zipcode", mem.zipcode);  
-    	memAP.setValue("active", (mem.active == true)?"true":"false");
-    	//need to add edate
-    	return memAP;
-    }
     private ProjectAdapter projectToProjectAdapter(Project project) throws Exception{
     	ProjectAdapter proAdapter = new ProjectAdapter();
     	proAdapter.setValue("account", project.account);
@@ -152,7 +120,7 @@ public class CoralServices {
     	proAdapter.setValue("active", (project.active)?"true":"false");
     	return proAdapter;
     }
-    private AccountAdapter accountToAccountAdapter(Account account) throws Exception {
+    private AccountAdapter accountToAccountAdapter(org.opencoral.idl.Account account) throws Exception {
     	AccountAdapter adapter = new AccountAdapter();
 
 		if (account.edate != null) adapter.setEdate(new Tstamp(account.edate));
@@ -180,10 +148,10 @@ public class CoralServices {
     }
     public void CreateNewMember(Member member) throws Exception {
             ResourceManager rscmgr = this.getResourceManager();
-            MemberAdapter memAP = this.MemtoMemAP(member);
-            //create a new member should be active
-            memAP.setValue("active", "true");
-            rscmgr.addMember((Member)memAP.getObject(), this.ticketString);
+
+            //create a new member should be active ??
+            member.setActive(true);
+            rscmgr.addMember(member.convertToIDLMemberForRscMgr(), this.ticketString);
     }
 
     public void CreateNewProject(Project project) throws Exception {
@@ -209,9 +177,9 @@ public class CoralServices {
 			 rscmgr.removeMemberFromProject(member, project, this.ticketString);
 		 }    	
     }
-    public Member getMember(String member) throws InvalidMemberSignal{
+    public Member getMember(String member) throws Exception{
     	ResourceManager rscmgr = this.getResourceManager();
-    	Member mem = rscmgr.getMember(member);
+    	Member mem = new Member(rscmgr.getMember(member));
     	return mem;
     }
     
@@ -276,7 +244,7 @@ public class CoralServices {
 	public void enable(String item){
 		EquipmentManager equipmentManager = this.getEquipmentManager();
 		ActivityFactory fac = new ActivityFactory();
-		Activity activity = fac.createDefaultActivity(item);
+		org.opencoral.idl.Activity activity = fac.createDefaultActivity(item);
 		try{
 			equipmentManager.enable(activity, false, this.ticketString);
 		}
@@ -315,19 +283,24 @@ public class CoralServices {
 //	deleteReservation( tool, member, time, length )
 //	costRecovery (month, year)          
 	public Members GetProjectMembers(String projectName) {
+		logger.debug("GetProjectMembers called for project " + projectName);
 		Members matches = new Members();
     	ResourceManager rscmgr = this.getResourceManager();
 		Relation[] relations;
 		try {
+			logger.debug("Calling getMemberInfoForProject");
 			relations = rscmgr.getMemberInfoForProject(projectName, true);
 			for (Relation relation : relations ) {
 				String memberName = relation.master;
 				try {
 					logger.debug("Adding " + memberName + " to resultset");
-					matches.add(rscmgr.getMember(memberName));
+					Member temp = new Member(rscmgr.getMember(memberName));
+					matches.add(temp);
 					logger.debug("Added " + memberName + " to resultset");
 				} catch (InvalidMemberSignal e) {
 					logger.debug("Error fetching member from Relation: " + memberName + ". Not including in the result set.");
+				} catch (Exception e) {
+					logger.error("Error casting idlMember to apiMember");
 				}
 			}
 		} catch (MemberNotFoundSignal e) {
@@ -336,13 +309,13 @@ public class CoralServices {
 		logger.debug("size of resultset: " + matches.size());
 		return matches;
 	}
-	public void CreateNewAccount(Account account) throws Exception {
+	public void CreateNewAccount(org.opencoral.idl.Account account) throws Exception {
 		ResourceManager rscmgr = this.getResourceManager();
 		AccountAdapter adapter = this.accountToAccountAdapter(account);
-		rscmgr.addAccount((Account)adapter.getObject(), this.ticketString);
+		rscmgr.addAccount((org.opencoral.idl.Account)adapter.getObject(), this.ticketString);
 	}
 
-	public Account getAccount(String name) throws InvalidAccountSignal {
+	public org.opencoral.idl.Account getAccount(String name) throws InvalidAccountSignal {
 		ResourceManager rscmgr = this.getResourceManager();
 		return rscmgr.getAccount(name);
 	}

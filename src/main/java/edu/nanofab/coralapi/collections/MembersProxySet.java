@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
-import org.opencoral.idl.Member;
+import edu.nanofab.coralapi.resource.Member;
 
 public class MembersProxySet implements Set {
 	protected HashSet<Member> members = new HashSet<Member>();
