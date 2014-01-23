@@ -26,12 +26,12 @@ import org.opencoral.idl.InvalidProjectSignal;
 import org.opencoral.idl.InvalidResourceSignal;
 import org.opencoral.idl.InvalidTicketSignal;
 import org.opencoral.idl.NotAuthorizedSignal;
-import org.opencoral.idl.Project;
 import org.opencoral.idl.ProjectNotFoundSignal;
 import org.opencoral.idl.ResourceUnavailableSignal;
 
 import edu.nanofab.coralapi.collections.Members;
 import edu.nanofab.coralapi.resource.Member;
+import edu.nanofab.coralapi.resource.Project;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -55,6 +55,7 @@ public class CoralServicesTest extends TestCase {
     }
     
     protected void guardAgainstRunningOnLive() throws Exception {
+    	this._guardAgainstRunningOnLive();
     }
     
     protected void _guardAgainstRunningOnLive() throws Exception {
@@ -82,7 +83,7 @@ public class CoralServicesTest extends TestCase {
     public void testGetProjects() throws ProjectNotFoundSignal{
     	System.out.println("Get ALL PROJECTS");
     	CoralServices instance = new CoralServices();
-    	int len = instance.getProjects().length;
+    	int len = instance.getProjects().size();
     	System.out.println("Number of projects: "+ len);
     	assertTrue(len > 0);
     }
@@ -106,13 +107,14 @@ public class CoralServicesTest extends TestCase {
         data.deleteProject("Bootstrap project");
     	System.out.println("Test Create New Project");
         Project project = new Project();
-        project.name = "Bootstrap project";
-        project.account = "Bootstrap account";
+        project.setName("Bootstrap project");
+        project.setAccount("Bootstrap account");
         CoralServices instance = new CoralServices();
         instance.CreateNewProject(project);
-        Project fetched = instance.getProject(project.name);
-        assertEquals(fetched.name, project.name);
+        Project fetched = instance.getProject(project.getName());
+        assertEquals(fetched.getName(), project.getName());
     }
+    
     public void testGetProjectThrowsExceptionForMissingProject() {
     	boolean exceptionThrown = false;
     	try {
@@ -161,8 +163,8 @@ public class CoralServicesTest extends TestCase {
     	member1.setProject("Bootstrap project");
     	String[] members = {"testmem_18"};
         Project p = new Project();
-        p.name = "Bootstrap project";
-        p.account = "Bootstrap account";
+        p.setName("Bootstrap project");
+        p.setAccount("Bootstrap account");
         instance.CreateNewProject(p);
         instance.CreateNewMember(member1);
     	instance.AddProjectMembers("Bootstrap project", members);

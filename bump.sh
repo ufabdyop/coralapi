@@ -5,7 +5,7 @@ echo "bumping version"
 POMVERSION=`ruby bumpPom.rb`
 
 echo "deploy"
-mvn deploy
+mvn -Dmaven.test.skip=true deploy
 
 echo "commit"
 git commit -a -m "Bumping to version $POMVERSION"

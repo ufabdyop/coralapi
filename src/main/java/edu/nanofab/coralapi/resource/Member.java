@@ -265,7 +265,28 @@ public class Member {
 		this.setActive(idlMember.active);
 	}
 	
-	public MemberAdapter convertToMemberAdapter() throws Exception {
+	public boolean equals(Member m) {
+		return m.name.equals(this.name);
+	}
+	
+	/**
+	 * rscmgr in coral expects an org.opencoral.idl object.  For some reason,
+	 * this needs to come from a MemberAdapter that gets cast to idl object
+	 * @return org.opencoral.idl.Member that can be used with rscmgr
+	 * @throws Exception
+	 */
+	public org.opencoral.idl.Member convertToIDLMemberForRscMgr() throws Exception {
+		 MemberAdapter memAP = this.convertToMemberAdapter();
+         return (org.opencoral.idl.Member)memAP.getObject();
+	}
+	
+	/**
+	 * 
+	 * Converts this Member object to a MemberAdapter
+	 * @return org.opencoral.corba.MemberAdapter
+	 * @throws Exception
+	 */
+	private MemberAdapter convertToMemberAdapter() throws Exception {
 		MemberAdapter memAP = new MemberAdapter();
     	memAP.setValue("name", this.name);
     	if (this.address1 != null) memAP.setValue("address1", this.address1);
@@ -293,20 +314,5 @@ public class Member {
     	if (this.zipcode != null) memAP.setValue("zipcode", this.zipcode);  
     	memAP.setValue("active", (this.active == true)?"true":"false");
 		return memAP;
-	}
-	
-	public boolean equals(Member m) {
-		return m.name.equals(this.name);
-	}
-	
-	/**
-	 * rscmgr in coral expects an org.opencoral.idl object.  For some reason,
-	 * this needs to come from a MemberAdapter that gets cast to idl object
-	 * @return org.opencoral.idl.Member that can be used with rscmgr
-	 * @throws Exception
-	 */
-	public org.opencoral.idl.Member convertToIDLMemberForRscMgr() throws Exception {
-		 MemberAdapter memAP = this.convertToMemberAdapter();
-         return (org.opencoral.idl.Member)memAP.getObject();
-	}
+	}	
 }

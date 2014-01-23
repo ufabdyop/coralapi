@@ -16,7 +16,7 @@ public class Members extends MembersProxySet {
 		return false;
 	}
 
-	public boolean membersEqual(Member member, Member m) {
+	private boolean membersEqual(Member member, Member m) {
 		System.out.println("checking if " + member.getName() + " is equal to " + m.getName());
 		return m.equals(member);
 	}

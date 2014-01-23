@@ -22,7 +22,6 @@ import org.opencoral.idl.InvalidTicketSignal;
 import org.opencoral.idl.MemberDuplicateSignal;
 import org.opencoral.idl.MemberNotFoundSignal;
 import org.opencoral.idl.NotAuthorizedSignal;
-import org.opencoral.idl.Project;
 import org.opencoral.idl.ProjectNotFoundSignal;
 import org.opencoral.idl.Relation;
 import org.opencoral.idl.ResourceUnavailableSignal;
@@ -36,7 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.nanofab.coralapi.collections.Members;
+import edu.nanofab.coralapi.collections.Projects;
 import edu.nanofab.coralapi.resource.Member;
+import edu.nanofab.coralapi.resource.Project;
 import edu.utah.nanofab.CoralManagerConnector;
 
 /**
@@ -89,7 +90,7 @@ public class CoralServices {
 
             this.ticketString = connector.getTicketString();
             System.out.println("this.ticketString = " + this.ticketString );
-            Project[] projects; 
+            org.opencoral.idl.Project[] projects; 
 
             try {
                     projects = resourceManager.getAllProjects();
@@ -109,18 +110,6 @@ public class CoralServices {
 
             return resourceManager;
     }
-    private ProjectAdapter projectToProjectAdapter(Project project) throws Exception{
-    	ProjectAdapter proAdapter = new ProjectAdapter();
-    	proAdapter.setValue("account", project.account);
-    	if (project.description != null) proAdapter.setValue("description", project.description);
-    	if (project.discipline != null) proAdapter.setValue("discipline", project.discipline);
-    	if (project.name != null) proAdapter.setValue("name", project.name);
-    	if (project.nickname != null) proAdapter.setValue("nickname", project.nickname);
-    	if (project.pi != null) proAdapter.setValue("pi", project.pi);
-    	if (project.type != null) proAdapter.setValue("type", project.type);
-    	proAdapter.setValue("active", (project.active)?"true":"false");
-    	return proAdapter;
-    }
     private AccountAdapter accountToAccountAdapter(org.opencoral.idl.Account account) throws Exception {
     	AccountAdapter adapter = new AccountAdapter();
 
@@ -134,14 +123,18 @@ public class CoralServices {
 
     	return adapter;
     }
-    public Project[] getProjects() throws ProjectNotFoundSignal{
+    public Projects getProjects() throws ProjectNotFoundSignal{
     	ResourceManager rscmgr = this.getResourceManager();
-		return rscmgr.getAllProjects();
+    	org.opencoral.idl.Project[] allProjects = rscmgr.getAllProjects();
+    	Projects projectCollection = Projects.fromIdlProjectArray(allProjects); 
+		return projectCollection;
     }
     public Project getProject(String name) throws ProjectNotFoundSignal {
     	ResourceManager rscmgr = this.getResourceManager();
+    	Project project = new Project();
 		try {
-			return rscmgr.getProject(name);
+			project.populateFromIdlProject(rscmgr.getProject(name));
+			return project;
 		} catch (InvalidProjectSignal e) {
 			ProjectNotFoundSignal notfound = new ProjectNotFoundSignal(name);
 			throw notfound;
@@ -157,9 +150,8 @@ public class CoralServices {
 
     public void CreateNewProject(Project project) throws Exception {
             ResourceManager rscmgr = this.getResourceManager();
-            ProjectAdapter proAdapter = this.projectToProjectAdapter(project);
-            proAdapter.setValue("active","true");
-            rscmgr.addProject((Project)proAdapter.getObject(), this.ticketString);
+            project.setActive(true);
+            rscmgr.addProject(project.convertToIdlProjectForRscMgr(), this.ticketString);
     }
  
     public void DeleteMemberFromProject(String memberName, String projectName) throws InvalidTicketSignal, MemberDuplicateSignal, InvalidProjectSignal, NotAuthorizedSignal, InvalidMemberSignal {
