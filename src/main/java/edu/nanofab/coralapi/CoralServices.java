@@ -11,6 +11,7 @@ import org.opencoral.constants.Constants;
 import org.opencoral.corba.AccountAdapter;
 import org.opencoral.corba.MemberAdapter;
 import org.opencoral.corba.ProjectAdapter;
+import org.opencoral.idl.AccountNotFoundSignal;
 import org.opencoral.idl.InvalidAccountSignal;
 import org.opencoral.idl.InvalidAgentSignal;
 import org.opencoral.idl.InvalidMemberSignal;
@@ -34,8 +35,11 @@ import org.opencoral.util.Tstamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.nanofab.coralapi.collections.Accounts;
 import edu.nanofab.coralapi.collections.Members;
+import edu.nanofab.coralapi.collections.MembersProxySet;
 import edu.nanofab.coralapi.collections.Projects;
+import edu.nanofab.coralapi.resource.Account;
 import edu.nanofab.coralapi.resource.Member;
 import edu.nanofab.coralapi.resource.Project;
 import edu.utah.nanofab.CoralManagerConnector;
@@ -302,16 +306,36 @@ public class CoralServices {
 		logger.debug("size of resultset: " + matches.size());
 		return matches;
 	}
-	public void CreateNewAccount(org.opencoral.idl.Account account) throws Exception {
+	public void CreateNewAccount(Account acct) throws Exception {
 		ResourceManager rscmgr = this.getResourceManager();
-		AccountAdapter adapter = this.accountToAccountAdapter(account);
-		rscmgr.addAccount((org.opencoral.idl.Account)adapter.getObject(), this.ticketString);
+		rscmgr.addAccount(acct.convertToIdlAccountForRscMgr(), this.ticketString);
+	}
+	public void CreateNewAccountUnlessExists(Account acct) throws Exception {
+		try {
+			this.getAccount(acct.getName());
+		} catch (InvalidAccountSignal e) {
+			this.CreateNewAccount(acct);
+		}
 	}
 
-	public org.opencoral.idl.Account getAccount(String name) throws InvalidAccountSignal {
+	public edu.nanofab.coralapi.resource.Account getAccount(String name) throws InvalidAccountSignal {
 		ResourceManager rscmgr = this.getResourceManager();
-		return rscmgr.getAccount(name);
+		org.opencoral.idl.Account idlAccount = rscmgr.getAccount(name);
+		Account acct = new Account();
+		acct.populateFromIdlAccount(idlAccount);
+		return acct;
 	}
 	
+	public edu.nanofab.coralapi.collections.Accounts getAccounts() throws AccountNotFoundSignal {
+		ResourceManager rscmgr = this.getResourceManager();
+    	org.opencoral.idl.Account[] allAccounts = rscmgr.getAllAccounts();
+    	Accounts accountCollection = Accounts.fromIdlAccountArray(allAccounts); 
+		return accountCollection;
+	}
+	public void deleteProject(String projectName) throws InvalidTicketSignal, NotAuthorizedSignal, Exception {
+		ResourceManager rscmgr = this.getResourceManager();
+		Project p = this.getProject(projectName);
+		rscmgr.removeProject(p.convertToIdlProjectForRscMgr(), this.ticketString);
+	}
 
 }

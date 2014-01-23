@@ -16,7 +16,6 @@ import junit.framework.TestCase;
 
 import org.opencoral.corba.MemberAdapter;
 import org.opencoral.corba.ProjectAdapter;
-import org.opencoral.idl.Account;
 import org.opencoral.idl.AccountNotFoundSignal;
 import org.opencoral.idl.InvalidAccountSignal;
 import org.opencoral.idl.InvalidAgentSignal;
@@ -30,6 +29,7 @@ import org.opencoral.idl.ProjectNotFoundSignal;
 import org.opencoral.idl.ResourceUnavailableSignal;
 
 import edu.nanofab.coralapi.collections.Members;
+import edu.nanofab.coralapi.resource.Account;
 import edu.nanofab.coralapi.resource.Member;
 import edu.nanofab.coralapi.resource.Project;
 
@@ -87,6 +87,15 @@ public class CoralServicesTest extends TestCase {
     	System.out.println("Number of projects: "+ len);
     	assertTrue(len > 0);
     }
+
+    public void testGetAccounts() throws AccountNotFoundSignal {
+    	System.out.println("Get ALL accounts");
+    	CoralServices instance = new CoralServices();
+    	int len = instance.getAccounts().size();
+    	System.out.println("Number of accounts: "+ len);
+    	assertTrue(len > 0);
+    }
+
     /**
      * Test of CreateNewMember method, of class CoralServices.
      */
@@ -95,32 +104,43 @@ public class CoralServicesTest extends TestCase {
     	System.out.println("TESTING CREATING NEW MEMBER");
     	Member member = new Member();
     	member.setName("testuser");
-    	member.setProject( "Bootstrap project" );
+    	member.setProject( "JUnit Testing Project" );
         CoralServices instance = new CoralServices();
         instance.CreateNewMember(member);
     }
 
     /**
      * Test of CreateNewProject method, of class CoralServices.
+     * @throws Exception 
      */
     public void testCreateNewProject() throws Exception {
-        data.deleteProject("Bootstrap project");
-    	System.out.println("Test Create New Project");
-        Project project = new Project();
-        project.setName("Bootstrap project");
-        project.setAccount("Bootstrap account");
         CoralServices instance = new CoralServices();
+        try {
+			data.deleteProject("JUnit Testing Project");
+		} catch (Exception e) {
+			//ignore in test
+		}
+    	System.out.println("Test Create New Project");
+    	
+        Account acct = new Account();
+        acct.setName("JUnit Testing Account");
+        instance.CreateNewAccountUnlessExists(acct);
+        
+        Project project = new Project();
+        project.setName("JUnit Testing Project");
+        project.setAccount(acct.getName());
         instance.CreateNewProject(project);
+        
         Project fetched = instance.getProject(project.getName());
         assertEquals(fetched.getName(), project.getName());
     }
     
-    public void testGetProjectThrowsExceptionForMissingProject() {
+    public void testGetProjectThrowsExceptionForMissingProject() throws InvalidTicketSignal, NotAuthorizedSignal, Exception {
     	boolean exceptionThrown = false;
     	try {
-	    	data.deleteProject("Bootstrap project");
 	    	CoralServices instance = new CoralServices();
-	    	instance.getProject("Bootstrap project");
+	    	data.deleteProject("JUnit Testing Project");
+	    	instance.getProject("JUnit Testing Project");
     	} catch (ProjectNotFoundSignal e) {
     		exceptionThrown = true;
     	}
@@ -130,9 +150,9 @@ public class CoralServicesTest extends TestCase {
     public void testGetAccountThrowsExceptionForMissingProject() {
     	boolean exceptionThrown = false;
     	try {
-	    	data.deleteAccount("test unit account");
+	    	data.deleteAccount("JUnit Testing Account");
 	    	CoralServices instance = new CoralServices();
-	    	instance.getAccount("test unit account");
+	    	instance.getAccount("JUnit Testing Account");
     	} catch (InvalidAccountSignal e) {
     		exceptionThrown = true;
 		}
@@ -144,33 +164,32 @@ public class CoralServicesTest extends TestCase {
      * Test of CreateNewAccount method, of class CoralServices.
      */
     public void testCreateNewAccount() throws Exception {
-        data.deleteAccount("unit test account");
+        data.deleteAccount("JUnit Testing Account");
         Account account = new Account();
-        account.name = "unit test account";
+        account.setName("JUnit Testing Account");
         CoralServices instance = new CoralServices();
         instance.CreateNewAccount(account);
-        Account fetched = instance.getAccount(account.name);
-        assertEquals(fetched.name, account.name);
+        Account fetched = instance.getAccount(account.getName());
+        assertEquals(fetched.getName(), account.getName());
     }
-    
     
     public void testAddProjectMembers() throws Exception {
     	data.deleteMember("testmem_18");
-    	data.deleteProject("Bootstrap project");
+    	data.deleteProject("JUnit Testing Project");
     	CoralServices instance = new CoralServices();
     	Member member1 = new Member();
     	member1.setName("testmem_18");
-    	member1.setProject("Bootstrap project");
+    	member1.setProject("JUnit Testing Project");
     	String[] members = {"testmem_18"};
         Project p = new Project();
-        p.setName("Bootstrap project");
-        p.setAccount("Bootstrap account");
+        p.setName("JUnit Testing Project");
+        p.setAccount("JUnit Testing Account");
         instance.CreateNewProject(p);
         instance.CreateNewMember(member1);
-    	instance.AddProjectMembers("Bootstrap project", members);
-    	Members fetchedMembers = instance.GetProjectMembers("Bootstrap project");
+    	instance.AddProjectMembers("JUnit Testing Project", members);
+    	Members fetchedMembers = instance.GetProjectMembers("JUnit Testing Project");
     	assertTrue(fetchedMembers.contains(member1));
-    	//instance.RemoveProjectMembers("Bootstrap project", members);
+    	//instance.RemoveProjectMembers("JUnit Testing Project", members);
     }
     
     public void testRemoveProjectMembers() throws Exception {
@@ -178,7 +197,7 @@ public class CoralServicesTest extends TestCase {
     	String[] members = {"testmem_10"};
     	CoralServices instance = new CoralServices();
     	try {
-    		instance.RemoveProjectMembers("Bootstrap project", members);
+    		instance.RemoveProjectMembers("JUnit Testing Project", members);
     	} catch (Exception e) {
     		System.out.println(e.getMessage());
     	}
@@ -189,7 +208,7 @@ public class CoralServicesTest extends TestCase {
     	System.out.println("Test Get Member");
     	Member member = new Member();
     	member.setName("testuser");
-    	member.setProject("Bootstrap project");
+    	member.setProject("JUnit Testing Project");
         CoralServices instance = new CoralServices();
         instance.CreateNewMember(member);  
         Member mem = instance.getMember("testuser");
