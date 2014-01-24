@@ -38,6 +38,9 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -74,6 +77,13 @@ public class CoralServicesTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         guardAgainstRunningOnLive();
+    	CoralServices instance = new CoralServices();
+    	Account a = new Account();
+    	a.setName("JUnit Testing Account" );
+    	Project p = new Project();
+    	p.setName("JUnit Testing Project");
+    	instance.CreateNewAccountUnlessExists(a);
+    	instance.CreateNewProjectUnlessExists(p);
     }
     
     @Override
@@ -171,6 +181,68 @@ public class CoralServicesTest extends TestCase {
         instance.CreateNewAccount(account);
         Account fetched = instance.getAccount(account.getName());
         assertEquals(fetched.getName(), account.getName());
+    }
+    
+    public void testAccountDateManipulation() throws Exception {
+    	Calendar cal = Calendar.getInstance();
+    	cal.set(2013, 0, 27, 13, 59, 00);
+        SimpleDateFormat format = 
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	Date testDate = cal.getTime();
+        assertEquals("2013-01-27 13:59:00", format.format(testDate));
+        data.deleteAccount("JUnit Testing Account");
+        Account account = new Account();
+        account.setBdate(testDate);
+        org.opencoral.idl.Account idlAccount = account.convertToIdlAccountForRscMgr();
+        String bdate = idlAccount.bdate.year + "-0" +
+        		idlAccount.bdate.month + "-" +
+        		idlAccount.bdate.day + " " +
+        		idlAccount.bdate.hour + ":" +
+        		idlAccount.bdate.minute + ":" +
+        		idlAccount.bdate.second + "0" ;
+        assertEquals( bdate, format.format(testDate));
+    }
+    
+    /**
+     * This test would be nice, but the coral ResourceManagerImpl class
+     * doesn't allow you to set edate.
+     * @throws Exception
+     */
+    public void _testAccountDateManipulationRoundTrip() throws Exception {
+    	Calendar cal = Calendar.getInstance();
+    	cal.set(2013, 0, 27, 13, 59, 00);
+        SimpleDateFormat format = 
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	Date testDate = cal.getTime();
+        assertEquals("2013-01-27 13:59:00", format.format(testDate));
+        data.deleteAccount("JUnit Testing Account2");
+        Account account = new Account();
+        account.setEdate(testDate);
+        account.setName("JUnit Testing Account2");
+        CoralServices instance = new CoralServices();
+        instance.CreateNewAccount(account);
+        Account fetched = instance.getAccount(account.getName());
+        assertEquals(fetched.getName(), account.getName());
+        assertEquals(fetched.getEdate(), account.getEdate());
+    }
+    
+    public void testAccountEDateIsNullRoundTrip() throws Exception {
+    	Calendar cal = Calendar.getInstance();
+    	cal.set(2013, 0, 27, 13, 59, 00);
+        SimpleDateFormat format = 
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	Date testDate = cal.getTime();
+        assertEquals("2013-01-27 13:59:00", format.format(testDate));
+        data.deleteAccount("JUnit Testing Account2");
+        Account account = new Account();
+        account.setEdate(testDate);
+        account.setName("JUnit Testing Account2");
+        CoralServices instance = new CoralServices();
+        instance.CreateNewAccount(account);
+        Account fetched = instance.getAccount(account.getName());
+        assertEquals(fetched.getName(), account.getName());
+        assertEquals("This tests coral's expected behavior (not ideal) that the edate is always set to null", 
+        		null, fetched.getEdate());
     }
     
     public void testAddProjectMembers() throws Exception {

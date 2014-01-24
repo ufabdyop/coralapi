@@ -157,6 +157,14 @@ public class CoralServices {
             project.setActive(true);
             rscmgr.addProject(project.convertToIdlProjectForRscMgr(), this.ticketString);
     }
+    
+    public void CreateNewProjectUnlessExists(Project project) throws Exception {
+		try {
+			this.getProject(project.getName());
+		} catch (ProjectNotFoundSignal e) {
+			this.CreateNewProject(project);
+		}
+    }
  
     public void DeleteMemberFromProject(String memberName, String projectName) throws InvalidTicketSignal, MemberDuplicateSignal, InvalidProjectSignal, NotAuthorizedSignal, InvalidMemberSignal {
         ResourceManager rscmgr = this.getResourceManager();
@@ -317,10 +325,11 @@ public class CoralServices {
 			this.CreateNewAccount(acct);
 		}
 	}
-
+	
 	public edu.nanofab.coralapi.resource.Account getAccount(String name) throws InvalidAccountSignal {
 		ResourceManager rscmgr = this.getResourceManager();
 		org.opencoral.idl.Account idlAccount = rscmgr.getAccount(name);
+		logger.debug("Account fetched: " + idlAccount.name + " with edate fields (year, month, day, hour, isnull: " + idlAccount.edate.year + "," + idlAccount.edate.month + "," + idlAccount.edate.day +"," + idlAccount.edate.hour + "," + idlAccount.edate.isNull);
 		Account acct = new Account();
 		acct.populateFromIdlAccount(idlAccount);
 		return acct;
