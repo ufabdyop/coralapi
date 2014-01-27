@@ -89,14 +89,61 @@ public class CoralServicesTest extends TestCase {
     /**
      * Test of CreateNewMember method, of class CoralServices.
      */
-    public void testCreateNewMember() throws Exception {
-        data.deleteMember("testuser");
+    public void testCreateNewMemberRoundTrip() throws Exception {
+        data.deleteMember("mytest02");
     	System.out.println("TESTING CREATING NEW MEMBER");
     	Member member = new Member();
-    	member.setName("testuser");
+    	member.setName("mytest02");
     	member.setProject( "JUnit Testing Project" );
+    	member.setAddress1("a");
+    	member.setAddress2("b");
+    	member.setAdvisor("c");
+    	member.setAltFax("d");
+    	member.setAltOffice("e");
+    	member.setAltPhone("f");
+    	member.setCity("g");
+    	member.setDisability("h");
+    	member.setEmail("i");
+    	member.setEthnicity("j");
+    	member.setFax("k");
+    	member.setFirstName("l");
+    	member.setLastName("m");
+    	member.setMailCode("n");
+    	member.setPassword("o");
+    	member.setPhone("p");
+    	member.setRace("q");
+    	member.setState("r");
+    	member.setType("s");
+    	member.setUnivid("t");
+    	member.setUrl("u");
+    	member.setZipcode("v");
+    	member.setActive(true);    	
         CoralServices instance = new CoralServices();
         instance.CreateNewMember(member);
+        Member fetched = instance.getMember("mytest02");
+        assertEquals(member.getAddress1(), fetched.getAddress1());
+        assertEquals(member.getAddress2(), fetched.getAddress2());
+        assertEquals(member.getAdvisor(), fetched.getAdvisor());
+        assertEquals(member.getAltFax(), fetched.getAltFax());
+        assertEquals(member.getAltOffice(), fetched.getAltOffice());
+        assertEquals(member.getAltPhone(), fetched.getAltPhone());
+        assertEquals(member.getCity(), fetched.getCity());
+        assertEquals(member.getDisability(), fetched.getDisability());
+        assertEquals(member.getEmail(), fetched.getEmail());
+        assertEquals(member.getEthnicity(), fetched.getEthnicity());
+        assertEquals(member.getFax(), fetched.getFax());
+        assertEquals(member.getFirstName(), fetched.getFirstName());
+        assertEquals(member.getLastName(), fetched.getLastName());
+        assertEquals(member.getMailCode(), fetched.getMailCode());
+        assertEquals(member.getPassword(), fetched.getPassword());
+        assertEquals(member.getPhone(), fetched.getPhone());
+        assertEquals(member.getRace(), fetched.getRace());
+        assertEquals(member.getState(), fetched.getState());
+        assertEquals(member.getType(), fetched.getType());
+        assertEquals(member.getUnivid(), fetched.getUnivid());
+        assertEquals(member.getUrl(), fetched.getUrl());
+        assertEquals(member.getZipcode(), fetched.getZipcode());
+        assertEquals(member.isActive(), fetched.isActive());
     }
 
     /**
