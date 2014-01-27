@@ -7,45 +7,25 @@ package edu.nanofab.coralapi;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.opencoral.corba.MemberAdapter;
-import org.opencoral.corba.ProjectAdapter;
 import org.opencoral.idl.AccountNotFoundSignal;
 import org.opencoral.idl.InvalidAccountSignal;
-import org.opencoral.idl.InvalidAgentSignal;
-import org.opencoral.idl.InvalidMemberSignal;
-import org.opencoral.idl.InvalidProcessSignal;
-import org.opencoral.idl.InvalidProjectSignal;
-import org.opencoral.idl.InvalidResourceSignal;
 import org.opencoral.idl.InvalidTicketSignal;
 import org.opencoral.idl.NotAuthorizedSignal;
 import org.opencoral.idl.ProjectNotFoundSignal;
-import org.opencoral.idl.ResourceUnavailableSignal;
 
 import edu.nanofab.coralapi.collections.Members;
 import edu.nanofab.coralapi.resource.Account;
 import edu.nanofab.coralapi.resource.Member;
 import edu.nanofab.coralapi.resource.Project;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import javax.mail.Quota.Resource;
 /**
  *
  * @author neil
@@ -139,10 +119,20 @@ public class CoralServicesTest extends TestCase {
         Project project = new Project();
         project.setName("JUnit Testing Project");
         project.setAccount(acct.getName());
+        project.setDescription("b");
+        project.setDiscipline("c");
+        project.setNickname("e");
+        project.setPi("f");
+        project.setType("g");
         instance.CreateNewProject(project);
         
         Project fetched = instance.getProject(project.getName());
         assertEquals(fetched.getName(), project.getName());
+        assertEquals(fetched.getDescription(), project.getDescription());
+        assertEquals(fetched.getDiscipline(), project.getDiscipline());
+        assertEquals(fetched.getNickname(), project.getNickname());
+        assertEquals(fetched.getPi(), project.getPi());
+        assertEquals(fetched.getType(), project.getType());
     }
     
     public void testGetProjectThrowsExceptionForMissingProject() throws InvalidTicketSignal, NotAuthorizedSignal, Exception {
