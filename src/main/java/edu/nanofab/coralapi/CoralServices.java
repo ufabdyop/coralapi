@@ -11,6 +11,7 @@ import org.opencoral.constants.Constants;
 import org.opencoral.corba.AccountAdapter;
 import org.opencoral.corba.MemberAdapter;
 import org.opencoral.corba.ProjectAdapter;
+import org.opencoral.gui.LabFrame;
 import org.opencoral.idl.AccountNotFoundSignal;
 import org.opencoral.idl.InvalidAccountSignal;
 import org.opencoral.idl.InvalidAgentSignal;
@@ -26,10 +27,13 @@ import org.opencoral.idl.NotAuthorizedSignal;
 import org.opencoral.idl.ProjectNotFoundSignal;
 import org.opencoral.idl.Relation;
 import org.opencoral.idl.ResourceUnavailableSignal;
+import org.opencoral.idl.Auth.AuthManager;
+import org.opencoral.idl.Auth.AuthManagerHelper;
 import org.opencoral.idl.Equipment.EquipmentManager;
 import org.opencoral.idl.Equipment.EquipmentManagerHelper;
 import org.opencoral.idl.Resource.ResourceManager;
 import org.opencoral.idl.Resource.ResourceManagerHelper;
+import org.opencoral.util.Encryption;
 import org.opencoral.util.ResourceRoles;
 import org.opencoral.util.Tstamp;
 import org.slf4j.Logger;
@@ -51,25 +55,35 @@ import edu.utah.nanofab.CoralManagerConnector;
 public class CoralServices {
     private String coralUser="coral";
     private String iorUrl="http://vagrant-coral-dev/IOR/";
+    private String configUrl = "";
     private String ticketString = "";
+	private AuthManager authManager;
 	public static Logger logger ;
-    public static CoralManagerConnector connector = null;
-    public static ResourceManager resourceManager = null;
-    public static EquipmentManager equipmentManager = null;
+    private CoralManagerConnector connector = null;
+    private ResourceManager resourceManager = null;
+    private EquipmentManager equipmentManager = null;
+	private CoralCrypto coralCrypto;
            
-    public CoralServices() {
+    public CoralServices(String coralUser, String iorUrl, String configUrl) {
+    	this.coralUser = coralUser;
+    	this.iorUrl = iorUrl;
+    	this.configUrl = configUrl;
         System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
         logger = LoggerFactory.getLogger(CoralServices.class);
+        this.coralCrypto = new CoralCrypto(this.configUrl);
     }
+    
     private void reconnectToCoral() {
             connector = new CoralManagerConnector();
             connector.setCoralUser(this.coralUser);
             connector.setIorUrl(this.iorUrl);
     }
+    
     private void reconnectToResourceManager() {
             resourceManager = ResourceManagerHelper.narrow(connector.getManager(Constants.RSCMGR_NAME));
     }
-    private EquipmentManager getEquipmentManager(){
+    
+    private void getEquipmentManager(){
         System.out.println("Entered getEquipmentManager()");
         if (connector == null) {
                 System.out.println("connector is null");
@@ -79,9 +93,22 @@ public class CoralServices {
     		equipmentManager = EquipmentManagerHelper.narrow(connector.getManager(Constants.EQUMGR_NAME));
     	}
     	this.ticketString = connector.getTicketString();
-    	return equipmentManager;
     }
-    private ResourceManager getResourceManager() {
+    
+    private void getAuthManager(){
+        System.out.println("Entered getAuthManager()");
+        if (connector == null) {
+                System.out.println("connector is null");
+                reconnectToCoral();
+        }    	
+    	if (authManager == null){
+    		authManager = AuthManagerHelper.narrow(connector.getManager(Constants.ATHMGR_NAME));
+    	}
+    	this.ticketString = connector.getTicketString();
+    }
+    
+    
+    private void getResourceManager() {
             System.out.println("Entered getResourceManager()");
             if (connector == null) {
                     System.out.println("connector is null");
@@ -111,9 +138,8 @@ public class CoralServices {
             } catch (Exception e) {
                     System.out.println("General exception found" + e.getMessage());
             }
-
-            return resourceManager;
     }
+    
     private AccountAdapter accountToAccountAdapter(org.opencoral.idl.Account account) throws Exception {
     	AccountAdapter adapter = new AccountAdapter();
 
@@ -128,16 +154,16 @@ public class CoralServices {
     	return adapter;
     }
     public Projects getProjects() throws ProjectNotFoundSignal{
-    	ResourceManager rscmgr = this.getResourceManager();
-    	org.opencoral.idl.Project[] allProjects = rscmgr.getAllProjects();
+    	this.getResourceManager();
+    	org.opencoral.idl.Project[] allProjects = resourceManager.getAllProjects();
     	Projects projectCollection = Projects.fromIdlProjectArray(allProjects); 
 		return projectCollection;
     }
     public Project getProject(String name) throws ProjectNotFoundSignal {
-    	ResourceManager rscmgr = this.getResourceManager();
+    	this.getResourceManager();
     	Project project = new Project();
 		try {
-			project.populateFromIdlProject(rscmgr.getProject(name));
+			project.populateFromIdlProject(resourceManager.getProject(name));
 			return project;
 		} catch (InvalidProjectSignal e) {
 			ProjectNotFoundSignal notfound = new ProjectNotFoundSignal(name);
@@ -145,17 +171,17 @@ public class CoralServices {
 		} 
     }
     public void CreateNewMember(Member member) throws Exception {
-            ResourceManager rscmgr = this.getResourceManager();
+            this.getResourceManager();
 
             //create a new member should be active ??
             member.setActive(true);
-            rscmgr.addMember(member.convertToIDLMemberForRscMgr(), this.ticketString);
+            resourceManager.addMember(member.convertToIDLMemberForRscMgr(), this.ticketString);
     }
 
     public void CreateNewProject(Project project) throws Exception {
-            ResourceManager rscmgr = this.getResourceManager();
+            this.getResourceManager();
             project.setActive(true);
-            rscmgr.addProject(project.convertToIdlProjectForRscMgr(), this.ticketString);
+            resourceManager.addProject(project.convertToIdlProjectForRscMgr(), this.ticketString);
     }
     
     public void CreateNewProjectUnlessExists(Project project) throws Exception {
@@ -167,41 +193,41 @@ public class CoralServices {
     }
  
     public void DeleteMemberFromProject(String memberName, String projectName) throws InvalidTicketSignal, MemberDuplicateSignal, InvalidProjectSignal, NotAuthorizedSignal, InvalidMemberSignal {
-        ResourceManager rscmgr = this.getResourceManager();
-        rscmgr.removeMemberFromProject(memberName, projectName, this.ticketString);
+        this.getResourceManager();
+        resourceManager.removeMemberFromProject(memberName, projectName, this.ticketString);
     }
     public void AddProjectMembers(String project, String[] members) throws InvalidTicketSignal, InvalidMemberSignal, InvalidProjectSignal, NotAuthorizedSignal{
-		 ResourceManager rscmgr = this.getResourceManager();
+		 this.getResourceManager();
 		 for (String member: members ) {
-			 rscmgr.addMemberToProject(member, project, this.ticketString);
+			 resourceManager.addMemberToProject(member, project, this.ticketString);
 		 }
     }
     public void RemoveProjectMembers(String project, String[] members) throws InvalidTicketSignal, InvalidMemberSignal, InvalidProjectSignal, NotAuthorizedSignal{
-		 ResourceManager rscmgr = this.getResourceManager();
+		 this.getResourceManager();
 		 for (String member: members ) {
-			 rscmgr.removeMemberFromProject(member, project, this.ticketString);
+			 resourceManager.removeMemberFromProject(member, project, this.ticketString);
 		 }    	
     }
     public Member getMember(String member) throws Exception{
-    	ResourceManager rscmgr = this.getResourceManager();
-    	Member mem = new Member(rscmgr.getMember(member));
+    	this.getResourceManager();
+    	Member mem = new Member(resourceManager.getMember(member));
     	return mem;
     }
     
     public void AddMemberProjects(String member, String[] projects) throws InvalidTicketSignal, InvalidMemberSignal, InvalidProjectSignal, NotAuthorizedSignal{
-		 ResourceManager rscmgr = this.getResourceManager();
+		 this.getResourceManager();
 		 for (String project: projects ) {
-			 rscmgr.addMemberToProject(member, project, this.ticketString);
+			 resourceManager.addMemberToProject(member, project, this.ticketString);
 		 }    	
     }
     public void RemoveMemberProjects(String member, String[] projects) throws InvalidTicketSignal, InvalidMemberSignal, InvalidProjectSignal, NotAuthorizedSignal{
-		 ResourceManager rscmgr = this.getResourceManager();
+		 this.getResourceManager();
 		 for (String project: projects ) {
-			 rscmgr.removeMemberFromProject(member, project, this.ticketString);
+			 resourceManager.removeMemberFromProject(member, project, this.ticketString);
 		 }    	
     }
 	public void AddEquipmentRoleToMember(String member, String roleName, String resource) throws IOException, InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
-		ResourceManager rscmgr = this.getResourceManager();
+		this.getResourceManager();
    
 		System.out.println("AddEquipmentRoleToMember called: Is ticket null?" + (this.ticketString == null));
 		System.out.println("Member: " + member);
@@ -210,7 +236,7 @@ public class CoralServices {
 		System.out.println("IOR: " + this.iorUrl );
 		System.out.println("coralUser: " + this.coralUser );
 		try {
-			rscmgr.addRoleToMember(member, roleName, resource, ResourceRoles.EQUIPMENT, this.ticketString);
+			resourceManager.addRoleToMember(member, roleName, resource, ResourceRoles.EQUIPMENT, this.ticketString);
 		} catch (InvalidRoleSignal irs ) {
 			throw new InvalidRoleSignal("IOR: " + this.iorUrl + " : " + irs.getMessage());
 			
@@ -219,24 +245,24 @@ public class CoralServices {
 	public void RemoveEquipmentRoleFromMember(String member, String roleName,
 			String resource) throws IOException, InvalidTicketSignal,
 			InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
-		ResourceManager rscmgr = this.getResourceManager();
+		this.getResourceManager();
         System.out.println("RemoveEquipmentRoleFromMember: Is ticket null?" + (this.ticketString == null));
-        rscmgr.removeRoleFromMember(member, roleName, resource, ResourceRoles.EQUIPMENT, this.ticketString);
+        resourceManager.removeRoleFromMember(member, roleName, resource, ResourceRoles.EQUIPMENT, this.ticketString);
 	}	
 	public void AddProjectRoleToMember(String member, String roleName,
 			String resource) throws IOException, InvalidTicketSignal,
 			InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
-		ResourceManager rscmgr = this.getResourceManager();
+		this.getResourceManager();
 		System.out.println("Adding project role for member:" + member + " role: " + roleName + " project:" + resource);
-		rscmgr.addRoleToMember(member, roleName, resource, ResourceRoles.PROJECT, this.ticketString);
+		resourceManager.addRoleToMember(member, roleName, resource, ResourceRoles.PROJECT, this.ticketString);
 	}
 
 	public void RemoveProjectRoleFromMember(String member, String roleName,
 			String resource) throws IOException, InvalidTicketSignal,
 			InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
-		ResourceManager rscmgr = this.getResourceManager();
+		this.getResourceManager();
 		System.out.println("Removing project role for member:" + member + " role: " + roleName + " project:" + resource);
-		rscmgr.removeRoleFromMember(member, roleName, resource, ResourceRoles.PROJECT, this.ticketString);
+		resourceManager.removeRoleFromMember(member, roleName, resource, ResourceRoles.PROJECT, this.ticketString);
 	}
 	public void AddSafetyFlagToMember(String member ) throws IOException, InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
 		this.AddEquipmentRoleToMember(member, "safety", "Door Access");
@@ -247,7 +273,7 @@ public class CoralServices {
 	}//need to write test for this
 	
 	public void enable(String item){
-		EquipmentManager equipmentManager = this.getEquipmentManager();
+		this.getEquipmentManager();
 		ActivityFactory fac = new ActivityFactory();
 		org.opencoral.idl.Activity activity = fac.createDefaultActivity(item);
 		try{
@@ -290,16 +316,16 @@ public class CoralServices {
 	public Members GetProjectMembers(String projectName) {
 		logger.debug("GetProjectMembers called for project " + projectName);
 		Members matches = new Members();
-    	ResourceManager rscmgr = this.getResourceManager();
+    	this.getResourceManager();
 		Relation[] relations;
 		try {
 			logger.debug("Calling getMemberInfoForProject");
-			relations = rscmgr.getMemberInfoForProject(projectName, true);
+			relations = resourceManager.getMemberInfoForProject(projectName, true);
 			for (Relation relation : relations ) {
 				String memberName = relation.master;
 				try {
 					logger.debug("Adding " + memberName + " to resultset");
-					Member temp = new Member(rscmgr.getMember(memberName));
+					Member temp = new Member(resourceManager.getMember(memberName));
 					matches.add(temp);
 					logger.debug("Added " + memberName + " to resultset");
 				} catch (InvalidMemberSignal e) {
@@ -315,8 +341,8 @@ public class CoralServices {
 		return matches;
 	}
 	public void CreateNewAccount(Account acct) throws Exception {
-		ResourceManager rscmgr = this.getResourceManager();
-		rscmgr.addAccount(acct.convertToIdlAccountForRscMgr(), this.ticketString);
+		this.getResourceManager();
+		resourceManager.addAccount(acct.convertToIdlAccountForRscMgr(), this.ticketString);
 	}
 	public void CreateNewAccountUnlessExists(Account acct) throws Exception {
 		try {
@@ -327,8 +353,8 @@ public class CoralServices {
 	}
 	
 	public edu.nanofab.coralapi.resource.Account getAccount(String name) throws InvalidAccountSignal {
-		ResourceManager rscmgr = this.getResourceManager();
-		org.opencoral.idl.Account idlAccount = rscmgr.getAccount(name);
+		this.getResourceManager();
+		org.opencoral.idl.Account idlAccount = resourceManager.getAccount(name);
 		logger.debug("Account fetched: " + idlAccount.name + " with edate fields (year, month, day, hour, isnull: " + idlAccount.edate.year + "," + idlAccount.edate.month + "," + idlAccount.edate.day +"," + idlAccount.edate.hour + "," + idlAccount.edate.isNull);
 		Account acct = new Account();
 		acct.populateFromIdlAccount(idlAccount);
@@ -336,15 +362,42 @@ public class CoralServices {
 	}
 	
 	public edu.nanofab.coralapi.collections.Accounts getAccounts() throws AccountNotFoundSignal {
-		ResourceManager rscmgr = this.getResourceManager();
-    	org.opencoral.idl.Account[] allAccounts = rscmgr.getAllAccounts();
+		this.getResourceManager();
+    	org.opencoral.idl.Account[] allAccounts = resourceManager.getAllAccounts();
     	Accounts accountCollection = Accounts.fromIdlAccountArray(allAccounts); 
 		return accountCollection;
 	}
 	public void deleteProject(String projectName) throws InvalidTicketSignal, NotAuthorizedSignal, Exception {
-		ResourceManager rscmgr = this.getResourceManager();
+		this.getResourceManager();
 		Project p = this.getProject(projectName);
-		rscmgr.removeProject(p.convertToIdlProjectForRscMgr(), this.ticketString);
+		resourceManager.removeProject(p.convertToIdlProjectForRscMgr(), this.ticketString);
+	}
+	public boolean authenticate(String username, String password) {
+		boolean result = false;
+		this.getAuthManager();
+		byte[] u = this.coralCrypto.encrypt(username);
+		byte[] p = this.coralCrypto.encrypt(password);
+		
+		try {
+			String ticket = authManager.authenticateByUserNamePassword(u, p);
+			result = true;
+		} catch (InvalidMemberSignal e) {
+			logger.debug("authenticate: Invalid member " + username);
+			e.printStackTrace();
+		} catch (NotAuthorizedSignal e) {
+			logger.debug("authenticate: Not authorized " + username);
+			e.printStackTrace();
+		} catch (InvalidTicketSignal e) {
+			logger.debug("authenticate: Invalid ticket " + username);
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	public void prepareBlackBox() {
+		Encryption blackBox = new Encryption("encrypt", "", "", "", null);
+				/*new Encryption("encrypt", LabFrame.CryptoProvider,
+				LabFrame.Algorithm, LabFrame.Transformation, keyIS);*/
 	}
 
 }
