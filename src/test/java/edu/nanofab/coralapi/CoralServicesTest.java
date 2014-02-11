@@ -252,26 +252,60 @@ public class CoralServicesTest extends TestCase {
     }
     
     /**
-     * This test would be nice, but the coral ResourceManagerImpl class
-     * doesn't allow you to set edate.
+     * This test only passes with modified opencoral source to allow edates to be set.
      * @throws Exception
      */
-    public void _testAccountDateManipulationRoundTrip() throws Exception {
+    public void testProjectDateManipulationRoundTrip() throws Exception {
     	Calendar cal = Calendar.getInstance();
-    	cal.set(2013, 0, 27, 13, 59, 00);
+    	cal.set(2099, 0, 27, 13, 59, 00);
         SimpleDateFormat format = 
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     	Date testDate = cal.getTime();
-        assertEquals("2013-01-27 13:59:00", format.format(testDate));
+        assertEquals("2099-01-27 13:59:00", format.format(testDate));
         data.deleteAccount("JUnit Testing Account2");
         Account account = new Account();
         account.setEdate(testDate);
         account.setName("JUnit Testing Account2");
         instance.CreateNewAccount(account);
-        Account fetched = instance.getAccount(account.getName());
-        assertEquals(fetched.getName(), account.getName());
-        assertEquals(fetched.getEdate(), account.getEdate());
+        
+        data.deleteProject("test project edates");
+        Project project = new Project();
+        project.setAccount("JUnit Testing Account2");
+        project.setName("test project edates");
+        project.setEdate(testDate);
+        instance.CreateNewProject(project);
+        
+        Project fetched = instance.getProject(project.getName());
+        assertEquals(fetched.getName(), project.getName());
+        assertEquals(project.getEdate().toString(), fetched.getEdate().toString());
+
+        //test updateProject too
+    	cal.set(2199, 1, 28, 14, 57, 01);
+    	project.setEdate(cal.getTime());
+    	instance.updateProject(project);
+        fetched = instance.getProject(project.getName());
+        assertEquals(fetched.getName(), project.getName());
+        assertEquals(project.getEdate().toString(), fetched.getEdate().toString());
     }
+
+    public void testMemberDateManipulationRoundTrip() throws Exception {
+    	Calendar cal = Calendar.getInstance();
+    	cal.set(2099, 0, 27, 13, 59, 00);
+        SimpleDateFormat format = 
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	Date testDate = cal.getTime();
+        assertEquals("2099-01-27 13:59:00", format.format(testDate));
+        Member member = new Member();
+        member.setProject("JUnit Testing Project");
+        member.setName("testmm01");
+        member.setEdate(testDate);
+        data.deleteMember("testmm01");
+        instance.CreateNewMember(member);
+        
+        Member fetched = instance.getMember(member.getName());
+        assertEquals(fetched.getName(), member.getName());
+        assertEquals(member.getEdate().toString(), fetched.getEdate().toString());
+    }    
     
     public void testAccountEDateIsNullRoundTrip() throws Exception {
     	Calendar cal = Calendar.getInstance();

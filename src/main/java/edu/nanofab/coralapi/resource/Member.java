@@ -1,6 +1,11 @@
 package edu.nanofab.coralapi.resource;
 
+import java.util.Date;
+
 import org.opencoral.corba.MemberAdapter;
+import org.opencoral.idl.Timestamp;
+
+import edu.nanofab.coralapi.helper.TimestampConverter;
 
 public class Member {
 	private String name;
@@ -28,6 +33,7 @@ public class Member {
 	private String url;
 	private String zipcode;
 	private boolean active;
+	private Date edate;
 	
 	public Member(org.opencoral.idl.Member idlMember) throws Exception {
 		super();
@@ -237,6 +243,14 @@ public class Member {
 		this.active = active;
 	}
 
+	public void setEdate(Date date) {
+		this.edate = date;
+	}
+
+	public Date getEdate() {
+		return this.edate;
+	}	
+
 	public void populateFromIdlMember(org.opencoral.idl.Member idlMember) throws Exception {
 		this.setName(idlMember.name);
 		this.setAddress1(idlMember.address1);
@@ -263,8 +277,13 @@ public class Member {
 		this.setUrl(idlMember.url);
 		this.setZipcode(idlMember.zipcode);
 		this.setActive(idlMember.active);
+	    this.setEdate(this.timestampToDate(idlMember.edate));
 	}
 	
+	private Date timestampToDate(Timestamp tstamp) {
+		return TimestampConverter.timestampToDate(tstamp);
+	}
+
 	public boolean equals(Member m) {
 		return m.name.equals(this.name);
 	}
@@ -313,6 +332,7 @@ public class Member {
     	if (this.url != null) memAP.setValue("url", this.url);
     	if (this.zipcode != null) memAP.setValue("zipcode", this.zipcode);  
     	memAP.setValue("active", (this.active == true)?"true":"false");
+		if (this.edate != null) memAP.setValue("edate", TimestampConverter.dateToAdapterString(this.edate));
 		return memAP;
-	}	
+	}
 }

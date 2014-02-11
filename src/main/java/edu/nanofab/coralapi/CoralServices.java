@@ -16,6 +16,7 @@ import org.opencoral.idl.AccountNotFoundSignal;
 import org.opencoral.idl.InvalidAccountSignal;
 import org.opencoral.idl.InvalidAgentSignal;
 import org.opencoral.idl.InvalidMemberSignal;
+import org.opencoral.idl.InvalidNicknameSignal;
 import org.opencoral.idl.InvalidProcessSignal;
 import org.opencoral.idl.InvalidProjectSignal;
 import org.opencoral.idl.InvalidResourceSignal;
@@ -381,7 +382,11 @@ public class CoralServices {
 		return result;
 	}
 	
-	public void updateProject(Project project) {
+	public void updateProject(Project project) throws InvalidTicketSignal, ProjectNotFoundSignal, InvalidNicknameSignal, InvalidAccountSignal, NotAuthorizedSignal, Exception {
+		this.getResourceManager();
+		resourceManager.updateProject(project.convertToIdlProjectForRscMgr(), this.ticketString);
 	}
+	
+	
 
 }
