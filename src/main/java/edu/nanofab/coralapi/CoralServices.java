@@ -107,7 +107,6 @@ public class CoralServices {
     	this.ticketString = connector.getTicketString();
     }
     
-    
     private void getResourceManager() {
             System.out.println("Entered getResourceManager()");
             if (connector == null) {
@@ -140,25 +139,13 @@ public class CoralServices {
             }
     }
     
-    private AccountAdapter accountToAccountAdapter(org.opencoral.idl.Account account) throws Exception {
-    	AccountAdapter adapter = new AccountAdapter();
-
-		if (account.edate != null) adapter.setEdate(new Tstamp(account.edate));
-		if (account.bdate != null) adapter.setBdate(new Tstamp(account.bdate));
-		if (account.type != null) adapter.setValue("type", account.type);
-		if (account.organization != null) adapter.setValue("organization", account.organization);
-		if (account.description != null) adapter.setValue("description", account.description);
-		if (account.name != null) adapter.setValue("name", account.name);
-		adapter.setValue("active", (account.active ? "true" : "false"));
-
-    	return adapter;
-    }
     public Projects getProjects() throws ProjectNotFoundSignal{
     	this.getResourceManager();
     	org.opencoral.idl.Project[] allProjects = resourceManager.getAllProjects();
     	Projects projectCollection = Projects.fromIdlProjectArray(allProjects); 
 		return projectCollection;
     }
+    
     public Project getProject(String name) throws ProjectNotFoundSignal {
     	this.getResourceManager();
     	Project project = new Project();
@@ -394,10 +381,7 @@ public class CoralServices {
 		return result;
 	}
 	
-	public void prepareBlackBox() {
-		Encryption blackBox = new Encryption("encrypt", "", "", "", null);
-				/*new Encryption("encrypt", LabFrame.CryptoProvider,
-				LabFrame.Algorithm, LabFrame.Transformation, keyIS);*/
+	public void updateProject(Project project) {
 	}
 
 }

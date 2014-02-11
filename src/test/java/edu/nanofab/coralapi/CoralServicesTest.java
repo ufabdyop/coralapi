@@ -179,6 +179,15 @@ public class CoralServicesTest extends TestCase {
         assertEquals(fetched.getType(), project.getType());
     }
     
+    public void testCreateProjectThenUpdateIt() throws Exception {
+    	this.testCreateNewProject();
+    	Project project = instance.getProject("JUnit Testing Project");
+    	project.setNickname("new nickname");
+    	instance.updateProject(project);
+    	Project fetched = instance.getProject("JUnit Testing Project");
+    	assertEquals(fetched.getNickname(), "new nickname");
+    }
+    
     public void testGetProjectThrowsExceptionForMissingProject() throws InvalidTicketSignal, NotAuthorizedSignal, Exception {
     	boolean exceptionThrown = false;
     	try {
