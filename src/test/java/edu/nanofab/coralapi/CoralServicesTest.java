@@ -63,6 +63,7 @@ public class CoralServicesTest extends TestCase {
     	a.setName("JUnit Testing Account" );
     	Project p = new Project();
     	p.setName("JUnit Testing Project");
+    	p.setAccount("JUnit Testing Account" );
     	instance.CreateNewAccountUnlessExists(a);
     	instance.CreateNewProjectUnlessExists(p);
     }
