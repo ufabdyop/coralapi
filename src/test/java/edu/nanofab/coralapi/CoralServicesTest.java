@@ -346,19 +346,32 @@ public class CoralServicesTest extends TestCase {
     public void testAddProjectMembers() throws Exception {
     	data.deleteMember("testmem_18");
     	data.deleteProject("JUnit Testing Project");
+    	data.deleteProject("JUnit Testing Project2");
+
+        Project p = new Project();
+        p.setName("JUnit Testing Project");
+        p.setAccount("JUnit Testing Account");    	
+        instance.CreateNewProject(p);
+
+        Project p2 = new Project();
+        p2.setName("JUnit Testing Project2");
+        p2.setAccount("JUnit Testing Account");    	
+        instance.CreateNewProject(p2);
+    	
     	Member member1 = new Member();
     	member1.setName("testmem_18");
     	member1.setProject("JUnit Testing Project");
-    	String[] members = {"testmem_18"};
-        Project p = new Project();
-        p.setName("JUnit Testing Project");
-        p.setAccount("JUnit Testing Account");
-        instance.CreateNewProject(p);
         instance.CreateNewMember(member1);
+    	
+    	String[] members = {"testmem_18"};
     	instance.AddProjectMembers("JUnit Testing Project", members);
+    	instance.AddProjectMembers("JUnit Testing Project2", members);
+    	
     	Members fetchedMembers = instance.GetProjectMembers("JUnit Testing Project");
     	assertTrue(fetchedMembers.contains(member1));
-    	//instance.RemoveProjectMembers("JUnit Testing Project", members);
+    	
+    	fetchedMembers = instance.GetProjectMembers("JUnit Testing Project2");
+    	assertTrue(fetchedMembers.contains(member1));
     }
     
     public void testRemoveProjectMembers() throws Exception {
