@@ -391,6 +391,11 @@ public class CoralServices {
 		this.getResourceManager();
 		resourceManager.updateAccount(account.convertToIdlAccountForRscMgr(), this.ticketString);
 	}
+
+	public void updateMember(Member member) throws InvalidTicketSignal, MemberNotFoundSignal, InvalidProjectSignal, NotAuthorizedSignal, Exception {
+		this.getResourceManager();
+		resourceManager.updateMember(member.convertToIDLMemberForRscMgr(), this.ticketString);
+	}
 	
 	
 

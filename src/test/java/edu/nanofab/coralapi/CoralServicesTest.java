@@ -198,6 +198,15 @@ public class CoralServicesTest extends TestCase {
     	assertEquals(fetched.getDescription(), "here is a description");
     }
     
+    public void testCreateMemberThenUpdateIt() throws Exception {
+    	this.testCreateNewMemberRoundTrip();
+    	Member m = instance.getMember("mytest02");
+    	m.setAddress1("here is an address");
+    	instance.updateMember(m);
+    	Member fetched = instance.getMember("mytest02");
+    	assertEquals(fetched.getAddress1(), "here is an address");
+    }
+        
     public void testGetProjectThrowsExceptionForMissingProject() throws InvalidTicketSignal, NotAuthorizedSignal, Exception {
     	boolean exceptionThrown = false;
     	try {
