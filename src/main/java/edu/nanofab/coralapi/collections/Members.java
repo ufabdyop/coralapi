@@ -20,4 +20,16 @@ public class Members extends MembersProxySet {
 		System.out.println("checking if " + member.getName() + " is equal to " + m.getName());
 		return m.equals(member);
 	}
+
+	public String[] getNames() 
+	{
+		String[] names = new String[this.size()];
+		int i = 0;
+		for (Member m : this.members ) {
+			names[i] = m.getName();
+			i++;
+		}
+		return names;
+	}
+
 }
