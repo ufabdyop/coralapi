@@ -396,7 +396,7 @@ public class CoralServices {
 		this.getResourceManager();
 		resourceManager.updateMember(member.convertToIDLMemberForRscMgr(), this.ticketString);
 	}
-	
-	
-
+	public void close() {
+        connector.release();
+	}
 }
