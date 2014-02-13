@@ -75,17 +75,20 @@ public class CoralServices {
     }
     
     private void reconnectToCoral() {
-            connector = new CoralManagerConnector();
-            connector.setCoralUser(this.coralUser);
-            connector.setIorUrl(this.iorUrl);
+		logger.debug("reconnectToCoral called");
+		connector = new CoralManagerConnector();
+		connector.setCoralUser(this.coralUser);
+		connector.setIorUrl(this.iorUrl);
     }
     
     private void reconnectToResourceManager() {
-            resourceManager = ResourceManagerHelper.narrow(connector.getManager(Constants.RSCMGR_NAME));
+		logger.debug("reconnectToResourceManager called");
+		resourceManager = ResourceManagerHelper.narrow(connector.getManager(Constants.RSCMGR_NAME));
     }
     
     private void getEquipmentManager(){
-        System.out.println("Entered getEquipmentManager()");
+    	logger.debug("Entered getEquipmentManager()");
+
         if (connector == null) {
                 System.out.println("connector is null");
                 reconnectToCoral();
@@ -398,9 +401,13 @@ public class CoralServices {
 	}
 	public void close() {
 		System.out.println("Close CoralServices Resources");
-		resourceManager._release();
-		authManager._release();
-		equipmentManager._release();
-        connector.release();
+		if (resourceManager != null) { resourceManager._release(); }
+		if (authManager != null) { authManager._release(); }
+		if (equipmentManager != null) { equipmentManager._release(); }
+		try {
+			connector.release();
+		} catch (Exception e) {
+			logger.error("could not call release on connector: " + e.getMessage());
+		}
 	}
 }
