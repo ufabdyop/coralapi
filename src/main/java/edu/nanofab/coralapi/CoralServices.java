@@ -374,13 +374,10 @@ public class CoralServices {
 			result = true;
 		} catch (InvalidMemberSignal e) {
 			logger.debug("authenticate: Invalid member " + username);
-			e.printStackTrace();
 		} catch (NotAuthorizedSignal e) {
 			logger.debug("authenticate: Not authorized " + username);
-			e.printStackTrace();
 		} catch (InvalidTicketSignal e) {
 			logger.debug("authenticate: Invalid ticket " + username);
-			e.printStackTrace();
 		}
 		return result;
 	}
