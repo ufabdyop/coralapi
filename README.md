@@ -1,12 +1,8 @@
 Coral API
 ===
 
-We are designing an API to get access to Coral’s core functionality
-through standard http queries.  Currently, some of this functionality
-exists in 2 places: [a command line
-client](http://nanoproject.eng.utah.edu/HardwareServerProxy/browser/HardwareServerProxy/HardwareServerProxy/branches/ObserverPatternRefactor/driver/src/main/java/edu/utah/nanofab/controller/coralToolKit.java) and
-[a soap-based web
-service](http://nanoproject.eng.utah.edu/CoralWebServices/browser/CoralWebServices/CoralWebServices/trunk/edu/utah/nanofab/coral_web_services/CoralSoapInterface.java) .
+We are designing an API to get access to Coral's core functionality
+through standard http queries.  
 
 Design Goals: 
 -------------
@@ -25,20 +21,20 @@ We need the API to meet the following requirements:
 -   Authentication is required (http basic auth should work:
     [http://stackoverflow.com/questions/319530/restful-authentication](http://stackoverflow.com/questions/319530/restful-authentication))
 -   Must Provide Distinct URLs for each resource ([See: RESTful Routing](http://mvccontrib.codeplex.com/wikipage?title=SimplyRestfulRouting&referringTitle=Documentation&ProjectName=mvccontrib) )
--   Must support the following functionality:
+-   Must support the following functionality (pseudo-code method names that would map to RESTful api calls):
 
-    -   AddEquipmentRoleToMember(String member, String roleName, String resource)
-    -   RemoveEquipmentRoleFromMember(String member, String roleName, String resource)
-    -   AddProjectRoleToMember(String member, String roleName, String resource)
-    -   RemoveProjectRoleFromMember(String member, String roleName, String resource)
-    -   AddSafetyFlagToMember(String member )
-    -   RemoveSafetyFlagFromMember(String member)
-    -   AddMemberProjects(String member, String[] projects)
-    -   RemoveMemberProjects(String member, String[] projects)
-    -   CreateNewMember(Member member)
-    -   CreateNewProject(Project project)
-    -   AddProjectMembers(String project, String[] members)
-    -   RemoveProjectMembers(String project, String[] members)
+    -   addEquipmentRoleToMember(String member, String roleName, String resource)
+    -   removeEquipmentRoleFromMember(String member, String roleName, String resource)
+    -   addProjectRoleToMember(String member, String roleName, String resource)
+    -   removeProjectRoleFromMember(String member, String roleName, String resource)
+    -   addSafetyFlagToMember(String member )
+    -   removeSafetyFlagFromMember(String member)
+    -   addMemberProjects(String member, String[] projects)
+    -   removeMemberProjects(String member, String[] projects)
+    -   createNewMember(Member member)
+    -   createNewProject(Project project)
+    -   addProjectMembers(String project, String[] members)
+    -   removeProjectMembers(String project, String[] members)
     -   enable( tool, agent, member, project, account )
     -   disable(tool)
     -   qualify(tool, member, role)
@@ -107,14 +103,14 @@ We need the API to meet the following requirements:
         -   List (GET)
 
   -   URLs (examples)
-    -   https://server/coral/api/v0.1/member
+    -   https://server/coral-api/v0.1/member
         -   supporting PUT, GET(list)
-    -   https://server/coral/api/v0.1/member/ryant
+    -   https://server/coral-api/v0.1/member?name=ryant
         -   supporting POST, GET
         -   POST and GET would send/receive json representations of member
-    -   https://server/coral/api/v0.1/reservation
+    -   https://server/coral-api/v0.1/reservation
         -   supporting POST, GET (list of reservations)
-    -   https://server/coral/api/v0.1/reservation/someID (base64 encoding of DB id?)
+    -   https://server/coral-api/v0.1/reservation?id=someID (base64 encoding of DB id?)
         -   supporting POST, GET, DELETE
 
 -   The server should respond with appropriate messages for errors or
