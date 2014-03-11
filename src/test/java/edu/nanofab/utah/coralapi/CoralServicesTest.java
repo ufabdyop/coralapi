@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.nanofab.utah.coralapi;
 
 import java.io.BufferedReader;
@@ -27,10 +23,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-/**
- *
- * @author neil
- */
 public class CoralServicesTest extends TestCase {
     FixtureHelper data = new FixtureHelper();
     protected String allowedHostname = "vagrant-centos63-32";
@@ -65,8 +57,8 @@ public class CoralServicesTest extends TestCase {
     	Project p = new Project();
     	p.setName("JUnit Testing Project");
     	p.setAccount("JUnit Testing Account" );
-    	instance.CreateNewAccountUnlessExists(a);
-    	instance.CreateNewProjectUnlessExists(p);
+    	instance.createNewAccountUnlessExists(a);
+    	instance.createNewProjectUnlessExists(p);
     }
     
     @Override
@@ -119,7 +111,7 @@ public class CoralServicesTest extends TestCase {
     	member.setUrl("u");
     	member.setZipcode("v");
     	member.setActive(true);    	
-        instance.CreateNewMember(member);
+        instance.createNewMember(member);
         Member fetched = instance.getMember("mytest02");
         assertEquals(member.getAddress1(), fetched.getAddress1());
         assertEquals(member.getAddress2(), fetched.getAddress2());
@@ -160,7 +152,7 @@ public class CoralServicesTest extends TestCase {
     	
         Account acct = new Account();
         acct.setName("JUnit Testing Account");
-        instance.CreateNewAccountUnlessExists(acct);
+        instance.createNewAccountUnlessExists(acct);
         
         Project project = new Project();
         project.setName("JUnit Testing Project");
@@ -170,7 +162,7 @@ public class CoralServicesTest extends TestCase {
         project.setNickname("e");
         project.setPi("f");
         project.setType("g");
-        instance.CreateNewProject(project);
+        instance.createNewProject(project);
         
         Project fetched = instance.getProject(project.getName());
         assertEquals(fetched.getName(), project.getName());
@@ -245,7 +237,7 @@ public class CoralServicesTest extends TestCase {
         data.deleteAccount("JUnit Testing Account");
         Account account = new Account();
         account.setName("JUnit Testing Account");
-        instance.CreateNewAccount(account);
+        instance.createNewAccount(account);
         Account fetched = instance.getAccount(account.getName());
         assertEquals(fetched.getName(), account.getName());
     }
@@ -285,14 +277,14 @@ public class CoralServicesTest extends TestCase {
         Account account = new Account();
         account.setEdate(testDate);
         account.setName("JUnit Testing Account2");
-        instance.CreateNewAccount(account);
+        instance.createNewAccount(account);
         
         data.deleteProject("test project edates");
         Project project = new Project();
         project.setAccount("JUnit Testing Account2");
         project.setName("test project edates");
         project.setEdate(testDate);
-        instance.CreateNewProject(project);
+        instance.createNewProject(project);
         
         Project fetched = instance.getProject(project.getName());
         assertEquals(fetched.getName(), project.getName());
@@ -319,7 +311,7 @@ public class CoralServicesTest extends TestCase {
         member.setName("testmm01");
         member.setEdate(testDate);
         data.deleteMember("testmm01");
-        instance.CreateNewMember(member);
+        instance.createNewMember(member);
         
         Member fetched = instance.getMember(member.getName());
         assertEquals(fetched.getName(), member.getName());
@@ -337,7 +329,7 @@ public class CoralServicesTest extends TestCase {
         Account account = new Account();
         account.setEdate(testDate);
         account.setName("JUnit Testing Account2");
-        instance.CreateNewAccount(account);
+        instance.createNewAccount(account);
         Account fetched = instance.getAccount(account.getName());
         assertEquals(fetched.getName(), account.getName());
         assertEquals("This tests coral's expected behavior (not ideal) that the edate is always set to null", 
@@ -352,26 +344,26 @@ public class CoralServicesTest extends TestCase {
         Project p = new Project();
         p.setName("JUnit Testing Project");
         p.setAccount("JUnit Testing Account");    	
-        instance.CreateNewProject(p);
+        instance.createNewProject(p);
 
         Project p2 = new Project();
         p2.setName("JUnit Testing Project2");
         p2.setAccount("JUnit Testing Account");    	
-        instance.CreateNewProject(p2);
+        instance.createNewProject(p2);
     	
     	Member member1 = new Member();
     	member1.setName("testmem_18");
     	member1.setProject("JUnit Testing Project");
-        instance.CreateNewMember(member1);
+        instance.createNewMember(member1);
     	
     	String[] members = {"testmem_18"};
-    	instance.AddProjectMembers("JUnit Testing Project", members);
-    	instance.AddProjectMembers("JUnit Testing Project2", members);
+    	instance.addProjectMembers("JUnit Testing Project", members);
+    	instance.addProjectMembers("JUnit Testing Project2", members);
     	
-    	Members fetchedMembers = instance.GetProjectMembers("JUnit Testing Project");
+    	Members fetchedMembers = instance.getProjectMembers("JUnit Testing Project");
     	assertTrue(fetchedMembers.contains(member1));
     	
-    	fetchedMembers = instance.GetProjectMembers("JUnit Testing Project2");
+    	fetchedMembers = instance.getProjectMembers("JUnit Testing Project2");
     	assertTrue(fetchedMembers.contains(member1));
     }
     
@@ -379,7 +371,7 @@ public class CoralServicesTest extends TestCase {
     	System.out.println("Test Remove Project Members");
     	String[] members = {"testmem_10"};
     	try {
-    		instance.RemoveProjectMembers("JUnit Testing Project", members);
+    		instance.removeProjectMembers("JUnit Testing Project", members);
     	} catch (Exception e) {
     		System.out.println(e.getMessage());
     	}
@@ -391,7 +383,7 @@ public class CoralServicesTest extends TestCase {
     	Member member = new Member();
     	member.setName("testuser");
     	member.setProject("JUnit Testing Project");
-        instance.CreateNewMember(member);  
+        instance.createNewMember(member);  
         Member mem = instance.getMember("testuser");
         Assert.assertEquals("testuser", mem.getName());
     }

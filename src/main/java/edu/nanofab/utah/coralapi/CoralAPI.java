@@ -145,7 +145,7 @@ public class CoralAPI {
 			throw notfound;
 		} 
     }
-    public void CreateNewMember(Member member) throws Exception {
+    public void createNewMember(Member member) throws Exception {
             this.getResourceManager();
 
             //create a new member should be active ??
@@ -153,31 +153,31 @@ public class CoralAPI {
             resourceManager.addMember(member.convertToIDLMemberForRscMgr(), this.ticketString);
     }
 
-    public void CreateNewProject(Project project) throws Exception {
+    public void createNewProject(Project project) throws Exception {
             this.getResourceManager();
             project.setActive(true);
             resourceManager.addProject(project.convertToIdlProjectForRscMgr(), this.ticketString);
     }
     
-    public void CreateNewProjectUnlessExists(Project project) throws Exception {
+    public void createNewProjectUnlessExists(Project project) throws Exception {
 		try {
 			this.getProject(project.getName());
 		} catch (ProjectNotFoundSignal e) {
-			this.CreateNewProject(project);
+			this.createNewProject(project);
 		}
     }
  
-    public void DeleteMemberFromProject(String memberName, String projectName) throws InvalidTicketSignal, MemberDuplicateSignal, InvalidProjectSignal, NotAuthorizedSignal, InvalidMemberSignal {
+    public void deleteMemberFromProject(String memberName, String projectName) throws InvalidTicketSignal, MemberDuplicateSignal, InvalidProjectSignal, NotAuthorizedSignal, InvalidMemberSignal {
         this.getResourceManager();
         resourceManager.removeMemberFromProject(memberName, projectName, this.ticketString);
     }
-    public void AddProjectMembers(String project, String[] members) throws InvalidTicketSignal, InvalidMemberSignal, InvalidProjectSignal, NotAuthorizedSignal{
+    public void addProjectMembers(String project, String[] members) throws InvalidTicketSignal, InvalidMemberSignal, InvalidProjectSignal, NotAuthorizedSignal{
 		 this.getResourceManager();
 		 for (String member: members ) {
 			 resourceManager.addMemberToProject(member, project, this.ticketString);
 		 }
     }
-    public void RemoveProjectMembers(String project, String[] members) throws InvalidTicketSignal, InvalidMemberSignal, InvalidProjectSignal, NotAuthorizedSignal{
+    public void removeProjectMembers(String project, String[] members) throws InvalidTicketSignal, InvalidMemberSignal, InvalidProjectSignal, NotAuthorizedSignal{
 		 this.getResourceManager();
 		 for (String member: members ) {
 			 resourceManager.removeMemberFromProject(member, project, this.ticketString);
@@ -189,27 +189,21 @@ public class CoralAPI {
     	return mem;
     }
     
-    public void AddMemberProjects(String member, String[] projects) throws InvalidTicketSignal, InvalidMemberSignal, InvalidProjectSignal, NotAuthorizedSignal{
+    public void addMemberProjects(String member, String[] projects) throws InvalidTicketSignal, InvalidMemberSignal, InvalidProjectSignal, NotAuthorizedSignal{
 		 this.getResourceManager();
 		 for (String project: projects ) {
 			 resourceManager.addMemberToProject(member, project, this.ticketString);
 		 }    	
     }
-    public void RemoveMemberProjects(String member, String[] projects) throws InvalidTicketSignal, InvalidMemberSignal, InvalidProjectSignal, NotAuthorizedSignal{
+    public void removeMemberProjects(String member, String[] projects) throws InvalidTicketSignal, InvalidMemberSignal, InvalidProjectSignal, NotAuthorizedSignal{
 		 this.getResourceManager();
 		 for (String project: projects ) {
 			 resourceManager.removeMemberFromProject(member, project, this.ticketString);
 		 }    	
     }
-	public void AddEquipmentRoleToMember(String member, String roleName, String resource) throws IOException, InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
+	public void addEquipmentRoleToMember(String member, String roleName, String resource) throws IOException, InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
 		this.getResourceManager();
    
-		System.out.println("AddEquipmentRoleToMember called: Is ticket null?" + (this.ticketString == null));
-		System.out.println("Member: " + member);
-		System.out.println("roleName: " + roleName);
-		System.out.println("resource: " + resource);
-		System.out.println("IOR: " + this.iorUrl );
-		System.out.println("coralUser: " + this.coralUser );
 		try {
 			resourceManager.addRoleToMember(member, roleName, resource, ResourceRoles.EQUIPMENT, this.ticketString);
 		} catch (InvalidRoleSignal irs ) {
@@ -217,35 +211,33 @@ public class CoralAPI {
 			
 		}
 	}
-	public void RemoveEquipmentRoleFromMember(String member, String roleName,
+	public void removeEquipmentRoleFromMember(String member, String roleName,
 			String resource) throws IOException, InvalidTicketSignal,
 			InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
 		this.getResourceManager();
-        System.out.println("RemoveEquipmentRoleFromMember: Is ticket null?" + (this.ticketString == null));
         resourceManager.removeRoleFromMember(member, roleName, resource, ResourceRoles.EQUIPMENT, this.ticketString);
 	}	
-	public void AddProjectRoleToMember(String member, String roleName,
+	public void addProjectRoleToMember(String member, String roleName,
 			String resource) throws IOException, InvalidTicketSignal,
 			InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
 		this.getResourceManager();
-		System.out.println("Adding project role for member:" + member + " role: " + roleName + " project:" + resource);
 		resourceManager.addRoleToMember(member, roleName, resource, ResourceRoles.PROJECT, this.ticketString);
 	}
 
-	public void RemoveProjectRoleFromMember(String member, String roleName,
+	public void removeProjectRoleFromMember(String member, String roleName,
 			String resource) throws IOException, InvalidTicketSignal,
 			InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
 		this.getResourceManager();
-		System.out.println("Removing project role for member:" + member + " role: " + roleName + " project:" + resource);
 		resourceManager.removeRoleFromMember(member, roleName, resource, ResourceRoles.PROJECT, this.ticketString);
 	}
-	public void AddSafetyFlagToMember(String member ) throws IOException, InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
-		this.AddEquipmentRoleToMember(member, "safety", "Door Access");
-	}//need to write test for this
 	
-	public void RemoveSafetyFlagFromMember(String member) throws IOException, InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
-		this.RemoveEquipmentRoleFromMember(member, "safety", "Door Access");
-	}//need to write test for this
+	public void addSafetyFlagToMember(String member ) throws IOException, InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
+		this.addEquipmentRoleToMember(member, "safety", "Door Access");
+	}
+	
+	public void removeSafetyFlagFromMember(String member) throws IOException, InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
+		this.removeEquipmentRoleFromMember(member, "safety", "Door Access");
+	}
 	
 	public void enable(String item){
 		this.getEquipmentManager();
@@ -288,7 +280,7 @@ public class CoralAPI {
 //	reserve( tool, agent, member, project, account, begin time, end time(or length) ) 
 //	deleteReservation( tool, member, time, length )
 //	costRecovery (month, year)          
-	public Members GetProjectMembers(String projectName) {
+	public Members getProjectMembers(String projectName) {
 		logger.debug("GetProjectMembers called for project " + projectName);
 		Members matches = new Members();
     	this.getResourceManager();
@@ -315,15 +307,15 @@ public class CoralAPI {
 		logger.debug("size of resultset: " + matches.size());
 		return matches;
 	}
-	public void CreateNewAccount(Account acct) throws Exception {
+	public void createNewAccount(Account acct) throws Exception {
 		this.getResourceManager();
 		resourceManager.addAccount(acct.convertToIdlAccountForRscMgr(), this.ticketString);
 	}
-	public void CreateNewAccountUnlessExists(Account acct) throws Exception {
+	public void createNewAccountUnlessExists(Account acct) throws Exception {
 		try {
 			this.getAccount(acct.getName());
 		} catch (InvalidAccountSignal e) {
-			this.CreateNewAccount(acct);
+			this.createNewAccount(acct);
 		}
 	}
 	
