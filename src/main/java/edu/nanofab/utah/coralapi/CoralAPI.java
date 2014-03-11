@@ -1,17 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package edu.nanofab.coralapi;
+
+package edu.nanofab.utah.coralapi;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.opencoral.constants.Constants;
-import org.opencoral.corba.AccountAdapter;
-import org.opencoral.corba.MemberAdapter;
-import org.opencoral.corba.ProjectAdapter;
-import org.opencoral.gui.LabFrame;
 import org.opencoral.idl.AccountNotFoundSignal;
 import org.opencoral.idl.InvalidAccountSignal;
 import org.opencoral.idl.InvalidAgentSignal;
@@ -34,26 +25,19 @@ import org.opencoral.idl.Equipment.EquipmentManager;
 import org.opencoral.idl.Equipment.EquipmentManagerHelper;
 import org.opencoral.idl.Resource.ResourceManager;
 import org.opencoral.idl.Resource.ResourceManagerHelper;
-import org.opencoral.util.Encryption;
 import org.opencoral.util.ResourceRoles;
-import org.opencoral.util.Tstamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.nanofab.coralapi.collections.Accounts;
-import edu.nanofab.coralapi.collections.Members;
-import edu.nanofab.coralapi.collections.MembersProxySet;
-import edu.nanofab.coralapi.collections.Projects;
-import edu.nanofab.coralapi.resource.Account;
-import edu.nanofab.coralapi.resource.Member;
-import edu.nanofab.coralapi.resource.Project;
+import edu.nanofab.utah.coralapi.collections.Accounts;
+import edu.nanofab.utah.coralapi.collections.Members;
+import edu.nanofab.utah.coralapi.collections.Projects;
+import edu.nanofab.utah.coralapi.resource.Account;
+import edu.nanofab.utah.coralapi.resource.Member;
+import edu.nanofab.utah.coralapi.resource.Project;
 import edu.utah.nanofab.CoralManagerConnector;
 
-/**
- *
- * @author neil
- */
-public class CoralServices {
+public class CoralAPI {
     private String coralUser="coral";
     private String iorUrl="http://vagrant-coral-dev/IOR/";
     private String configUrl = "";
@@ -65,12 +49,12 @@ public class CoralServices {
     private EquipmentManager equipmentManager = null;
 	private CoralCrypto coralCrypto;
            
-    public CoralServices(String coralUser, String iorUrl, String configUrl) {
+    public CoralAPI(String coralUser, String iorUrl, String configUrl) {
     	this.coralUser = coralUser;
     	this.iorUrl = iorUrl;
     	this.configUrl = configUrl;
         System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
-        logger = LoggerFactory.getLogger(CoralServices.class);
+        logger = LoggerFactory.getLogger(CoralAPI.class);
         this.coralCrypto = new CoralCrypto(this.configUrl);
     }
     
@@ -343,7 +327,7 @@ public class CoralServices {
 		}
 	}
 	
-	public edu.nanofab.coralapi.resource.Account getAccount(String name) throws InvalidAccountSignal {
+	public edu.nanofab.utah.coralapi.resource.Account getAccount(String name) throws InvalidAccountSignal {
 		this.getResourceManager();
 		org.opencoral.idl.Account idlAccount = resourceManager.getAccount(name);
 		logger.debug("Account fetched: " + idlAccount.name + " with edate fields (year, month, day, hour, isnull: " + idlAccount.edate.year + "," + idlAccount.edate.month + "," + idlAccount.edate.day +"," + idlAccount.edate.hour + "," + idlAccount.edate.isNull);
@@ -352,7 +336,7 @@ public class CoralServices {
 		return acct;
 	}
 	
-	public edu.nanofab.coralapi.collections.Accounts getAccounts() throws AccountNotFoundSignal {
+	public edu.nanofab.utah.coralapi.collections.Accounts getAccounts() throws AccountNotFoundSignal {
 		this.getResourceManager();
     	org.opencoral.idl.Account[] allAccounts = resourceManager.getAllAccounts();
     	Accounts accountCollection = Accounts.fromIdlAccountArray(allAccounts); 

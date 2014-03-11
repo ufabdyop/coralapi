@@ -1,7 +1,7 @@
-package edu.nanofab.coralapi.collections;
+package edu.nanofab.utah.coralapi.collections;
 
 
-import edu.nanofab.coralapi.resource.Account;
+import edu.nanofab.utah.coralapi.resource.Account;
 
 public class Accounts extends AccountsProxySet {
 

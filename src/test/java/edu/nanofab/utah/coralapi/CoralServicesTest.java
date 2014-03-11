@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.nanofab.coralapi;
+package edu.nanofab.utah.coralapi;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -17,10 +17,11 @@ import org.opencoral.idl.InvalidTicketSignal;
 import org.opencoral.idl.NotAuthorizedSignal;
 import org.opencoral.idl.ProjectNotFoundSignal;
 
-import edu.nanofab.coralapi.collections.Members;
-import edu.nanofab.coralapi.resource.Account;
-import edu.nanofab.coralapi.resource.Member;
-import edu.nanofab.coralapi.resource.Project;
+import edu.nanofab.utah.coralapi.CoralAPI;
+import edu.nanofab.utah.coralapi.collections.Members;
+import edu.nanofab.utah.coralapi.resource.Account;
+import edu.nanofab.utah.coralapi.resource.Member;
+import edu.nanofab.utah.coralapi.resource.Project;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -33,7 +34,7 @@ import java.util.Date;
 public class CoralServicesTest extends TestCase {
     FixtureHelper data = new FixtureHelper();
     protected String allowedHostname = "vagrant-centos63-32";
-	private CoralServices instance;
+	private CoralAPI instance;
 	public CoralServicesTest(String testName) {
         super(testName);
     }
@@ -58,7 +59,7 @@ public class CoralServicesTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         guardAgainstRunningOnLive();
-    	this.instance = new CoralServices("coral", "http://vagrant-coral-dev/IOR/", "http://vagrant-coral-dev/coral/lib/config.jar");
+    	this.instance = new CoralAPI("coral", "http://vagrant-coral-dev/IOR/", "http://vagrant-coral-dev/coral/lib/config.jar");
     	Account a = new Account();
     	a.setName("JUnit Testing Account" );
     	Project p = new Project();

@@ -37,7 +37,7 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
- 	<dependency>
+    <dependency>
       <groupId>opencoral</groupId>
       <artifactId>opencoral-utahnanofab</artifactId>
       <version>0.0.1</version>
@@ -51,7 +51,7 @@
       <groupId>org</groupId>
       <artifactId>postgresql</artifactId>
       <version>1.0.0.3</version>
-    </dependency>    
+    </dependency>
 
     <dependency>
         <groupId>log4j</groupId>

@@ -1,4 +1,4 @@
-package edu.nanofab.coralapi;
+package edu.nanofab.utah.coralapi;
 
 import java.io.File;
 import java.io.IOException;

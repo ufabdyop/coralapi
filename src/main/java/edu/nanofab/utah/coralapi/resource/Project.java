@@ -1,4 +1,4 @@
-package edu.nanofab.coralapi.resource;
+package edu.nanofab.utah.coralapi.resource;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -6,7 +6,7 @@ import java.util.Date;
 import org.opencoral.corba.ProjectAdapter;
 import org.opencoral.idl.Timestamp;
 
-import edu.nanofab.coralapi.helper.TimestampConverter;
+import edu.nanofab.utah.coralapi.helper.TimestampConverter;
 
 public class Project {
     boolean isNull;

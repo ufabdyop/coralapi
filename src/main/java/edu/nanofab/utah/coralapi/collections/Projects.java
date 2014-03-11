@@ -1,6 +1,6 @@
-package edu.nanofab.coralapi.collections;
+package edu.nanofab.utah.coralapi.collections;
 
-import edu.nanofab.coralapi.resource.Project;
+import edu.nanofab.utah.coralapi.resource.Project;
 
 
 public class Projects extends ProjectsProxySet {

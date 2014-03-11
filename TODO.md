@@ -2,6 +2,7 @@
 * TDD: getMembersForProject should only include active members
 * TDD: signed in user not allowed to delete account/project user is on 
 * Remove direct DB queries from tests
+* Add lab as a parameter
 
 Interface Change:
 
