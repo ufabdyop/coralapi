@@ -4,7 +4,7 @@
 
   <groupId>edu.nanofab</groupId>
   <artifactId>CoralAPI</artifactId>
-  <version>0.1.19</version>
+  <version>0.1.20-SNAPSHOT</version>
   <packaging>jar</packaging>
   
   <distributionManagement>

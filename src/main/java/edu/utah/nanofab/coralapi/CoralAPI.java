@@ -16,9 +16,12 @@ import org.opencoral.idl.InvalidTicketSignal;
 import org.opencoral.idl.MemberDuplicateSignal;
 import org.opencoral.idl.MemberNotFoundSignal;
 import org.opencoral.idl.NotAuthorizedSignal;
+import org.opencoral.idl.Persona;
 import org.opencoral.idl.ProjectNotFoundSignal;
 import org.opencoral.idl.Relation;
 import org.opencoral.idl.ResourceUnavailableSignal;
+import org.opencoral.idl.Role;
+import org.opencoral.idl.RoleNotFoundSignal;
 import org.opencoral.idl.Auth.AuthManager;
 import org.opencoral.idl.Auth.AuthManagerHelper;
 import org.opencoral.idl.Equipment.EquipmentManager;
@@ -31,8 +34,10 @@ import org.slf4j.LoggerFactory;
 
 import edu.utah.nanofab.coralapi.resource.Account;
 import edu.utah.nanofab.coralapi.collections.Accounts;
+import edu.utah.nanofab.coralapi.collections.LabRoles;
 import edu.utah.nanofab.coralapi.collections.Members;
 import edu.utah.nanofab.coralapi.collections.Projects;
+import edu.utah.nanofab.coralapi.resource.LabRole;
 import edu.utah.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.coralapi.resource.Project;
 import edu.utah.nanofab.helper.CoralManagerConnector;
@@ -239,41 +244,13 @@ public class CoralAPI {
 		this.removeEquipmentRoleFromMember(member, "safety", "Door Access");
 	}
 	
-	public void enable(String item){
+	public void enable(String item) throws InvalidTicketSignal, InvalidAgentSignal, InvalidProjectSignal, InvalidAccountSignal, InvalidMemberSignal, InvalidResourceSignal, InvalidProcessSignal, ResourceUnavailableSignal, NotAuthorizedSignal{
 		this.getEquipmentManager();
 		ActivityFactory fac = new ActivityFactory();
 		org.opencoral.idl.Activity activity = fac.createDefaultActivity(item);
-		try{
-			equipmentManager.enable(activity, false, this.ticketString);
-		}
-		catch (InvalidTicketSignal e){
-		
-		}
-		catch (InvalidAgentSignal e1){
-			
-		}
-		catch (InvalidProjectSignal e2){
-			
-		}
-		catch (InvalidAccountSignal e3){
-			
-		}
-		catch (InvalidMemberSignal e4){
-			
-		}
-		catch (InvalidResourceSignal e5){
-			
-		}
-		catch (InvalidProcessSignal e6){
-			
-		}
-		catch (ResourceUnavailableSignal e7){
-			
-		}
-		catch (NotAuthorizedSignal e8){
-			
-		}
+		equipmentManager.enable(activity, false, this.ticketString);
 	}
+	
 //	disable(tool)
 //	qualify(tool, member, role)
 //	disqualify(tool, member, role)
@@ -382,5 +359,21 @@ public class CoralAPI {
 		} catch (Exception e) {
 			logger.error("could not call release on connector: " + e.getMessage());
 		}
+	}
+
+	public void addLabRole(LabRole newRole) throws InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
+		this.getResourceManager();
+		resourceManager.addRoleToMember(
+				newRole.getMember(), 
+				newRole.getRole(),
+				newRole.getLab(),
+				"lab",
+				this.ticketString);
+	}
+
+	public LabRoles getLabRoles(String username) throws RoleNotFoundSignal {
+		this.getResourceManager();
+		Persona[] personas = resourceManager.getPersonas(username, "*", "*", ResourceRoles.LAB, true);
+		return LabRoles.fromIdlPersonaArray(personas);
 	}
 }

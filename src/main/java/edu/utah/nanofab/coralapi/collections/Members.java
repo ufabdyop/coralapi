@@ -3,12 +3,12 @@ package edu.utah.nanofab.coralapi.collections;
 import edu.utah.nanofab.coralapi.resource.Member;
 
 
-public class Members extends MembersProxySet {
+public class Members extends ProxySet<Member> {
 	@Override
 	public boolean contains(Object memberObject) 
 	{
 		Member member = (Member)memberObject;
-		for (Member m : this.members ) {
+		for (Member m : this.collection ) {
 			if (membersEqual(member, m)) {
 				return true;
 			}
@@ -25,7 +25,7 @@ public class Members extends MembersProxySet {
 	{
 		String[] names = new String[this.size()];
 		int i = 0;
-		for (Member m : this.members ) {
+		for (Member m : this.collection ) {
 			names[i] = m.getName();
 			i++;
 		}

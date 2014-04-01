@@ -3,7 +3,7 @@ package edu.utah.nanofab.coralapi.collections;
 
 import edu.utah.nanofab.coralapi.resource.Account;
 
-public class Accounts extends AccountsProxySet {
+public class Accounts extends ProxySet<Account> {
 
 	public static Accounts fromIdlAccountArray(org.opencoral.idl.Account[] allAccounts) {
 		Accounts accountCollection = new Accounts();

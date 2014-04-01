@@ -1,6 +1,7 @@
 package edu.utah.nanofab.coralapi;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
@@ -9,13 +10,17 @@ import junit.framework.TestCase;
 
 import org.opencoral.idl.AccountNotFoundSignal;
 import org.opencoral.idl.InvalidAccountSignal;
+import org.opencoral.idl.InvalidMemberSignal;
+import org.opencoral.idl.InvalidRoleSignal;
 import org.opencoral.idl.InvalidTicketSignal;
 import org.opencoral.idl.NotAuthorizedSignal;
 import org.opencoral.idl.ProjectNotFoundSignal;
 
 import edu.utah.nanofab.coralapi.CoralAPI;
 import edu.utah.nanofab.coralapi.resource.Account;
+import edu.utah.nanofab.coralapi.collections.LabRoles;
 import edu.utah.nanofab.coralapi.collections.Members;
+import edu.utah.nanofab.coralapi.resource.LabRole;
 import edu.utah.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.coralapi.resource.Project;
 
@@ -386,6 +391,19 @@ public class CoralServicesTest extends TestCase {
         instance.createNewMember(member);  
         Member mem = instance.getMember("testuser");
         Assert.assertEquals("testuser", mem.getName());
+    }
+    
+    public void testGetLabRoles() throws Exception {
+        data.deleteMember("testuser");
+    	System.out.println("Test Get Member");
+    	Member member = new Member();
+    	member.setName("testuser");
+    	member.setProject("JUnit Testing Project");
+        instance.createNewMember(member);
+        LabRole newRole = new LabRole("nano", member.getName(), "staff" );
+        instance.addLabRole( newRole );
+        LabRoles roles = instance.getLabRoles(member.getName());
+        assertTrue( roles.contains(newRole) );
     }
     
     /*
