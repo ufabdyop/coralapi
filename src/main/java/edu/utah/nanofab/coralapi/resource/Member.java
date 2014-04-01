@@ -1,11 +1,11 @@
-package edu.nanofab.utah.coralapi.resource;
+package edu.utah.nanofab.coralapi.resource;
 
 import java.util.Date;
 
 import org.opencoral.corba.MemberAdapter;
 import org.opencoral.idl.Timestamp;
 
-import edu.nanofab.utah.coralapi.helper.TimestampConverter;
+import edu.utah.nanofab.coralapi.helper.TimestampConverter;
 
 public class Member {
 	private String name;

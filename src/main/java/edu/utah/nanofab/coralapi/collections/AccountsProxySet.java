@@ -1,11 +1,11 @@
-package edu.nanofab.utah.coralapi.collections;
+package edu.utah.nanofab.coralapi.collections;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import edu.nanofab.utah.coralapi.resource.Account;
+import edu.utah.nanofab.coralapi.resource.Account;
 
 public class AccountsProxySet implements Set {
 	protected HashSet<Account> accounts = new HashSet<Account>();

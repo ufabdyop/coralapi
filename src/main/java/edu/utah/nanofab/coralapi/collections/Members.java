@@ -1,6 +1,6 @@
-package edu.nanofab.utah.coralapi.collections;
+package edu.utah.nanofab.coralapi.collections;
 
-import edu.nanofab.utah.coralapi.resource.Member;
+import edu.utah.nanofab.coralapi.resource.Member;
 
 
 public class Members extends MembersProxySet {

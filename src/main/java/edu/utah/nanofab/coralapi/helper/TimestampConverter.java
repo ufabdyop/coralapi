@@ -1,4 +1,4 @@
-package edu.nanofab.utah.coralapi.helper;
+package edu.utah.nanofab.coralapi.helper;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

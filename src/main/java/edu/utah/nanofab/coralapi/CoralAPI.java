@@ -1,5 +1,5 @@
 
-package edu.nanofab.utah.coralapi;
+package edu.utah.nanofab.coralapi;
 import java.io.IOException;
 
 import org.opencoral.constants.Constants;
@@ -29,13 +29,13 @@ import org.opencoral.util.ResourceRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.nanofab.utah.coralapi.collections.Accounts;
-import edu.nanofab.utah.coralapi.collections.Members;
-import edu.nanofab.utah.coralapi.collections.Projects;
-import edu.nanofab.utah.coralapi.resource.Account;
-import edu.nanofab.utah.coralapi.resource.Member;
-import edu.nanofab.utah.coralapi.resource.Project;
-import edu.utah.nanofab.CoralManagerConnector;
+import edu.utah.nanofab.coralapi.resource.Account;
+import edu.utah.nanofab.coralapi.collections.Accounts;
+import edu.utah.nanofab.coralapi.collections.Members;
+import edu.utah.nanofab.coralapi.collections.Projects;
+import edu.utah.nanofab.coralapi.resource.Member;
+import edu.utah.nanofab.coralapi.resource.Project;
+import edu.utah.nanofab.helper.CoralManagerConnector;
 
 public class CoralAPI {
     private String coralUser="coral";
@@ -319,7 +319,7 @@ public class CoralAPI {
 		}
 	}
 	
-	public edu.nanofab.utah.coralapi.resource.Account getAccount(String name) throws InvalidAccountSignal {
+	public edu.utah.nanofab.coralapi.resource.Account getAccount(String name) throws InvalidAccountSignal {
 		this.getResourceManager();
 		org.opencoral.idl.Account idlAccount = resourceManager.getAccount(name);
 		logger.debug("Account fetched: " + idlAccount.name + " with edate fields (year, month, day, hour, isnull: " + idlAccount.edate.year + "," + idlAccount.edate.month + "," + idlAccount.edate.day +"," + idlAccount.edate.hour + "," + idlAccount.edate.isNull);
@@ -328,7 +328,7 @@ public class CoralAPI {
 		return acct;
 	}
 	
-	public edu.nanofab.utah.coralapi.collections.Accounts getAccounts() throws AccountNotFoundSignal {
+	public edu.utah.nanofab.coralapi.collections.Accounts getAccounts() throws AccountNotFoundSignal {
 		this.getResourceManager();
     	org.opencoral.idl.Account[] allAccounts = resourceManager.getAllAccounts();
     	Accounts accountCollection = Accounts.fromIdlAccountArray(allAccounts); 

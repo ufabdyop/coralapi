@@ -1,4 +1,4 @@
-package edu.nanofab.utah.coralapi;
+package edu.utah.nanofab.coralapi;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

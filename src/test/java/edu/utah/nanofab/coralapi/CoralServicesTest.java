@@ -1,4 +1,4 @@
-package edu.nanofab.utah.coralapi;
+package edu.utah.nanofab.coralapi;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -13,11 +13,11 @@ import org.opencoral.idl.InvalidTicketSignal;
 import org.opencoral.idl.NotAuthorizedSignal;
 import org.opencoral.idl.ProjectNotFoundSignal;
 
-import edu.nanofab.utah.coralapi.CoralAPI;
-import edu.nanofab.utah.coralapi.collections.Members;
-import edu.nanofab.utah.coralapi.resource.Account;
-import edu.nanofab.utah.coralapi.resource.Member;
-import edu.nanofab.utah.coralapi.resource.Project;
+import edu.utah.nanofab.coralapi.CoralAPI;
+import edu.utah.nanofab.coralapi.resource.Account;
+import edu.utah.nanofab.coralapi.collections.Members;
+import edu.utah.nanofab.coralapi.resource.Member;
+import edu.utah.nanofab.coralapi.resource.Project;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

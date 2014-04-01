@@ -43,11 +43,6 @@
       <version>0.0.1</version>
     </dependency>
     <dependency>
-     <groupId>edu.utah.nanofab</groupId>
-    <artifactId>CoralManagerConnector</artifactId>
-    <version>0.0.6</version>
-    </dependency>
-    <dependency>
       <groupId>org</groupId>
       <artifactId>postgresql</artifactId>
       <version>1.0.0.3</version>
