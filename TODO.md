@@ -1,6 +1,6 @@
-* TDD: Create web interface for routing http requests to api calls.
 * TDD: getMembersForProject should only include active members
-* TDD: signed in user not allowed to delete account/project user is on 
+* TDD: signed in user not allowed to delete account/project user is on
+* Remove dependency on coralmanager connector and include class in this source tree 
 * Remove direct DB queries from tests
 * Add lab as a parameter
 
