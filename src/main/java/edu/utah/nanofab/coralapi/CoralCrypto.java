@@ -18,6 +18,7 @@ public class CoralCrypto {
 	private String Algorithm;
 	private String Transformation;
 	private Encryption blackBox;
+	private ClassLoader classLoader;
 
 	public CoralCrypto(String configUrl) {
 		this.configUrl = configUrl;
@@ -26,29 +27,32 @@ public class CoralCrypto {
 	
 	private void loadProperties() {
 		ClassLoader cl = this.getClassLoader();
+		this.classLoader = cl;
 		InputStream key = cl.getResourceAsStream("certs/Coral.key");
 		InputStream conf = cl.getResourceAsStream("coral.conf");
 		Props = new Properties();
 		String s = null;
 		try {
 			Props.load(conf);
-	        s = this.Props.getProperty("CRYPTO_PROVIDER");
-	        if (s != null) {
-	            this.CryptoProvider = s.trim();
-	        }
+			s = this.Props.getProperty("CRYPTO_PROVIDER");
+			if (s != null) {
+			    this.CryptoProvider = s.trim();
+			}
 
-	        s = this.Props.getProperty("ALGORITHM");
-	        if (s != null) {
-	            this.Algorithm = s.trim();
-	        }
+			s = this.Props.getProperty("ALGORITHM");
+			if (s != null) {
+			    this.Algorithm = s.trim();
+			}
 
-	        s = this.Props.getProperty("TRANSFORMATION");
-	        if (s != null) {
-	            this.Transformation = s.trim();
-	        }
+			s = this.Props.getProperty("TRANSFORMATION");
+			if (s != null) {
+			    this.Transformation = s.trim();
+			}
 			this.blackBox = new Encryption("encrypt", this.CryptoProvider,
-			this.Algorithm, this.Transformation, key);
+				this.Algorithm, this.Transformation, key);
+			this.logProperties();
 		} catch (IOException e) {
+		        System.err.println("Error initializing crypto properties");
 			e.printStackTrace();
 		}
 	}
@@ -92,6 +96,23 @@ public class CoralCrypto {
 		} catch (java.lang.NullPointerException npe) {
 			return "";
 		}
+	}
+
+	private void logProperties()
+	{
+              System.out.println("PROVIDER: " + CryptoProvider);
+              System.out.println("ALGORITHM: " + Algorithm);
+              System.out.println("TRANSFORMATION: " + Transformation);
+
+	      System.out.println("Key loaded: ");
+		InputStream key = classLoader.getResourceAsStream("certs/Coral.key");
+		byte[] keyAsBytes = convertStreamToString(key).getBytes(java.nio.charset.Charset.forName("UTF-8"));
+		System.out.println(javax.xml.bind.DatatypeConverter.printBase64Binary(keyAsBytes));
+	      try {
+		key.close();
+	      } catch (IOException e) {
+			System.err.println("Cannot close input stream for key");
+	      }
 	}
 	
 }
