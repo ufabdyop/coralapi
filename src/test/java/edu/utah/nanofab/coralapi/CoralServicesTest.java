@@ -228,8 +228,8 @@ public class CoralServicesTest extends TestCase {
     }
     
     //how to use this test???
-    public void _testAuthentication() {
-    	boolean password_check = instance.authenticate("testuser", "realpass");
+    public void testAuthentication() {
+    	boolean password_check = instance.authenticate("coral", "coral");
     	assertTrue(password_check);
     	boolean failed_check = instance.authenticate("testuser", "fakepass");
     	assertFalse(failed_check);
