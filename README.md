@@ -12,3 +12,5 @@ This API should wrap up all the boilerplate CORBA stuff for talking to coral, so
     member.getFirstName();
     member.setEmail("johndoe@yahoo.com");
     coral.updateMember(member);
+
+    coral.close();
