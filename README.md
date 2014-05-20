@@ -13,4 +13,7 @@ This API should wrap up all the boilerplate CORBA stuff for talking to coral, so
     member.setEmail("johndoe@yahoo.com");
     coral.updateMember(member);
 
+    //check someone's credentials
+    boolean validCredentials = coral.authenticate("username", "mypassword");
+
     coral.close();
