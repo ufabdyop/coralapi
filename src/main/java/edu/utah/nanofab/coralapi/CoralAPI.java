@@ -197,7 +197,7 @@ public class CoralAPI {
         try {
             mem = new Member(resourceManager.getMember(member));
         } catch (InvalidMemberSignal e) {
-            throw new UnknownMemberException(e.getMessage());
+            throw new UnknownMemberException("Cannot find member: " + member);
         }
 
     	return mem;
