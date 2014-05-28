@@ -316,8 +316,23 @@ public class CoralAPI {
 		Project p = this.getProject(projectName);
 		resourceManager.removeProject(p.convertToIdlProjectForRscMgr(), this.ticketString);
 	}
+        
+        /**
+         * Authenticates the coral account. If the coral account with the supplied
+         * username and password is a valid coral account, this will return true.
+         * Otherwise it will return false. Note, this function will return false
+         * if null parameters are supplied.
+         * 
+         * @param username - the username of the coral member
+         * @param password - the password for the coral username
+         * @return - True if the coral account exists. False otherwise.
+         */
 	public boolean authenticate(String username, String password) {
-		boolean result = false;
+              
+                if (username == null || password == null)
+                    return false;
+		
+                boolean result = false;
 		this.getAuthManager();
 		byte[] u = this.coralCrypto.encrypt(username);
 		byte[] p = this.coralCrypto.encrypt(password);

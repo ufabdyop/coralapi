@@ -231,8 +231,12 @@ public class CoralServicesTest extends TestCase {
     public void testAuthentication() {
     	boolean password_check = instance.authenticate("coral", "coral");
     	assertTrue(password_check);
-    	boolean failed_check = instance.authenticate("testuser", "fakepass");
+    	
+        boolean failed_check = instance.authenticate("testuser", "fakepass");
     	assertFalse(failed_check);
+        
+        boolean invalid_auth = instance.authenticate(null, null);
+        assertFalse(invalid_auth);
     }
     
     /**
