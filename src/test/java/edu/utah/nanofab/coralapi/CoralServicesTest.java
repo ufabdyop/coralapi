@@ -397,6 +397,11 @@ public class CoralServicesTest extends TestCase {
         Assert.assertEquals("testuser", mem.getName());
     }
     
+    @Test(expected=UnknownMemberException.class)
+    public void testUnknownMember() throws Exception {
+        instance.getMember("unknown_member");
+    }
+    
     public void testGetLabRoles() throws Exception {
         data.deleteMember("testuser");
     	System.out.println("Test Get Member");
