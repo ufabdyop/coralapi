@@ -22,6 +22,8 @@
   <url>http://maven.apache.org</url>
 
   <properties>
+    <maven.compiler.target>1.5</maven.compiler.target>
+    <maven.compiler.target>1.5</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
