@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.utah.nanofab.coralapi.resource.Account;
+import edu.utah.nanofab.coralapi.exceptions.UnknownMemberException;
 import edu.utah.nanofab.coralapi.collections.Accounts;
 import edu.utah.nanofab.coralapi.collections.LabRoles;
 import edu.utah.nanofab.coralapi.collections.Members;
@@ -41,6 +42,7 @@ import edu.utah.nanofab.coralapi.resource.LabRole;
 import edu.utah.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.coralapi.resource.Project;
 import edu.utah.nanofab.helper.CoralManagerConnector;
+import java.util.logging.Level;
 
 public class CoralAPI {
     private String coralUser="coral";
@@ -188,9 +190,16 @@ public class CoralAPI {
 			 resourceManager.removeMemberFromProject(member, project, this.ticketString);
 		 }    	
     }
-    public Member getMember(String member) throws Exception{
+    public Member getMember(String member) throws UnknownMemberException, Exception {
     	this.getResourceManager();
-    	Member mem = new Member(resourceManager.getMember(member));
+
+        Member mem;
+        try {
+            mem = new Member(resourceManager.getMember(member));
+        } catch (InvalidMemberSignal e) {
+            throw new UnknownMemberException(e.getMessage());
+        }
+
     	return mem;
     }
     

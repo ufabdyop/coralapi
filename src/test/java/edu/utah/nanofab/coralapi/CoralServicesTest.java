@@ -1,13 +1,23 @@
 package edu.utah.nanofab.coralapi;
 
+import edu.utah.nanofab.coralapi.CoralAPI;
+import edu.utah.nanofab.coralapi.collections.LabRoles;
+import edu.utah.nanofab.coralapi.collections.Members;
+import edu.utah.nanofab.coralapi.exceptions.UnknownMemberException;
+import edu.utah.nanofab.coralapi.resource.Account;
+import edu.utah.nanofab.coralapi.resource.LabRole;
+import edu.utah.nanofab.coralapi.resource.Member;
+import edu.utah.nanofab.coralapi.resource.Project;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import junit.framework.Assert;
 import junit.framework.TestCase;
-
+import org.junit.Test;
 import org.opencoral.idl.AccountNotFoundSignal;
 import org.opencoral.idl.InvalidAccountSignal;
 import org.opencoral.idl.InvalidMemberSignal;
@@ -15,18 +25,6 @@ import org.opencoral.idl.InvalidRoleSignal;
 import org.opencoral.idl.InvalidTicketSignal;
 import org.opencoral.idl.NotAuthorizedSignal;
 import org.opencoral.idl.ProjectNotFoundSignal;
-
-import edu.utah.nanofab.coralapi.CoralAPI;
-import edu.utah.nanofab.coralapi.resource.Account;
-import edu.utah.nanofab.coralapi.collections.LabRoles;
-import edu.utah.nanofab.coralapi.collections.Members;
-import edu.utah.nanofab.coralapi.resource.LabRole;
-import edu.utah.nanofab.coralapi.resource.Member;
-import edu.utah.nanofab.coralapi.resource.Project;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 public class CoralServicesTest extends TestCase {
     FixtureHelper data = new FixtureHelper();
