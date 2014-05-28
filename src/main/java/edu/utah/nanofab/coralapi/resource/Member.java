@@ -26,6 +26,7 @@ public class Member {
 	private String password;
 	private String phone;
 	private String project;
+        private String gender;
 	private String race;
 	private String state;
 	private String type;
@@ -33,6 +34,7 @@ public class Member {
 	private String url;
 	private String zipcode;
 	private boolean active;
+        private Date bdate;
 	private Date edate;
 	
 	public Member(org.opencoral.idl.Member idlMember) throws Exception {
@@ -186,6 +188,14 @@ public class Member {
 	public void setProject(String project) {
 		this.project = project;
 	}
+        
+        public String getGender() {
+                return gender;
+        }
+        
+        public void setGender(String gender) {
+                this.gender = gender;
+        }
 
 	public String getRace() {
 		return race;
@@ -243,6 +253,14 @@ public class Member {
 		this.active = active;
 	}
 
+        public void setBdate(Date date) {
+                this.bdate = date;
+        }
+        
+        public Date getBdate() {
+                return this.bdate;
+        }
+        
 	public void setEdate(Date date) {
 		this.edate = date;
 	}
@@ -325,6 +343,7 @@ public class Member {
     	if (this.password != null) memAP.setValue("password", this.password);
     	if (this.phone != null) memAP.setValue("phone", this.phone);
     	if (this.project != null) memAP.setValue("project", this.project);
+        if (this.gender != null) memAP.setValue("gender", this.gender);
     	if (this.race != null) memAP.setValue("race", this.race);
     	if (this.state != null) memAP.setValue("state", this.state);
     	if (this.type != null) memAP.setValue("type", this.type);
@@ -332,7 +351,8 @@ public class Member {
     	if (this.url != null) memAP.setValue("url", this.url);
     	if (this.zipcode != null) memAP.setValue("zipcode", this.zipcode);  
     	memAP.setValue("active", (this.active == true)?"true":"false");
-		if (this.edate != null) memAP.setValue("edate", TimestampConverter.dateToAdapterString(this.edate));
+        if (this.edate != null) memAP.setValue("edate", TimestampConverter.dateToAdapterString(this.edate));
+        if (this.bdate != null) memAP.setValue("bdate", TimestampConverter.dateToAdapterString(this.bdate));
 		return memAP;
 	}
 }
