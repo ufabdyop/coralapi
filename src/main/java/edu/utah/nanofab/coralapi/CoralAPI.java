@@ -317,7 +317,7 @@ public class CoralAPI {
 		resourceManager.removeProject(p.convertToIdlProjectForRscMgr(), this.ticketString);
 	}
         
-        /**
+       /**
          * Authenticates the coral account. If the coral account with the supplied
          * username and password is a valid coral account, this will return true.
          * Otherwise it will return false. Note, this function will return false
