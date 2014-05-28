@@ -15,6 +15,8 @@ import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import org.junit.Test;
@@ -395,9 +397,14 @@ public class CoralServicesTest extends TestCase {
         Assert.assertEquals("testuser", mem.getName());
     }
     
-    @Test(expected=UnknownMemberException.class)
     public void testUnknownMember() throws Exception {
-        instance.getMember("unknown_member");
+        boolean exceptionCaught = false;
+        try {
+            instance.getMember("unknown_member");
+        } catch (UnknownMemberException ex) {
+            exceptionCaught = true;
+        }
+        assertTrue(exceptionCaught);
     }
     
     public void testGetLabRoles() throws Exception {
