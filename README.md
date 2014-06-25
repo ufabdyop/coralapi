@@ -17,3 +17,7 @@ This API should wrap up all the boilerplate CORBA stuff for talking to coral, so
     boolean validCredentials = coral.authenticate("username", "mypassword");
 
     coral.close();
+    
+Reference Code:
+---
+http://nanoproject.eng.utah.edu/HardwareServerProxy/browser/HardwareServerProxy/HardwareServerProxy/branches/ObserverPatternRefactor/driver/src/main/java/edu/utah/nanofab/controller
