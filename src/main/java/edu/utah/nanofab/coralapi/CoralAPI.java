@@ -41,7 +41,9 @@ import edu.utah.nanofab.coralapi.collections.Projects;
 import edu.utah.nanofab.coralapi.resource.LabRole;
 import edu.utah.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.coralapi.resource.Project;
+import edu.utah.nanofab.coralapi.resource.Reservation;
 import edu.utah.nanofab.helper.CoralManagerConnector;
+
 import java.util.logging.Level;
 
 public class CoralAPI {
@@ -399,5 +401,14 @@ public class CoralAPI {
 		this.getResourceManager();
 		Persona[] personas = resourceManager.getPersonas(username, "*", "*", ResourceRoles.LAB, true);
 		return LabRoles.fromIdlPersonaArray(personas);
+	}
+
+	public void createNewReservation(Reservation r) {
+		
+	}
+
+	public Reservation getReservation(String string, String string2,
+			String string3) {
+		return null;
 	}
 }

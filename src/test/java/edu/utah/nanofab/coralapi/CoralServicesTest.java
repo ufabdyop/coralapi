@@ -8,6 +8,8 @@ import edu.utah.nanofab.coralapi.resource.Account;
 import edu.utah.nanofab.coralapi.resource.LabRole;
 import edu.utah.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.coralapi.resource.Project;
+import edu.utah.nanofab.coralapi.resource.Reservation;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,8 +19,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
+
 import org.junit.Test;
 import org.opencoral.idl.AccountNotFoundSignal;
 import org.opencoral.idl.InvalidAccountSignal;
@@ -249,6 +253,42 @@ public class CoralServicesTest extends TestCase {
         instance.createNewAccount(account);
         Account fetched = instance.getAccount(account.getName());
         assertEquals(fetched.getName(), account.getName());
+    }
+    
+    /**
+     * Test of CreateNewReservation method, of class CoralServices.
+     */
+    public void testCreateNewReservation() throws Exception {
+        data.deleteAccount("JUnit Testing Account");
+        data.deleteProject("JUnit Testing Project");
+        data.deleteMember("testreserve");
+        data.deleteReservation("TMV Super", "2099-01-01 12:00:00", "2099-01-01 13:00:00");
+        
+        Account account = new Account();
+        account.setName("JUnit Testing Account");
+        instance.createNewAccount(account);
+        
+        Project p = new Project();
+        p.setName("JUnit Testing Project");
+        p.setAccount("JUnit Testing Account");
+        instance.createNewProject(p);
+        
+        Member m = new Member();
+        m.setName("testreserve");
+        m.setProject("JUnit Testing Project");
+        instance.createNewMember(m);
+        
+        Reservation r = new Reservation();
+        r.setItem("TMV Super");
+        r.setBdate(2099,1,1,12,0);
+        r.setEdate(2099,1,1,13,0);
+        r.setMember(m);
+        r.setProject(p);
+        r.setAccount(account);
+        instance.createNewReservation(r);
+        
+        Reservation fetched = instance.getReservation("TMV Super", "2099-01-01 12:00:00", "2099-01-01 13:00:00");
+        assertEquals(fetched.getMember().getName(), r.getMember().getName());
     }
     
     public void testAccountDateManipulation() throws Exception {

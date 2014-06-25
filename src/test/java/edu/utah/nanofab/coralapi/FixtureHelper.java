@@ -74,4 +74,12 @@ public class FixtureHelper {
     	System.out.println(query_);
     	query(query_);
 	}
+
+	public void deleteReservation(String item, String bdate, String edate) {
+		String query_ ="DELETE FROM resmgr.reservation WHERE item='"+item+"' "
+				+ "AND (bdate, edate) OVERLAPS ('" + bdate +"'::timestamp, '"
+						+ edate + "'::timestamp)";
+    	System.out.println(query_);
+    	query(query_);		
+	}
 }
