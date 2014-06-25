@@ -1,13 +1,25 @@
 package edu.utah.nanofab.coralapi;
 
+import edu.utah.nanofab.coralapi.CoralAPI;
+import edu.utah.nanofab.coralapi.collections.LabRoles;
+import edu.utah.nanofab.coralapi.collections.Members;
+import edu.utah.nanofab.coralapi.exceptions.UnknownMemberException;
+import edu.utah.nanofab.coralapi.resource.Account;
+import edu.utah.nanofab.coralapi.resource.LabRole;
+import edu.utah.nanofab.coralapi.resource.Member;
+import edu.utah.nanofab.coralapi.resource.Project;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import junit.framework.Assert;
 import junit.framework.TestCase;
-
+import org.junit.Test;
 import org.opencoral.idl.AccountNotFoundSignal;
 import org.opencoral.idl.InvalidAccountSignal;
 import org.opencoral.idl.InvalidMemberSignal;
@@ -15,18 +27,6 @@ import org.opencoral.idl.InvalidRoleSignal;
 import org.opencoral.idl.InvalidTicketSignal;
 import org.opencoral.idl.NotAuthorizedSignal;
 import org.opencoral.idl.ProjectNotFoundSignal;
-
-import edu.utah.nanofab.coralapi.CoralAPI;
-import edu.utah.nanofab.coralapi.resource.Account;
-import edu.utah.nanofab.coralapi.collections.LabRoles;
-import edu.utah.nanofab.coralapi.collections.Members;
-import edu.utah.nanofab.coralapi.resource.LabRole;
-import edu.utah.nanofab.coralapi.resource.Member;
-import edu.utah.nanofab.coralapi.resource.Project;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 public class CoralServicesTest extends TestCase {
     FixtureHelper data = new FixtureHelper();
@@ -231,8 +231,12 @@ public class CoralServicesTest extends TestCase {
     public void testAuthentication() {
     	boolean password_check = instance.authenticate("coral", "coral");
     	assertTrue(password_check);
-    	boolean failed_check = instance.authenticate("testuser", "fakepass");
+    	
+        boolean failed_check = instance.authenticate("testuser", "fakepass");
     	assertFalse(failed_check);
+        
+        boolean invalid_auth = instance.authenticate(null, null);
+        assertFalse(invalid_auth);
     }
     
     /**
@@ -391,6 +395,16 @@ public class CoralServicesTest extends TestCase {
         instance.createNewMember(member);  
         Member mem = instance.getMember("testuser");
         Assert.assertEquals("testuser", mem.getName());
+    }
+    
+    public void testUnknownMember() throws Exception {
+        boolean exceptionCaught = false;
+        try {
+            instance.getMember("unknown_member");
+        } catch (UnknownMemberException ex) {
+            exceptionCaught = true;
+        }
+        assertTrue(exceptionCaught);
     }
     
     public void testGetLabRoles() throws Exception {
