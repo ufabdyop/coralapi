@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.utah.nanofab.coralapi.resource.Account;
+import edu.utah.nanofab.coralapi.exceptions.NotImplementedException;
 import edu.utah.nanofab.coralapi.exceptions.UnknownMemberException;
 import edu.utah.nanofab.coralapi.collections.Accounts;
 import edu.utah.nanofab.coralapi.collections.LabRoles;
@@ -438,7 +439,9 @@ public class CoralAPI {
 
 
 	public Reservation getReservation(String string, String string2,
-			String string3) {
-		return null;
+			String string3) throws NotImplementedException {
+		this.getReservationManager();
+		//reservationManager.findReservation(arg0, arg1);
+		throw new NotImplementedException();
 	}
 }

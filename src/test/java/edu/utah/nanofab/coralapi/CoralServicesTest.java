@@ -274,9 +274,8 @@ public class CoralServicesTest extends TestCase {
         instance.createNewProject(p);
         
         Member m = new Member();
-        m.setName("testreserve");
-        m.setProject("JUnit Testing Project");
-        instance.createNewMember(m);
+        m.setName("coral");
+        m.setProject("Bootstrap project");
         
         Reservation r = new Reservation();
         r.setItem("TMV Super");
