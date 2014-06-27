@@ -1,17 +1,20 @@
 package edu.utah.nanofab.coralapi;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import org.opencoral.idl.Activity;
 import org.opencoral.idl.Timestamp;
 
+import edu.utah.nanofab.coralapi.helper.TimestampConverter;
+
 public class ActivityFactory {
 
 	public Activity createDefaultActivity(String item) {
-		return createRunActivity("test", item, "test", "test", "test");
+		return createRunActivity("test", item, "test", "test", "test", new Date(), new Date());
 	}
 	
-	public static Activity createRunActivity(String user, String tool, String project, String account, String lab) {
+	public static Activity createRunActivity(String user, String tool, String project, String account, String lab, Date bdate, Date edate) {
 		Calendar currentDate = Calendar.getInstance();
 		int y = currentDate.get( Calendar.YEAR );
 		int m = currentDate.get( Calendar.MONTH );
@@ -30,31 +33,10 @@ public class ActivityFactory {
 		} catch (Exception e) {
 			
 		}
-		activity.bdate = new Timestamp(false, (short)y,
-				(short)m,
-				(short)d,
-				(short)h,
-				(short)i,
-				(short)s,
-				(short)0				
-				)      ;
-		activity.creationDate = new Timestamp(false, (short)y,
-				(short)m,
-				(short)d,
-				(short)h,
-				(short)i,
-				(short)s,
-				(short)0				
-				)      ;
-		activity.creator = "coral"      ;
-		activity.edate = new Timestamp(true, (short)0,
-				(short)0,
-				(short)0,
-				(short)0,
-				(short)0,
-				(short)0,
-				(short)0				
-				)      ;
+		activity.bdate = TimestampConverter.dateToTimestamp(bdate);
+		activity.creationDate = TimestampConverter.dateToTimestamp(new Date());
+		activity.creator = user      ;
+		activity.edate =TimestampConverter.dateToTimestamp(edate);
 		activity.id = "not assigned"    ;
 		activity.isNull = false ;
 		activity.item = tool  ;

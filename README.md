@@ -1,7 +1,7 @@
 Coral API
-=========
+===
 
-The CoralAPI project aims to wrap up all the boilerplate CORBA stuff for talking to coral.
+The CoralAPI should wrap up all the boilerplate CORBA stuff for talking to coral.
     
 Usage
 -----

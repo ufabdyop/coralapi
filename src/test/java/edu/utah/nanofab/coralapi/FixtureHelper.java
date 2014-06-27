@@ -115,5 +115,12 @@ public class FixtureHelper {
 
 	public void setDbpass(String dbpass) {
 		this.dbpass = dbpass;
+
+	public void deleteReservation(String item, String bdate, String edate) {
+		String query_ ="DELETE FROM resmgr.reservation WHERE item='"+item+"' "
+				+ "AND (bdate, edate) OVERLAPS ('" + bdate +"'::timestamp, '"
+						+ edate + "'::timestamp)";
+		System.out.println(query_);
+		query(query_);		
 	}
 }

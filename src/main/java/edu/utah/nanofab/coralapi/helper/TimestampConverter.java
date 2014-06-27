@@ -33,9 +33,22 @@ public class TimestampConverter {
 		cal.set(Calendar.SECOND, tstamp.second);
 		return cal.getTime();
 	}
+	
 	public static String dateToAdapterString(Date d) {
         SimpleDateFormat format = 
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return format.format(d);
+	}
+	
+	public static Date dateFromDateComponents(int y, int m, int d, int h, int minute, int second) {
+		Timestamp tstamp = new Timestamp(false, 
+				(short)y, 
+				(short)m, 
+				(short)d, 
+				(short)h, 
+				(short)minute, 
+				(short)second, 
+				(short)0);
+		return timestampToDate(tstamp);
 	}
 }

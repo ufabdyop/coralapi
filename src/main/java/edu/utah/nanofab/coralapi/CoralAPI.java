@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.opencoral.constants.Constants;
 import org.opencoral.idl.AccountNotFoundSignal;
+import org.opencoral.idl.Activity;
 import org.opencoral.idl.InvalidAccountSignal;
 import org.opencoral.idl.InvalidAgentSignal;
 import org.opencoral.idl.InvalidMemberSignal;
@@ -25,6 +26,8 @@ import org.opencoral.idl.Auth.AuthManager;
 import org.opencoral.idl.Auth.AuthManagerHelper;
 import org.opencoral.idl.Equipment.EquipmentManager;
 import org.opencoral.idl.Equipment.EquipmentManagerHelper;
+import org.opencoral.idl.Reservation.ReservationManager;
+import org.opencoral.idl.Reservation.ReservationManagerHelper;
 import org.opencoral.idl.Resource.ResourceManager;
 import org.opencoral.idl.Resource.ResourceManagerHelper;
 import org.opencoral.util.ResourceRoles;
@@ -32,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.utah.nanofab.coralapi.resource.Account;
+import edu.utah.nanofab.coralapi.exceptions.NotImplementedException;
 import edu.utah.nanofab.coralapi.exceptions.UnknownMemberException;
 import edu.utah.nanofab.coralapi.collections.Accounts;
 import edu.utah.nanofab.coralapi.collections.LabRoles;
@@ -40,6 +44,7 @@ import edu.utah.nanofab.coralapi.collections.Projects;
 import edu.utah.nanofab.coralapi.resource.LabRole;
 import edu.utah.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.coralapi.resource.Project;
+import edu.utah.nanofab.coralapi.resource.Reservation;
 import edu.utah.nanofab.helper.CoralManagerConnector;
 
 /**
@@ -59,6 +64,7 @@ public class CoralAPI {
     private CoralManagerConnector connector = null;
     private ResourceManager resourceManager = null;
     private EquipmentManager equipmentManager = null;
+    private ReservationManager reservationManager = null;
 	private CoralCrypto coralCrypto;
            
     public CoralAPI(String coralUser, String iorUrl, String configUrl) {
@@ -81,6 +87,19 @@ public class CoralAPI {
 		logger.debug("reconnectToResourceManager called");
 		resourceManager = ResourceManagerHelper.narrow(connector.getManager(Constants.RSCMGR_NAME));
     }
+    
+    private void getReservationManager() {
+		logger.debug("getReservationManager called");
+        if (connector == null) {
+            System.out.println("connector is null");
+            reconnectToCoral();
+	    }    	
+		if (reservationManager == null){
+			reservationManager = ReservationManagerHelper.narrow(connector.getManager(Constants.RESMGR_NAME));
+			System.out.println("resmgr is null? " + (reservationManager == null));
+		}
+		this.ticketString = connector.getTicketString();
+	}
     
     private void getEquipmentManager(){
     	logger.debug("Entered getEquipmentManager()");
@@ -136,8 +155,8 @@ public class CoralAPI {
                     System.out.println("General exception found" + e.getMessage());
             }
     }
-    
-    public Projects getProjects() throws ProjectNotFoundSignal{
+
+	public Projects getProjects() throws ProjectNotFoundSignal{
     	this.getResourceManager();
     	org.opencoral.idl.Project[] allProjects = resourceManager.getAllProjects();
     	Projects projectCollection = Projects.fromIdlProjectArray(allProjects); 
@@ -162,6 +181,7 @@ public class CoralAPI {
             member.setActive(true);
             resourceManager.addMember(member.convertToIDLMemberForRscMgr(), this.ticketString);
     }
+
 
     public void createNewProject(Project project) throws Exception {
             this.getResourceManager();
@@ -435,5 +455,28 @@ public class CoralAPI {
 		this.getResourceManager();
 		Persona[] personas = resourceManager.getPersonas(username, "*", "*", ResourceRoles.LAB, true);
 		return LabRoles.fromIdlPersonaArray(personas);
+	}
+
+    public void createNewReservation(Reservation r) throws Exception {
+        this.getReservationManager();
+        Activity a = ActivityFactory.createRunActivity(
+        		r.getMember().getName(), 
+        		r.getItem(), 
+    			r.getProject().getName(), 
+    			r.getAccount().getName(),
+    			r.getLab(),
+    			r.getBdate(),
+    			r.getEdate());
+		Activity[] activity_array = {a};
+		logger.debug("Making reservation for " + r.getMember().getName() + " " + r.getItem() );
+		reservationManager.makeReservation(activity_array, this.ticketString);
+}
+
+
+	public Reservation getReservation(String string, String string2,
+			String string3) throws NotImplementedException {
+		this.getReservationManager();
+		//reservationManager.findReservation(arg0, arg1);
+		throw new NotImplementedException();
 	}
 }
