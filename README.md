@@ -57,9 +57,8 @@ coral.close()
 
 For more examples, please refer to the online documentation.
 
-### Reference Material
-We have some old code that does similar stuff here:
+Reference Material
+------------------
+We have some old code that does similar stuff [here][ref]:
 
-Reference Code:
----
-http://nanoproject.eng.utah.edu/HardwareServerProxy/browser/HardwareServerProxy/HardwareServerProxy/branches/ObserverPatternRefactor/driver/src/main/java/edu/utah/nanofab/controller
+[ref]: http://nanoproject.eng.utah.edu/HardwareServerProxy/browser/HardwareServerProxy/HardwareServerProxy/branches/ObserverPatternRefactor/driver/src/main/java/edu/utah/nanofab/controller
