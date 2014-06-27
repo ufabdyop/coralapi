@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.opencoral.constants.Constants;
 import org.opencoral.idl.AccountNotFoundSignal;
+import org.opencoral.idl.Activity;
 import org.opencoral.idl.InvalidAccountSignal;
 import org.opencoral.idl.InvalidAgentSignal;
 import org.opencoral.idl.InvalidMemberSignal;
@@ -20,12 +21,13 @@ import org.opencoral.idl.Persona;
 import org.opencoral.idl.ProjectNotFoundSignal;
 import org.opencoral.idl.Relation;
 import org.opencoral.idl.ResourceUnavailableSignal;
-import org.opencoral.idl.Role;
 import org.opencoral.idl.RoleNotFoundSignal;
 import org.opencoral.idl.Auth.AuthManager;
 import org.opencoral.idl.Auth.AuthManagerHelper;
 import org.opencoral.idl.Equipment.EquipmentManager;
 import org.opencoral.idl.Equipment.EquipmentManagerHelper;
+import org.opencoral.idl.Reservation.ReservationManager;
+import org.opencoral.idl.Reservation.ReservationManagerHelper;
 import org.opencoral.idl.Resource.ResourceManager;
 import org.opencoral.idl.Resource.ResourceManagerHelper;
 import org.opencoral.util.ResourceRoles;
@@ -33,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.utah.nanofab.coralapi.resource.Account;
+import edu.utah.nanofab.coralapi.exceptions.NotImplementedException;
 import edu.utah.nanofab.coralapi.exceptions.UnknownMemberException;
 import edu.utah.nanofab.coralapi.collections.Accounts;
 import edu.utah.nanofab.coralapi.collections.LabRoles;
@@ -44,11 +47,16 @@ import edu.utah.nanofab.coralapi.resource.Project;
 import edu.utah.nanofab.coralapi.resource.Reservation;
 import edu.utah.nanofab.helper.CoralManagerConnector;
 
-import java.util.logging.Level;
-
+/**
+ * The CoralAPI class provides a wrapper for the primary coral services.
+ * 
+ * @author University of Utah Nanofab
+ * @contact nanofab-support@eng.utah.edu
+ */
 public class CoralAPI {
-    private String coralUser="coral";
-    private String iorUrl="http://vagrant-coral-dev/IOR/";
+    
+	private String coralUser = "coral";
+    private String iorUrl = "http://vagrant-coral-dev/IOR/";
     private String configUrl = "";
     private String ticketString = "";
 	private AuthManager authManager;
@@ -56,6 +64,7 @@ public class CoralAPI {
     private CoralManagerConnector connector = null;
     private ResourceManager resourceManager = null;
     private EquipmentManager equipmentManager = null;
+    private ReservationManager reservationManager = null;
 	private CoralCrypto coralCrypto;
            
     public CoralAPI(String coralUser, String iorUrl, String configUrl) {
@@ -78,6 +87,19 @@ public class CoralAPI {
 		logger.debug("reconnectToResourceManager called");
 		resourceManager = ResourceManagerHelper.narrow(connector.getManager(Constants.RSCMGR_NAME));
     }
+    
+    private void getReservationManager() {
+		logger.debug("getReservationManager called");
+        if (connector == null) {
+            System.out.println("connector is null");
+            reconnectToCoral();
+	    }    	
+		if (reservationManager == null){
+			reservationManager = ReservationManagerHelper.narrow(connector.getManager(Constants.RESMGR_NAME));
+			System.out.println("resmgr is null? " + (reservationManager == null));
+		}
+		this.ticketString = connector.getTicketString();
+	}
     
     private void getEquipmentManager(){
     	logger.debug("Entered getEquipmentManager()");
@@ -117,10 +139,8 @@ public class CoralAPI {
 
             this.ticketString = connector.getTicketString();
             System.out.println("this.ticketString = " + this.ticketString );
-            org.opencoral.idl.Project[] projects; 
-
             try {
-                    projects = resourceManager.getAllProjects();
+                    resourceManager.getAllProjects();
             } catch (org.omg.CORBA.COMM_FAILURE comm) {
                     System.out.println("orb communication failure ");
                     connector = null;
@@ -135,8 +155,8 @@ public class CoralAPI {
                     System.out.println("General exception found" + e.getMessage());
             }
     }
-    
-    public Projects getProjects() throws ProjectNotFoundSignal{
+
+	public Projects getProjects() throws ProjectNotFoundSignal{
     	this.getResourceManager();
     	org.opencoral.idl.Project[] allProjects = resourceManager.getAllProjects();
     	Projects projectCollection = Projects.fromIdlProjectArray(allProjects); 
@@ -161,6 +181,7 @@ public class CoralAPI {
             member.setActive(true);
             resourceManager.addMember(member.convertToIDLMemberForRscMgr(), this.ticketString);
     }
+
 
     public void createNewProject(Project project) throws Exception {
             this.getResourceManager();
@@ -192,6 +213,15 @@ public class CoralAPI {
 			 resourceManager.removeMemberFromProject(member, project, this.ticketString);
 		 }    	
     }
+    
+    /**
+     * Gets the member details as a Member object.
+     * 
+     * @param member The name of the coral member.
+     * @return A new Member object with the members details.
+     * @throws UnknownMemberException If the member wasn't found.
+     * @throws Exception If any other error occurs while trying to get the member from the resource manager.
+     */
     public Member getMember(String member) throws UnknownMemberException, Exception {
     	this.getResourceManager();
 
@@ -205,12 +235,36 @@ public class CoralAPI {
     	return mem;
     }
     
+    /**
+     * Gets all the projects that the given member is currently working on.
+     * 
+     * @param member The name of the coral member.
+     * @return The Projects collection.
+     */
+    public Projects getMemberProjects(String member) {
+    	this.getResourceManager();
+    	org.opencoral.idl.Project[] memberProjects = resourceManager.getAllProjectsForMember(member);
+    	Projects projectCollection = Projects.fromIdlProjectArray(memberProjects);
+    	
+    	return projectCollection;
+    }
+    
     public void addMemberProjects(String member, String[] projects) throws InvalidTicketSignal, InvalidMemberSignal, InvalidProjectSignal, NotAuthorizedSignal{
 		 this.getResourceManager();
 		 for (String project: projects ) {
 			 resourceManager.addMemberToProject(member, project, this.ticketString);
 		 }    	
     }
+    
+    public void addMemberProjectCollection(String member, Projects projects) {
+    	this.getResourceManager();
+    	
+    	/*
+    	 * foreach project in projects
+    	 * 		addMemberToProject
+    	 */
+    }
+    
     public void removeMemberProjects(String member, String[] projects) throws InvalidTicketSignal, InvalidMemberSignal, InvalidProjectSignal, NotAuthorizedSignal{
 		 this.getResourceManager();
 		 for (String project: projects ) {
@@ -349,7 +403,7 @@ public class CoralAPI {
 		byte[] p = this.coralCrypto.encrypt(password);
 		
 		try {
-			String ticket = authManager.authenticateByUserNamePassword(u, p);
+			authManager.authenticateByUserNamePassword(u, p);
 			result = true;
 		} catch (InvalidMemberSignal e) {
 			logger.debug("authenticate: Invalid member " + username);
@@ -403,12 +457,26 @@ public class CoralAPI {
 		return LabRoles.fromIdlPersonaArray(personas);
 	}
 
-	public void createNewReservation(Reservation r) {
-		
-	}
+    public void createNewReservation(Reservation r) throws Exception {
+        this.getReservationManager();
+        Activity a = ActivityFactory.createRunActivity(
+        		r.getMember().getName(), 
+        		r.getItem(), 
+    			r.getProject().getName(), 
+    			r.getAccount().getName(),
+    			r.getLab(),
+    			r.getBdate(),
+    			r.getEdate());
+		Activity[] activity_array = {a};
+		logger.debug("Making reservation for " + r.getMember().getName() + " " + r.getItem() );
+		reservationManager.makeReservation(activity_array, this.ticketString);
+}
+
 
 	public Reservation getReservation(String string, String string2,
-			String string3) {
-		return null;
+			String string3) throws NotImplementedException {
+		this.getReservationManager();
+		//reservationManager.findReservation(arg0, arg1);
+		throw new NotImplementedException();
 	}
 }

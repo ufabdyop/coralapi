@@ -8,6 +8,8 @@ public class Reservation {
 	private Date bdate;
 	private Date edate;
 	private String item;
+	private String lab;
+
 	private Member member;
 	private Project project;
 	private Account account;
@@ -54,4 +56,10 @@ public class Reservation {
 	public void setEdate(int y, int m, int d, int h, int min) {
 		this.edate = TimestampConverter.dateFromDateComponents(y,m,d,h,min,0);
 	}
+	public String getLab() {
+		return lab;
+	}
+	public void setLab(String lab) {
+		this.lab = lab;
+	}	
 }

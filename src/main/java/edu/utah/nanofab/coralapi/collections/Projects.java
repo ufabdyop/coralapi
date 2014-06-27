@@ -4,10 +4,11 @@ import edu.utah.nanofab.coralapi.resource.Project;
 
 
 public class Projects extends ProxySet<Project> {
+	
 	@Override
 	public boolean contains(Object projectObject) 
 	{
-		Project project = (Project)projectObject;
+		Project project = (Project) projectObject;
 		for (Project m : this.collection ) {
 			if (projectsEqual(project, m)) {
 				return true;
