@@ -4,7 +4,7 @@
 
   <groupId>edu.utah.nanofab</groupId>
   <artifactId>CoralAPI</artifactId>
-  <version>0.1.25</version>
+  <version>0.1.26</version>
   <packaging>jar</packaging>
   
   <distributionManagement>
@@ -76,4 +76,5 @@
     </repository>
   </repositories>
     
+  <description>The CoralAPI project aims to wrap up all the boilerplate CORBA stuff for talking to coral.</description>
 </project>

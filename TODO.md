@@ -13,3 +13,11 @@ software would no longer need to know about the specifics of the opencoral codeb
 smarter linking between Member and Project, for example: ApiMember.getProjects(), ApiMember.setProjects(...), etc.
 
 
+Jon:
+Test member.getProjects()
+
+* Large ambiguity between addMemberProjects and addProjectMembers...
+
+* I think the method signatures on the API side should match the method signatures on
+the ResourceManagerImpl server side. Unless of course the original naming was very
+ambiguous

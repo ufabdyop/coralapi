@@ -5,11 +5,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class ProxySet<T> implements Set {
+public class ProxySet<T> implements Set<T> {
 	protected HashSet<T> collection = new HashSet<T>();
 
 	public boolean add(Object arg0) {
-		return collection.add((T)arg0); 
+		return collection.add((T) arg0);
 	}
 
 	public boolean addAll(Collection arg0) {
@@ -32,7 +32,7 @@ public class ProxySet<T> implements Set {
 		return collection.isEmpty(); 
 	}
 
-	public Iterator iterator() {
+	public Iterator<T> iterator() {
 		return collection.iterator();
 	}
 

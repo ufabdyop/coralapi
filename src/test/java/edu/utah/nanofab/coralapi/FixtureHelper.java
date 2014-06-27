@@ -11,7 +11,28 @@ import org.opencoral.idl.Project;
 
 public class FixtureHelper {
 
+	private String dbhost = "";
+	private String dbuser = "";
+	private String dbpass = "";
+	
+	/**
+	 * Constructs a FixtureHelper with the supplied connection information.
+	 * 
+	 * @param dbhost The host where the SQL server exists.
+	 * @param dbuser The username for the SQL server.
+	 * @param dbpass The password for the supplied username.
+	 */
+	public FixtureHelper(String dbhost, String dbuser, String dbpass) {
+		this.setDbhost(dbhost);
+		this.setDbuser(dbuser);
+		this.setDbpass(dbpass);
+	}
+	
+	/**
+	 * Constructs a FixtureHelper without any default connection information.
+	 */
 	public FixtureHelper() {
+		
 	}
 
     public Member newMember(String name) throws Exception{
@@ -35,17 +56,14 @@ public class FixtureHelper {
     	String query_ ="DELETE FROM rscmgr.project WHERE name='"+name+"'";
     	System.out.println(query_);
     	query(query_);
-    }    
+    }
+    
     public void query(String query_){
         Connection con = null;
         java.sql.Statement st = null;
-    
-        String url = "jdbc:postgresql://localhost/coral";
-        String user = "coraldba";
-        String password = "coraldba";
 
         try {
-            con = DriverManager.getConnection(url, user, password);
+            con = DriverManager.getConnection(this.dbhost, this.dbuser, this.dbpass);
             st = con.createStatement();
             st.execute(query_);
 
@@ -73,5 +91,29 @@ public class FixtureHelper {
     	String query_ ="DELETE FROM rscmgr.account WHERE name='"+name+"'";
     	System.out.println(query_);
     	query(query_);
+	}
+
+	public String getDbhost() {
+		return dbhost;
+	}
+
+	public void setDbhost(String dbhost) {
+		this.dbhost = dbhost;
+	}
+
+	public String getDbuser() {
+		return dbuser;
+	}
+
+	public void setDbuser(String dbuser) {
+		this.dbuser = dbuser;
+	}
+
+	public String getDbpass() {
+		return dbpass;
+	}
+
+	public void setDbpass(String dbpass) {
+		this.dbpass = dbpass;
 	}
 }

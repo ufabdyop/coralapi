@@ -3,62 +3,63 @@ package edu.utah.nanofab.coralapi;
 import edu.utah.nanofab.coralapi.CoralAPI;
 import edu.utah.nanofab.coralapi.collections.LabRoles;
 import edu.utah.nanofab.coralapi.collections.Members;
+import edu.utah.nanofab.coralapi.collections.Projects;
 import edu.utah.nanofab.coralapi.exceptions.UnknownMemberException;
 import edu.utah.nanofab.coralapi.resource.Account;
 import edu.utah.nanofab.coralapi.resource.LabRole;
 import edu.utah.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.coralapi.resource.Project;
+
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import junit.framework.Assert;
 import junit.framework.TestCase;
-import org.junit.Test;
+
 import org.opencoral.idl.AccountNotFoundSignal;
 import org.opencoral.idl.InvalidAccountSignal;
-import org.opencoral.idl.InvalidMemberSignal;
-import org.opencoral.idl.InvalidRoleSignal;
 import org.opencoral.idl.InvalidTicketSignal;
 import org.opencoral.idl.NotAuthorizedSignal;
 import org.opencoral.idl.ProjectNotFoundSignal;
 
-public class CoralServicesTest extends TestCase {
-    FixtureHelper data = new FixtureHelper();
-    protected String allowedHostname = "vagrant-centos63-32";
+public class CoralAPITest extends TestCase {
+	
+	String dbhost = "jdbc:postgresql://localhost/coral";
+	String dbuser = "coraldba";
+	String dbpass = "coraldba";
+    FixtureHelper data = new FixtureHelper(dbhost, dbuser, dbpass);
+    
 	private CoralAPI instance;
-	public CoralServicesTest(String testName) {
+	
+	public CoralAPITest(String testName) {
         super(testName);
     }
     
     protected void guardAgainstRunningOnLive() throws Exception {
-    	this._guardAgainstRunningOnLive();
-    }
-    
-    protected void _guardAgainstRunningOnLive() throws Exception {
+    	String liveHost = "coral.nanofab.utah.edu";
         Process results = Runtime.getRuntime().exec("hostname");
         InputStream stdout = results.getInputStream();
         BufferedReader reader = new BufferedReader (new InputStreamReader(stdout));
         String hostname = reader.readLine();
-        if (hostname.equals(allowedHostname)) {
-        } else {
-        	System.err.println("Hostname should be " + allowedHostname + "!");
-        }
-        assertTrue("only allow tests to run on vm called " + allowedHostname, hostname.equals(allowedHostname));
+        
+        assertTrue(!hostname.equals(liveHost));
     }
     
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         guardAgainstRunningOnLive();
-    	this.instance = new CoralAPI("coral", "http://vagrant-coral-dev/IOR/", "http://vagrant-coral-dev/coral/lib/config.jar");
+        
+        String coralUser = "coral";
+        String iorUrl = "http://vagrant-coral-dev/IOR/";
+        String configUrl = "http://vagrant-coral-dev/coral/lib/config.jar";
+    	this.instance = new CoralAPI(coralUser, iorUrl, configUrl);
+    	
     	Account a = new Account();
-    	a.setName("JUnit Testing Account" );
+    	a.setName("JUnit Testing Account");
+    	
     	Project p = new Project();
     	p.setName("JUnit Testing Project");
     	p.setAccount("JUnit Testing Account" );
@@ -70,11 +71,41 @@ public class CoralServicesTest extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
     }
+    
     public void testGetProjects() throws ProjectNotFoundSignal{
     	System.out.println("Get ALL PROJECTS");
     	int len = instance.getProjects().size();
     	System.out.println("Number of projects: "+ len);
     	assertTrue(len > 0);
+    }
+    
+    public void testGetMemberProjects() throws Exception {
+    	System.out.println("Get Member PROJECTS");
+    	    	
+    	Project project1 = new Project();
+    	project1.setName("JUnit Testing Project 1");
+    	project1.setAccount("JUnit Testing Account");
+    	instance.createNewProjectUnlessExists(project1);
+    	
+    	Project project2 = new Project();
+    	project2.setName("JUnit Testing Project 2");
+    	project2.setAccount("JUnit Testing Account");
+    	instance.createNewProjectUnlessExists(project2);
+    	
+    	String memberName = "JUnit Testing Member";
+    	Member member = new Member();
+    	member.setName(memberName);
+    	member.setProject(project1.getName());
+    	
+    	String[] projectList = {project1.getName(), project2.getName()};
+    	instance.createNewMember(member);
+    	System.out.println("Added member: " + memberName);
+    	instance.addMemberProjects(memberName, projectList);
+    	
+    	Projects memberProjects = instance.getMemberProjects(memberName);
+    	int numProjects = memberProjects.size();
+    	System.out.println("Number of projects: "+ numProjects);
+    	assertTrue(numProjects == 2);
     }
 
     public void testGetAccounts() throws AccountNotFoundSignal {
@@ -387,14 +418,15 @@ public class CoralServicesTest extends TestCase {
     }
     
     public void testGetMember() throws Exception {
-        data.deleteMember("testuser");
     	System.out.println("Test Get Member");
+    	data.deleteMember("testuser");
+    	
     	Member member = new Member();
     	member.setName("testuser");
     	member.setProject("JUnit Testing Project");
         instance.createNewMember(member);  
         Member mem = instance.getMember("testuser");
-        Assert.assertEquals("testuser", mem.getName());
+        assertEquals("testuser", mem.getName());
     }
     
     public void testUnknownMember() throws Exception {

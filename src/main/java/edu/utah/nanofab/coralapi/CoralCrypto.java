@@ -1,6 +1,5 @@
 package edu.utah.nanofab.coralapi;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -8,7 +7,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Properties;
 
-import org.opencoral.gui.LabFrame;
 import org.opencoral.util.Encryption;
 
 public class CoralCrypto {

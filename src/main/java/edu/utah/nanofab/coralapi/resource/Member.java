@@ -26,7 +26,7 @@ public class Member {
 	private String password;
 	private String phone;
 	private String project;
-        private String gender;
+    private String gender;
 	private String race;
 	private String state;
 	private String type;
@@ -34,7 +34,7 @@ public class Member {
 	private String url;
 	private String zipcode;
 	private boolean active;
-        private Date bdate;
+    private Date bdate;
 	private Date edate;
 	
 	public Member(org.opencoral.idl.Member idlMember) throws Exception {
