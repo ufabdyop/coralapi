@@ -41,6 +41,7 @@ import edu.utah.nanofab.coralapi.collections.Accounts;
 import edu.utah.nanofab.coralapi.collections.LabRoles;
 import edu.utah.nanofab.coralapi.collections.Members;
 import edu.utah.nanofab.coralapi.collections.Projects;
+import edu.utah.nanofab.coralapi.resource.Enable;
 import edu.utah.nanofab.coralapi.resource.LabRole;
 import edu.utah.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.coralapi.resource.Project;
@@ -309,19 +310,6 @@ public class CoralAPI {
 		this.removeEquipmentRoleFromMember(member, "safety", "Door Access");
 	}
 	
-	public void enable(String item) throws InvalidTicketSignal, InvalidAgentSignal, InvalidProjectSignal, InvalidAccountSignal, InvalidMemberSignal, InvalidResourceSignal, InvalidProcessSignal, ResourceUnavailableSignal, NotAuthorizedSignal{
-		this.getEquipmentManager();
-		ActivityFactory fac = new ActivityFactory();
-		org.opencoral.idl.Activity activity = fac.createDefaultActivity(item);
-		equipmentManager.enable(activity, false, this.ticketString);
-	}
-	
-//	disable(tool)
-//	qualify(tool, member, role)
-//	disqualify(tool, member, role)
-//	reserve( tool, agent, member, project, account, begin time, end time(or length) ) 
-//	deleteReservation( tool, member, time, length )
-//	costRecovery (month, year)          
 	public Members getProjectMembers(String projectName) {
 		logger.debug("GetProjectMembers called for project " + projectName);
 		Members matches = new Members();
@@ -472,6 +460,25 @@ public class CoralAPI {
 		reservationManager.makeReservation(activity_array, this.ticketString);
 }
 
+	public void enable(Enable enableActivity) throws InvalidTicketSignal, InvalidAgentSignal, InvalidProjectSignal, InvalidAccountSignal, InvalidMemberSignal, InvalidResourceSignal, InvalidProcessSignal, ResourceUnavailableSignal, NotAuthorizedSignal{
+		this.getEquipmentManager();
+		Activity activity = ActivityFactory.createRunActivity(
+        		enableActivity.getMember().getName(), 
+        		enableActivity.getItem(), 
+    			enableActivity.getProject().getName(), 
+    			enableActivity.getAccount().getName(),
+    			enableActivity.getLab(),
+    			enableActivity.getBdate(),
+    			enableActivity.getEdate());		
+		equipmentManager.enable(activity, false, this.ticketString);
+	}
+	
+//	disable(tool)
+//	qualify(tool, member, role)
+//	disqualify(tool, member, role)
+//	reserve( tool, agent, member, project, account, begin time, end time(or length) ) 
+//	deleteReservation( tool, member, time, length )
+//	costRecovery (month, year)          
 
 	public Reservation getReservation(String string, String string2,
 			String string3) throws NotImplementedException {

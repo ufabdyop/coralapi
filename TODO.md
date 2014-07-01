@@ -21,3 +21,5 @@ Test member.getProjects()
 * I think the method signatures on the API side should match the method signatures on
 the ResourceManagerImpl server side. Unless of course the original naming was very
 ambiguous
+
+* Fix createNewReservation test.

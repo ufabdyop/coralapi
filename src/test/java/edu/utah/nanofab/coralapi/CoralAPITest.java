@@ -9,6 +9,7 @@ import edu.utah.nanofab.coralapi.resource.Account;
 import edu.utah.nanofab.coralapi.resource.LabRole;
 import edu.utah.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.coralapi.resource.Project;
+import edu.utah.nanofab.coralapi.resource.Reservation;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -16,6 +17,7 @@ import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
 import junit.framework.TestCase;
 
 import org.opencoral.idl.AccountNotFoundSignal;
@@ -81,7 +83,9 @@ public class CoralAPITest extends TestCase {
     
     public void testGetMemberProjects() throws Exception {
     	System.out.println("Get Member PROJECTS");
-    	    	
+    	String memberName = "JUnit Testing Member";
+    	data.deleteMember(memberName);
+    	
     	Project project1 = new Project();
     	project1.setName("JUnit Testing Project 1");
     	project1.setAccount("JUnit Testing Account");
@@ -92,7 +96,6 @@ public class CoralAPITest extends TestCase {
     	project2.setAccount("JUnit Testing Account");
     	instance.createNewProjectUnlessExists(project2);
     	
-    	String memberName = "JUnit Testing Member";
     	Member member = new Member();
     	member.setName(memberName);
     	member.setProject(project1.getName());
@@ -108,7 +111,7 @@ public class CoralAPITest extends TestCase {
     	assertTrue(numProjects == 2);
     }
 
-    public void _testGetAccounts() throws AccountNotFoundSignal {
+    public void testGetAccounts() throws AccountNotFoundSignal {
     	System.out.println("Get ALL accounts");
     	int len = instance.getAccounts().size();
     	System.out.println("Number of accounts: "+ len);
@@ -118,7 +121,7 @@ public class CoralAPITest extends TestCase {
     /**
      * Test of CreateNewMember method, of class CoralServices.
      */
-    public void _testCreateNewMemberRoundTrip() throws Exception {
+    public void testCreateNewMemberRoundTrip() throws Exception {
         data.deleteMember("mytest02");
     	System.out.println("TESTING CREATING NEW MEMBER");
     	Member member = new Member();
@@ -178,7 +181,7 @@ public class CoralAPITest extends TestCase {
      * Test of CreateNewProject method, of class CoralServices.
      * @throws Exception 
      */
-    public void _testCreateNewProject() throws Exception {
+    public void testCreateNewProject() throws Exception {
         try {
 			data.deleteProject("JUnit Testing Project");
 		} catch (Exception e) {
@@ -209,8 +212,8 @@ public class CoralAPITest extends TestCase {
         assertEquals(fetched.getType(), project.getType());
     }
     
-    public void _testCreateProjectThenUpdateIt() throws Exception {
-    	this._testCreateNewProject();
+    public void testCreateProjectThenUpdateIt() throws Exception {
+    	this.testCreateNewProject();
     	Project project = instance.getProject("JUnit Testing Project");
     	project.setNickname("new nickname");
     	instance.updateProject(project);
@@ -218,8 +221,8 @@ public class CoralAPITest extends TestCase {
     	assertEquals(fetched.getNickname(), "new nickname");
     }
     
-    public void _testCreateAccountThenUpdateIt() throws Exception {
-    	this._testCreateNewAccount();
+    public void testCreateAccountThenUpdateIt() throws Exception {
+    	this.testCreateNewAccount();
     	Account a = instance.getAccount("JUnit Testing Account");
     	a.setDescription("here is a description");
     	instance.updateAccount(a);
@@ -227,8 +230,8 @@ public class CoralAPITest extends TestCase {
     	assertEquals(fetched.getDescription(), "here is a description");
     }
     
-    public void _testCreateMemberThenUpdateIt() throws Exception {
-    	this._testCreateNewMemberRoundTrip();
+    public void testCreateMemberThenUpdateIt() throws Exception {
+    	this.testCreateNewMemberRoundTrip();
     	Member m = instance.getMember("mytest02");
     	m.setAddress1("here is an address");
     	instance.updateMember(m);
@@ -236,7 +239,7 @@ public class CoralAPITest extends TestCase {
     	assertEquals(fetched.getAddress1(), "here is an address");
     }
         
-    public void _testGetProjectThrowsExceptionForMissingProject() throws InvalidTicketSignal, NotAuthorizedSignal, Exception {
+    public void testGetProjectThrowsExceptionForMissingProject() throws InvalidTicketSignal, NotAuthorizedSignal, Exception {
     	boolean exceptionThrown = false;
     	try {
 	    	data.deleteProject("JUnit Testing Project");
@@ -247,7 +250,7 @@ public class CoralAPITest extends TestCase {
     	assertTrue(exceptionThrown);
     }
 
-    public void _testGetAccountThrowsExceptionForMissingProject() {
+    public void testGetAccountThrowsExceptionForMissingProject() {
     	boolean exceptionThrown = false;
     	try {
 	    	data.deleteAccount("JUnit Testing Account");
@@ -259,21 +262,21 @@ public class CoralAPITest extends TestCase {
     }
     
     //how to use this test???
-    public void _testAuthentication() {
-    	boolean password_check = instance.authenticate("coral", "coral");
-    	assertTrue(password_check);
+    public void testAuthentication() {
+    	boolean passwordCheck = instance.authenticate("coral", "coral");
+    	assertTrue(passwordCheck);
     	
-        boolean failed_check = instance.authenticate("testuser", "fakepass");
-    	assertFalse(failed_check);
+        boolean failedCheck = instance.authenticate("testuser", "fakepass");
+    	assertFalse(failedCheck);
         
-        boolean invalid_auth = instance.authenticate(null, null);
-        assertFalse(invalid_auth);
+        boolean invalidAuth = instance.authenticate(null, null);
+        assertFalse(invalidAuth);
     }
     
     /**
      * Test of CreateNewAccount method, of class CoralServices.
      */
-    public void _testCreateNewAccount() throws Exception {
+    public void testCreateNewAccount() throws Exception {
         data.deleteAccount("JUnit Testing Account");
         Account account = new Account();
         account.setName("JUnit Testing Account");
@@ -318,7 +321,7 @@ public class CoralAPITest extends TestCase {
         assertEquals(fetched.getMember().getName(), r.getMember().getName());
     }
     
-    public void _testAccountDateManipulation() throws Exception {
+    public void testAccountDateManipulation() throws Exception {
     	Calendar cal = Calendar.getInstance();
     	cal.set(2013, 0, 27, 13, 59, 00);
         SimpleDateFormat format = 
@@ -342,7 +345,7 @@ public class CoralAPITest extends TestCase {
      * This test only passes with modified opencoral source to allow edates to be set.
      * @throws Exception
      */
-    public void _testProjectDateManipulationRoundTrip() throws Exception {
+    public void testProjectDateManipulationRoundTrip() throws Exception {
     	Calendar cal = Calendar.getInstance();
     	cal.set(2099, 0, 27, 13, 59, 00);
         SimpleDateFormat format = 
@@ -375,7 +378,7 @@ public class CoralAPITest extends TestCase {
         assertEquals(project.getEdate().toString(), fetched.getEdate().toString());
     }
 
-    public void _testMemberDateManipulationRoundTrip() throws Exception {
+    public void testMemberDateManipulationRoundTrip() throws Exception {
     	Calendar cal = Calendar.getInstance();
     	cal.set(2099, 0, 27, 13, 59, 00);
         SimpleDateFormat format = 
@@ -394,7 +397,7 @@ public class CoralAPITest extends TestCase {
         assertEquals(member.getEdate().toString(), fetched.getEdate().toString());
     }    
     
-    public void _testAccountEDateIsNullRoundTrip() throws Exception {
+    public void testAccountEDateIsNullRoundTrip() throws Exception {
     	Calendar cal = Calendar.getInstance();
     	cal.set(2013, 0, 27, 13, 59, 00);
         SimpleDateFormat format = 
@@ -412,7 +415,7 @@ public class CoralAPITest extends TestCase {
         		null, fetched.getEdate());
     }
     
-    public void _testAddProjectMembers() throws Exception {
+    public void testAddProjectMembers() throws Exception {
     	data.deleteMember("testmem_18");
     	data.deleteProject("JUnit Testing Project");
     	data.deleteProject("JUnit Testing Project2");
@@ -443,7 +446,7 @@ public class CoralAPITest extends TestCase {
     	assertTrue(fetchedMembers.contains(member1));
     }
     
-    public void _testRemoveProjectMembers() throws Exception {
+    public void testRemoveProjectMembers() throws Exception {
     	System.out.println("Test Remove Project Members");
     	String[] members = {"testmem_10"};
     	try {
@@ -466,7 +469,7 @@ public class CoralAPITest extends TestCase {
         assertEquals("testuser", mem.getName());
     }
     
-    public void _testUnknownMember() throws Exception {
+    public void testUnknownMember() throws Exception {
         boolean exceptionCaught = false;
         try {
             instance.getMember("unknown_member");
@@ -476,7 +479,7 @@ public class CoralAPITest extends TestCase {
         assertTrue(exceptionCaught);
     }
     
-    public void _testGetLabRoles() throws Exception {
+    public void testGetLabRoles() throws Exception {
         data.deleteMember("testuser");
     	System.out.println("Test Get Member");
     	Member member = new Member();
@@ -490,7 +493,7 @@ public class CoralAPITest extends TestCase {
     }
     
     /*
-    public void _testAddMemberProjects() throws Exception {
+    public void testAddMemberProjects() throws Exception {
     	this.deleteMember("testmem_1");
     	this.deleteProject("testproject_1");
     	this.deleteProject("testproject_2");
@@ -507,7 +510,7 @@ public class CoralAPITest extends TestCase {
     	
     	instance.AddMemberProjects("testmem_1", projectNames);
     }
-    public void _testAddEquipmentRoleToMember() throws Exception{
+    public void testAddEquipmentRoleToMember() throws Exception{
     	this.deleteMember("testmem_1");
     	System.out.println("Test Add Member Projects");
     	Member member = newMember("testmem_1");
@@ -516,7 +519,7 @@ public class CoralAPITest extends TestCase {
     	instance.AddEquipmentRoleToMember("testmem_1", "user", "TMV Super");
     	instance.RemoveEquipmentRoleFromMember("testmem_1", "user", "TMP Super");
     }
-    public void _testAddProjectRoleToMember() throws Exception{
+    public void testAddProjectRoleToMember() throws Exception{
     	this.deleteMember("testmem_1");
     	System.out.println("Test Add Project Role To Member");
     	Member member = newMember("testmem_1");
@@ -525,7 +528,7 @@ public class CoralAPITest extends TestCase {
     	instance.AddProjectRoleToMember("testmem_1", "pi", "Inventory");
     	instance.RemoveProjectRoleFromMember("testmem_1", "pi", "Inventory");
     }
-    public void _testEnable() {
+    public void testEnable() {
     	CoralServices instance = new CoralServices();
     	instance.enable("TMV Super");
     }
