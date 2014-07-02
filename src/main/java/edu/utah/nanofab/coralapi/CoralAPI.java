@@ -1,6 +1,7 @@
 
 package edu.utah.nanofab.coralapi;
 import java.io.IOException;
+import java.util.Date;
 
 import org.opencoral.constants.Constants;
 import org.opencoral.idl.AccountNotFoundSignal;
@@ -26,6 +27,7 @@ import org.opencoral.idl.Auth.AuthManager;
 import org.opencoral.idl.Auth.AuthManagerHelper;
 import org.opencoral.idl.Equipment.EquipmentManager;
 import org.opencoral.idl.Equipment.EquipmentManagerHelper;
+import org.opencoral.idl.Equipment.EquipmentManagerPackage.MachineRetrievalFailedSignal;
 import org.opencoral.idl.Reservation.ReservationManager;
 import org.opencoral.idl.Reservation.ReservationManagerHelper;
 import org.opencoral.idl.Resource.ResourceManager;
@@ -349,6 +351,15 @@ public class CoralAPI {
 		}
 	}
 	
+	public edu.utah.nanofab.coralapi.resource.Machine getMachine(String name) throws MachineRetrievalFailedSignal  {
+		this.getEquipmentManager();
+		org.opencoral.idl.Machine idlMachine = equipmentManager.findMachineNamed(name);
+		logger.debug("Machine fetched: " + idlMachine.name );
+		edu.utah.nanofab.coralapi.resource.Machine apiMachine = new edu.utah.nanofab.coralapi.resource.Machine();
+		apiMachine.populateFromIdlMachine(idlMachine);
+		return apiMachine;
+	}
+	
 	public edu.utah.nanofab.coralapi.resource.Account getAccount(String name) throws InvalidAccountSignal {
 		this.getResourceManager();
 		org.opencoral.idl.Account idlAccount = resourceManager.getAccount(name);
@@ -473,9 +484,38 @@ public class CoralAPI {
 		activity.agent = enableActivity.getAgent().getName();
 		equipmentManager.enable(activity, false, this.ticketString);
 	}
-
 	
-//	disable(tool)
+	public void enable(String agent, String member, String project, String account, String machineName) throws UnknownMemberException, Exception {
+		Enable enableActivity = new Enable();
+		enableActivity.setAgent(this.getMember(agent));
+		enableActivity.setMember(this.getMember(member));
+		enableActivity.setBdate(new Date());
+		enableActivity.setEdate(new Date());
+		
+		edu.utah.nanofab.coralapi.resource.Machine m = this.getMachine(machineName);
+		enableActivity.setItem(m.getName());
+		enableActivity.setLab(m.getLab());
+		
+		Project p = this.getProject(project);
+		enableActivity.setProject(p);
+		
+		Account a =  this.getAccount(account);
+		enableActivity.setAccount(a);
+		
+		this.enable(enableActivity);
+	}
+	
+	public void enable(String agent, String member, String project, String machineName) throws UnknownMemberException, Exception {
+		Project p = this.getProject(project);
+		Account account = this.getAccount(p.getAccount());
+		this.enable(agent, member, project, account.getName(), machineName);
+	}
+	
+	public void disable (String agent, String machine) throws InvalidTicketSignal, InvalidAgentSignal, InvalidResourceSignal, ResourceUnavailableSignal, NotAuthorizedSignal {
+		this.getEquipmentManager();
+		equipmentManager.disable(agent, machine, false, this.ticketString);
+	}
+	
 //	qualify(tool, member, role)
 //	disqualify(tool, member, role)
 //	reserve( tool, agent, member, project, account, begin time, end time(or length) ) 
