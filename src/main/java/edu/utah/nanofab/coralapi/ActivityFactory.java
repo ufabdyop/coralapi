@@ -33,6 +33,7 @@ public class ActivityFactory {
 		} catch (Exception e) {
 			
 		}
+		
 		activity.bdate = TimestampConverter.dateToTimestamp(bdate);
 		activity.creationDate = TimestampConverter.dateToTimestamp(new Date());
 		activity.creator = user      ;

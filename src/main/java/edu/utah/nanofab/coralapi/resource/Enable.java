@@ -11,13 +11,20 @@ public class Enable {
 	private String lab;
 
 	private Member member;
+	private Member agent;
 	private Project project;
+	public Member getAgent() {
+		return agent;
+	}
+	public void setAgent(Member agent) {
+		this.agent = agent;
+	}
 	private Account account;
 
 	public Date getBdate() {
 		return bdate;
 	}
-	public void Date(Date bdate) {
+	public void setBdate(Date bdate) {
 		this.bdate = bdate;
 	}
 	public Date getEdate() {

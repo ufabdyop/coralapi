@@ -470,8 +470,10 @@ public class CoralAPI {
     			enableActivity.getLab(),
     			enableActivity.getBdate(),
     			enableActivity.getEdate());		
+		activity.agent = enableActivity.getAgent().getName();
 		equipmentManager.enable(activity, false, this.ticketString);
 	}
+
 	
 //	disable(tool)
 //	qualify(tool, member, role)
