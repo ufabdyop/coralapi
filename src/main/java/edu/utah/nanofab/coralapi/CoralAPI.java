@@ -41,6 +41,7 @@ import edu.utah.nanofab.coralapi.exceptions.NotImplementedException;
 import edu.utah.nanofab.coralapi.exceptions.UnknownMemberException;
 import edu.utah.nanofab.coralapi.collections.Accounts;
 import edu.utah.nanofab.coralapi.collections.LabRoles;
+import edu.utah.nanofab.coralapi.collections.Machines;
 import edu.utah.nanofab.coralapi.collections.Members;
 import edu.utah.nanofab.coralapi.collections.Projects;
 import edu.utah.nanofab.coralapi.resource.Enable;
@@ -358,6 +359,12 @@ public class CoralAPI {
 		edu.utah.nanofab.coralapi.resource.Machine apiMachine = new edu.utah.nanofab.coralapi.resource.Machine();
 		apiMachine.populateFromIdlMachine(idlMachine);
 		return apiMachine;
+	}
+	
+	public edu.utah.nanofab.coralapi.collections.Machines getAllMachines()  {
+		this.getEquipmentManager();
+		org.opencoral.idl.Machine[] allMachines = equipmentManager.allMachines();
+		return Machines.fromIdlMachineArray(allMachines);
 	}
 	
 	public edu.utah.nanofab.coralapi.resource.Account getAccount(String name) throws InvalidAccountSignal {
