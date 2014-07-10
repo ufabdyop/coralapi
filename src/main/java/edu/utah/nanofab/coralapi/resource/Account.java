@@ -3,7 +3,6 @@ package edu.utah.nanofab.coralapi.resource;
 import java.util.Date;
 
 import org.opencoral.corba.AccountAdapter;
-import org.opencoral.corba.ProjectAdapter;
 import org.opencoral.idl.Timestamp;
 
 import edu.utah.nanofab.coralapi.helper.TimestampConverter;

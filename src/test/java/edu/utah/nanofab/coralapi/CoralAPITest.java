@@ -10,6 +10,7 @@ import edu.utah.nanofab.coralapi.resource.LabRole;
 import edu.utah.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.coralapi.resource.Project;
 import edu.utah.nanofab.coralapi.resource.Reservation;
+import edu.utah.nanofab.helper.Utils;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -166,7 +167,6 @@ public class CoralAPITest extends TestCase {
         assertEquals(member.getFirstName(), fetched.getFirstName());
         assertEquals(member.getLastName(), fetched.getLastName());
         assertEquals(member.getMailCode(), fetched.getMailCode());
-        assertEquals(member.getPassword(), fetched.getPassword());
         assertEquals(member.getPhone(), fetched.getPhone());
         assertEquals(member.getRace(), fetched.getRace());
         assertEquals(member.getState(), fetched.getState());
@@ -261,16 +261,29 @@ public class CoralAPITest extends TestCase {
     	assertTrue(exceptionThrown);
     }
     
-    //how to use this test???
-    public void testAuthentication() {
-    	boolean passwordCheck = instance.authenticate("coral", "coral");
-    	assertTrue(passwordCheck);
+    public void testAuthentication() throws Exception {
+    	// Create a new member for this test.
+    	data.deleteMember("user");
+    	Member member = new Member();
+    	member.setName("user");
+    	member.setPassword("pass");
+    	member.setProject("JUnit Testing Project");
+    	member.setActive(true);
+    	instance.createNewMember(member);
     	
-        boolean failedCheck = instance.authenticate("testuser", "fakepass");
-    	assertFalse(failedCheck);
+    	boolean result1 = instance.authenticate("user", "pass");
+    	assertTrue(result1);
+        boolean result2 = instance.authenticate("invalid-user", "invalid-pass");
+    	assertFalse(result2);
+    	boolean result3 = instance.authenticate(null, "pass");
+    	assertFalse(result3);
+    	boolean result4 = instance.authenticate("user", null);
+    	assertFalse(result4);
+        boolean result5 = instance.authenticate(null, null);
+        assertFalse(result5);
         
-        boolean invalidAuth = instance.authenticate(null, null);
-        assertFalse(invalidAuth);
+        // Delete the created member for cleanup purposes.
+        data.deleteMember("user");
     }
     
     /**
@@ -291,7 +304,7 @@ public class CoralAPITest extends TestCase {
     public void testCreateNewReservation() throws Exception {
         data.deleteAccount("JUnit Testing Account");
         data.deleteProject("JUnit Testing Project");
-        data.deleteMember("testreserve");
+        data.deleteMember("user");
         data.deleteReservation("TMV Super", "2099-01-01 12:00:00", "2099-01-01 13:00:00");
         
         Account account = new Account();
@@ -304,8 +317,9 @@ public class CoralAPITest extends TestCase {
         instance.createNewProject(p);
         
         Member m = new Member();
-        m.setName("coral");
-        m.setProject("Bootstrap project");
+        m.setName("user");
+        m.setProject("JUnit Testing Project");
+        m.setActive(true);
         
         Reservation r = new Reservation();
         r.setItem("TMV Super");
@@ -480,18 +494,98 @@ public class CoralAPITest extends TestCase {
     }
     
     public void testGetLabRoles() throws Exception {
-        data.deleteMember("testuser");
+        // Create a member for this test.
+    	data.deleteMember("user");
     	System.out.println("Test Get Member");
     	Member member = new Member();
-    	member.setName("testuser");
+    	member.setName("user");
     	member.setProject("JUnit Testing Project");
+    	member.setActive(true);
         instance.createNewMember(member);
+        
         LabRole newRole = new LabRole("nano", member.getName(), "staff" );
-        instance.addLabRole( newRole );
+        instance.addLabRole(newRole);
         LabRoles roles = instance.getLabRoles(member.getName());
-        assertTrue( roles.contains(newRole) );
+        assertTrue(roles.contains(newRole));
     }
     
+    /**
+     * Tests the 'isValidEmail' functionality for various valid email addresses.
+     */
+    public void testValidEmails() {
+    	String email1 = "firstname@example.com";
+    	boolean expected1 = true;
+    	boolean actual1 = Utils.isValidEmailAddress(email1);
+    	assertEquals(expected1, actual1);
+    	
+    	String email2 = "firstname.lastname@example.com";
+    	boolean expected2 = true;
+    	boolean actual2 = Utils.isValidEmailAddress(email2);
+    	assertEquals(expected2, actual2);
+    	
+    	String email3 = "me@me.co.uk";
+    	boolean expected3 = true;
+    	boolean actual3 = Utils.isValidEmailAddress(email3);
+    	assertEquals(expected3, actual3);
+    	
+    	String email4 = "me@1.com";
+    	boolean expected4 = true;
+    	boolean actual4 = Utils.isValidEmailAddress(email4);
+    	assertEquals(expected4, actual4);    	
+    }
+    
+    /**
+     * Tests the 'isValidEmail' functionality for various invalid email addresses.
+     */
+    public void testInvalidEmails() {
+    	String email1 = "me@.com";
+    	boolean expected1 = false;
+    	boolean actual1 = Utils.isValidEmailAddress(email1);
+    	assertEquals(expected1, actual1);
+    	
+    	String email2 = "me@.com.my";
+    	boolean expected2 = false;
+    	boolean actual2 = Utils.isValidEmailAddress(email2);
+    	assertEquals(expected2, actual2);
+    	
+    	String email3 = "me@me@example.com";
+    	boolean expected3 = false;
+    	boolean actual3 = Utils.isValidEmailAddress(email3);
+    	assertEquals(expected3, actual3);  
+    }
+
+    /**
+     * Tests the 'updatePassword' functionality.
+     * 
+     * @throws Exception 
+     */
+    public void testUpdatePassword() throws Exception {
+    	String username = "user";
+    	String password = "pass";
+    	String project = "JUnit Testing Project";
+    	this.createTestMember(username, password, project);
+    	
+    	String newPassword = "new-pass";
+    	instance.updatePassword(username, newPassword);
+    	assertTrue(instance.authenticate(username, newPassword));	
+    	assertFalse(instance.authenticate(username, password));
+    }
+    
+    /**
+     * Creates a coral user with supplied user, password, and default project. This user can be used 
+     * to test operations on. 
+     * 
+     * @throws Exception
+     */
+    public void createTestMember(String username, String password, String project) throws Exception {
+    	data.deleteMember(username);
+    	Member member = new Member();
+    	member.setName(username);
+    	member.setPassword(password);
+    	member.setProject(project);
+    	member.setActive(true);
+        instance.createNewMember(member);
+    }
     /*
     public void testAddMemberProjects() throws Exception {
     	this.deleteMember("testmem_1");

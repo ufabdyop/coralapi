@@ -178,12 +178,17 @@ public class CoralAPI {
 			throw notfound;
 		} 
     }
-    public void createNewMember(Member member) throws Exception {
+    public void createNewMember(Member member) throws MemberDuplicateSignal, InvalidProjectSignal, Exception {
             this.getResourceManager();
-
-            //create a new member should be active ??
+            this.getAuthManager();
             member.setActive(true);
             resourceManager.addMember(member.convertToIDLMemberForRscMgr(), this.ticketString);
+            
+            String pass = member.getPassword();
+            if (pass != "" && pass != null) {
+            	byte[] encrypted_pass = this.coralCrypto.encrypt(pass);
+            	authManager.update(member.getName(), encrypted_pass);
+            }
     }
 
 
@@ -388,26 +393,28 @@ public class CoralAPI {
 		resourceManager.removeProject(p.convertToIdlProjectForRscMgr(), this.ticketString);
 	}
         
-       /**
-         * Authenticates the coral account. If the coral account with the supplied
-         * username and password is a valid coral account, this will return true.
-         * Otherwise it will return false. Note, this function will return false
-         * if null parameters are supplied.
-         * 
-         * @param username - the username of the coral member
-         * @param password - the password for the coral username
-         * @return - True if the coral account exists. False otherwise.
-         */
+	/**
+	 * Authenticates the coral account. If the coral account with the supplied
+	 * username and password is a valid coral account, this will return true.
+	 * Otherwise it will return false. Note, this function will return false if
+	 * null parameters are supplied.
+	 * 
+	 * @param username
+	 *            - the username of the coral member
+	 * @param password
+	 *            - the password for the coral username
+	 * @return - True if the coral account exists. False otherwise.
+	 */
 	public boolean authenticate(String username, String password) {
-              
-                if (username == null || password == null)
-                    return false;
-		
-                boolean result = false;
+
+		if (username == null || password == null)
+			return false;
+
+		boolean result = false;
 		this.getAuthManager();
 		byte[] u = this.coralCrypto.encrypt(username);
 		byte[] p = this.coralCrypto.encrypt(password);
-		
+
 		try {
 			authManager.authenticateByUserNamePassword(u, p);
 			result = true;
@@ -521,6 +528,25 @@ public class CoralAPI {
 	public void disable (String agent, String machine) throws InvalidTicketSignal, InvalidAgentSignal, InvalidResourceSignal, ResourceUnavailableSignal, NotAuthorizedSignal {
 		this.getEquipmentManager();
 		equipmentManager.disable(agent, machine, false, this.ticketString);
+	}
+	
+	/**
+	 * Updates a member's remote password.
+	 * 
+	 * @param member
+	 *            The user name of the coral member.
+	 * @param newPassword
+	 *            The users new remote password.
+	 * @throws InvalidTicketSignal
+	 * @throws NotAuthorizedSignal
+	 * @throws InvalidMemberSignal
+	 */
+	public void updatePassword(String member, String newPassword)
+			throws InvalidMemberSignal, NotAuthorizedSignal,
+			InvalidTicketSignal {
+
+		byte[] pass = this.coralCrypto.encrypt(newPassword);
+		this.authManager.update(member, pass);
 	}
 	
 //	qualify(tool, member, role)

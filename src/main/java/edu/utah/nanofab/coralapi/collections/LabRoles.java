@@ -1,9 +1,6 @@
 package edu.utah.nanofab.coralapi.collections;
 
-import org.opencoral.idl.Persona;
-
 import edu.utah.nanofab.coralapi.resource.LabRole;
-import edu.utah.nanofab.coralapi.resource.Member;
 
 public class LabRoles extends ProxySet<LabRole> {
 

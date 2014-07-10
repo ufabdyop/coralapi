@@ -1,7 +1,6 @@
 package edu.utah.nanofab.coralapi.resource;
 
 import org.opencoral.idl.Persona;
-import org.opencoral.idl.Role;
 
 public class LabRole {
 	private String lab;

@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Properties;
+import java.util.Scanner;
 
 import org.opencoral.util.Encryption;
 
@@ -88,11 +89,17 @@ public class CoralCrypto {
 	 * @return the string
 	 */
 	private static String convertStreamToString(java.io.InputStream is) {
+		
+		Scanner s = null;
 		try {
-			java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+			s = new Scanner(is).useDelimiter("\\A");
 			return s.hasNext() ? s.next() : "";
 		} catch (java.lang.NullPointerException npe) {
 			return "";
+		} finally {
+			if (s != null) {
+				s.close();
+			}
 		}
 	}
 

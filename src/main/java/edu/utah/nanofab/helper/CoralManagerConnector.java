@@ -1,14 +1,10 @@
 package edu.utah.nanofab.helper;
 
 import org.omg.CORBA.ORB;
-import org.omg.CORBA.Object;
 import org.opencoral.constants.Constants;
 import org.opencoral.idl.Admin.AdminManager;
-import org.opencoral.idl.Admin.Server;
 import org.opencoral.idl.Auth.AuthManager;
 import org.opencoral.idl.Auth.AuthManagerHelper;
-import org.opencoral.idl.Hardware.HardwareManager;
-import org.opencoral.idl.Hardware.HardwareManagerHelper;
 import org.opencoral.util.AdminManagerConnection;
 
 public class CoralManagerConnector {
@@ -55,9 +51,6 @@ public class CoralManagerConnector {
 		if (this.coralUser == null) {
 			this.coralUser = "coral";
 		}
-
-		//we probably don't need this
-		String lab = null;
 
 		// get admin manager via ior
 		adminManager = null;
