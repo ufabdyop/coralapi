@@ -548,6 +548,7 @@ public class CoralAPI {
 			throws InvalidMemberSignal, NotAuthorizedSignal,
 			InvalidTicketSignal {
 
+		this.getAuthManager();
 		byte[] pass = this.coralCrypto.encrypt(newPassword);
 		this.authManager.update(member, pass);
 	}
