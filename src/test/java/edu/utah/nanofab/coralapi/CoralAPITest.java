@@ -555,6 +555,7 @@ public class CoralAPITest extends TestCase {
     	String password = "pass";
     	String project = "JUnit Testing Project";
     	this.createTestMember(username, password, project);
+    	assertTrue(instance.authenticate(username, password));
     	
     	String newPassword = "new-pass";
     	instance.updatePassword(username, newPassword);

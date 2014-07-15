@@ -71,8 +71,6 @@ public class CoralAPI {
     private ReservationManager reservationManager = null;
 	private CoralCrypto coralCrypto;
 	public static Logger logger;
-	
-	
            
     public CoralAPI(String coralUser, String iorUrl, String configUrl) {
     	this.coralUser = coralUser;
@@ -84,35 +82,33 @@ public class CoralAPI {
     }
     
     private void reconnectToCoral() {
-		logger.debug("reconnectToCoral called");
+    	logger.debug("Reconnecting to Coral...");
 		connector = new CoralManagerConnector();
 		connector.setCoralUser(this.coralUser);
 		connector.setIorUrl(this.iorUrl);
     }
     
     private void reconnectToResourceManager() {
-		logger.debug("reconnectToResourceManager called");
+    	logger.debug("Reconnecting to Resource Manager");
 		resourceManager = ResourceManagerHelper.narrow(connector.getManager(Constants.RSCMGR_NAME));
     }
     
     private void getReservationManager() {
-		logger.debug("getReservationManager called");
+    	logger.info("Getting Reservation Manager...");
         if (connector == null) {
-            System.out.println("connector is null");
+        	logger.debug("ReservationManager connector is null. Reconnecting to coral...");
             reconnectToCoral();
 	    }    	
 		if (reservationManager == null){
 			reservationManager = ReservationManagerHelper.narrow(connector.getManager(Constants.RESMGR_NAME));
-			System.out.println("resmgr is null? " + (reservationManager == null));
 		}
 		this.ticketString = connector.getTicketString();
 	}
     
     private void getEquipmentManager(){
-    	logger.debug("Entered getEquipmentManager()");
-
+    	logger.info("Getting Equipment Manager");
         if (connector == null) {
-                System.out.println("connector is null");
+        		logger.debug("EquipmentManager connector is null. Reconnecting to coral...");
                 reconnectToCoral();
         }    	
     	if (equipmentManager == null){
@@ -122,9 +118,9 @@ public class CoralAPI {
     }
     
     private void getAuthManager(){
-        System.out.println("Entered getAuthManager()");
+        logger.info("Getting Authentication Manager");
         if (connector == null) {
-                System.out.println("connector is null");
+                logger.debug("AuthManager connector is null. Reconnecting to coral...");
                 reconnectToCoral();
         }    	
     	if (authManager == null){
@@ -134,32 +130,35 @@ public class CoralAPI {
     }
     
     private void getResourceManager() {
-            System.out.println("Entered getResourceManager()");
+    		logger.info("Getting Resource Manager");
             if (connector == null) {
-                    System.out.println("connector is null");
+                    logger.debug("ResourceManager connector is null. Reconnecting to coral...");
                     reconnectToCoral();
             }
             if (resourceManager == null) {
-                    System.out.println("resourceManager is null");
+            		logger.debug("ResourceManaer is null. Attempting to reconnect to the ResourceManager");
                     reconnectToResourceManager();
             }
 
             this.ticketString = connector.getTicketString();
-            System.out.println("this.ticketString = " + this.ticketString );
+            logger.debug("Ticket String: " + this.ticketString);
+            
             try {
                     resourceManager.getAllProjects();
             } catch (org.omg.CORBA.COMM_FAILURE comm) {
-                    System.out.println("orb communication failure ");
+            		logger.debug("ORB Comm Failure");
                     connector = null;
                     resourceManager = null;
             } catch (org.omg.CORBA.OBJECT_NOT_EXIST corbaException ) {
-                    System.out.println("Caught Corba error, probably lost coral connection, trying to reconnect");
+            		logger.debug("Caught CORBA error. This error is probably due to a lost coral connection.");
+            		logger.debug("Trying to reconnect...");
                     reconnectToCoral() ;
                     reconnectToResourceManager() ;
             } catch (ProjectNotFoundSignal e) {
-                    System.out.println("project not found signal!");
+            		logger.debug("Project Not Found!");
             } catch (Exception e) {
-                    System.out.println("General exception found" + e.getMessage());
+                    logger.debug("General Exception was caught. See the stacktrace for more details.");
+                    logger.trace(e.getMessage(), e);
             }
     }
 
