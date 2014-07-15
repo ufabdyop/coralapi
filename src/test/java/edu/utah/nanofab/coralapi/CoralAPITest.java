@@ -299,34 +299,25 @@ public class CoralAPITest extends TestCase {
     }
     
     /**
-     * Test of CreateNewReservation method, of class CoralServices.
+     * Test of createNewReservation method, of class CoralServices.
      */
     public void testCreateNewReservation() throws Exception {
-        data.deleteAccount("JUnit Testing Account");
-        data.deleteProject("JUnit Testing Project");
-        data.deleteMember("user");
+        String accountName = "JUnit Test Account";
+        String projectName = "JUnit Test Project";
+        String user = "user";
+        String pass = "pass";
+    	Account account = this.createTestAccount(accountName);
+        Project project = this.createTestProject(projectName, accountName);
+        Member member = this.createTestMember(user, pass, projectName);
+    	
         data.deleteReservation("TMV Super", "2099-01-01 12:00:00", "2099-01-01 13:00:00");
-        
-        Account account = new Account();
-        account.setName("JUnit Testing Account");
-        instance.createNewAccount(account);
-        
-        Project p = new Project();
-        p.setName("JUnit Testing Project");
-        p.setAccount("JUnit Testing Account");
-        instance.createNewProject(p);
-        
-        Member m = new Member();
-        m.setName("user");
-        m.setProject("JUnit Testing Project");
-        m.setActive(true);
-        
+
         Reservation r = new Reservation();
         r.setItem("TMV Super");
         r.setBdate(2099,1,1,12,0);
         r.setEdate(2099,1,1,13,0);
-        r.setMember(m);
-        r.setProject(p);
+        r.setMember(member);
+        r.setProject(project);
         r.setLab("nano");
         r.setAccount(account);
         instance.createNewReservation(r);
@@ -574,10 +565,11 @@ public class CoralAPITest extends TestCase {
     /**
      * Creates a coral user with supplied user, password, and default project. This user can be used 
      * to test operations on. 
+     * @return 
      * 
      * @throws Exception
      */
-    public void createTestMember(String username, String password, String project) throws Exception {
+    public Member createTestMember(String username, String password, String project) throws Exception {
     	data.deleteMember(username);
     	Member member = new Member();
     	member.setName(username);
@@ -585,7 +577,41 @@ public class CoralAPITest extends TestCase {
     	member.setProject(project);
     	member.setActive(true);
         instance.createNewMember(member);
+        return member;
     }
+    
+    /**
+     * Create a project with the supplied project name and account. This project can be used to 
+     * test operations on.
+     * @return 
+     * 
+     * @throws Exception
+     */
+    public Project createTestProject(String projectName, String account) throws Exception {
+    	data.deleteProject(projectName);
+    	Project project = new Project();
+    	project.setName(projectName);
+    	project.setAccount(account);
+    	project.setActive(true);
+    	instance.createNewProject(project);
+    	return project;
+    }
+    
+    /**
+     * Create an account with the supplied name.This account can be used to test operations on.
+     * 
+     * @throws Exception
+     */
+    public Account createTestAccount(String accountName) throws Exception {
+    	data.deleteAccount(accountName);
+    	Account account = new Account();
+    	account.setName(accountName);
+    	account.setDescription("A JUnit testing account.");
+    	account.setActive(true);
+    	instance.createNewAccount(account);
+    	return account;
+    }
+    
     /*
     public void testAddMemberProjects() throws Exception {
     	this.deleteMember("testmem_1");

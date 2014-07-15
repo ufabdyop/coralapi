@@ -63,19 +63,22 @@ public class CoralAPI {
     private String iorUrl = "http://vagrant-coral-dev/IOR/";
     private String configUrl = "";
     private String ticketString = "";
+    private String logLevel = "DEBUG";
 	private AuthManager authManager;
-	public static Logger logger ;
     private CoralManagerConnector connector = null;
     private ResourceManager resourceManager = null;
     private EquipmentManager equipmentManager = null;
     private ReservationManager reservationManager = null;
 	private CoralCrypto coralCrypto;
+	public static Logger logger;
+	
+	
            
     public CoralAPI(String coralUser, String iorUrl, String configUrl) {
     	this.coralUser = coralUser;
     	this.iorUrl = iorUrl;
     	this.configUrl = configUrl;
-        System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
+        this.setLogLevel(this.logLevel);
         logger = LoggerFactory.getLogger(CoralAPI.class);
         this.coralCrypto = new CoralCrypto(this.configUrl);
     }
@@ -560,5 +563,51 @@ public class CoralAPI {
 		this.getReservationManager();
 		//reservationManager.findReservation(arg0, arg1);
 		throw new NotImplementedException();
+	}
+	
+	/**
+	 * Gets the log level for this CoralAPI instance.
+	 * 
+	 * @return The logLevel
+	 */
+	public String getLogLevel() {
+		return logLevel;
+	}
+
+	/**
+	 * Sets the log level for this CoralAPI instance. If the supplied log level is
+	 * invalid, the log level will remain unchanged.
+	 * 
+	 * The six logging levels used by Log are (in order):
+	 *
+	 *	trace (the least serious)
+	 *	debug
+	 *	info
+	 *	warn
+	 *	error
+	 *	fatal (the most serious)
+	 * 
+	 * @param logLevel The logLevel to set
+	 */
+	public void setLogLevel(String logLevel) {
+		
+		String level = logLevel.toUpperCase(); // Convert the supplied level to upper case.
+		String[] levels = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
+		boolean validLevel = false;
+		
+		// Loop through each of the log levels and check if the supplied level
+		// matches one of the valid levels.
+		for (String l : levels) {
+			if (level.equals(l)) {
+				validLevel = true;
+				break;
+			}
+		}
+		
+		// If the supplied level was valid, change the log level.
+		if(validLevel) {
+			this.logLevel = level;
+			System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, level);
+		}
 	}
 }

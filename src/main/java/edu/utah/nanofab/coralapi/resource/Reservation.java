@@ -5,6 +5,7 @@ import java.util.Date;
 import edu.utah.nanofab.coralapi.helper.TimestampConverter;
 
 public class Reservation {
+	
 	private Date bdate;
 	private Date edate;
 	private String item;
