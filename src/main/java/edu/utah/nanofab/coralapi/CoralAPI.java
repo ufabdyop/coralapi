@@ -23,6 +23,7 @@ import org.opencoral.idl.ProjectNotFoundSignal;
 import org.opencoral.idl.Relation;
 import org.opencoral.idl.ResourceUnavailableSignal;
 import org.opencoral.idl.RoleNotFoundSignal;
+import org.opencoral.idl.Timestamp;
 import org.opencoral.idl.Auth.AuthManager;
 import org.opencoral.idl.Auth.AuthManagerHelper;
 import org.opencoral.idl.Equipment.EquipmentManager;
@@ -37,8 +38,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.utah.nanofab.coralapi.resource.Account;
+import edu.utah.nanofab.coralapi.exceptions.InvalidMemberException;
+import edu.utah.nanofab.coralapi.exceptions.InvalidRoleException;
+import edu.utah.nanofab.coralapi.exceptions.InvalidTicketException;
+import edu.utah.nanofab.coralapi.exceptions.NotAuthorizedException;
 import edu.utah.nanofab.coralapi.exceptions.NotImplementedException;
+import edu.utah.nanofab.coralapi.exceptions.RoleDuplicateException;
 import edu.utah.nanofab.coralapi.exceptions.UnknownMemberException;
+import edu.utah.nanofab.coralapi.helper.TimestampConverter;
 import edu.utah.nanofab.coralapi.collections.Accounts;
 import edu.utah.nanofab.coralapi.collections.LabRoles;
 import edu.utah.nanofab.coralapi.collections.Machines;
@@ -49,7 +56,7 @@ import edu.utah.nanofab.coralapi.resource.LabRole;
 import edu.utah.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.coralapi.resource.Project;
 import edu.utah.nanofab.coralapi.resource.Reservation;
-import edu.utah.nanofab.helper.CoralManagerConnector;
+import edu.utah.nanofab.coralapi.helper.CoralManagerConnector;
 
 /**
  * The CoralAPI class provides a wrapper for the primary coral services.
@@ -445,25 +452,52 @@ public class CoralAPI {
 		resourceManager.updateMember(member.convertToIDLMemberForRscMgr(), this.ticketString);
 	}
 	public void close() {
-		System.out.println("Close CoralServices Resources");
+		logger.debug("Shutting down Coral Services...");
+		
 		if (resourceManager != null) { resourceManager._release(); }
 		if (authManager != null) { authManager._release(); }
 		if (equipmentManager != null) { equipmentManager._release(); }
+		
 		try {
 			connector.release();
 		} catch (Exception e) {
-			logger.error("could not call release on connector: " + e.getMessage());
+			logger.error("Could not release the connector: " + e.getMessage());
 		}
 	}
 
-	public void addLabRole(LabRole newRole) throws InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
+	public void addLabRoleToMember(LabRole newRole) throws Exception {
 		this.getResourceManager();
-		resourceManager.addRoleToMember(
-				newRole.getMember(), 
-				newRole.getRole(),
-				newRole.getLab(),
-				"lab",
-				this.ticketString);
+		
+		try {
+			resourceManager.addRoleToMember(
+					newRole.getMember(), 
+					newRole.getRole(),
+					newRole.getLab(),
+					"lab",
+					this.ticketString);
+		} catch(Exception e) {
+			String message = e.getMessage();
+			Throwable cause = e.getCause();
+			
+			if (e instanceof org.opencoral.idl.InvalidTicketSignal) {
+				throw new edu.utah.nanofab.coralapi.exceptions.InvalidTicketException(message, cause);
+			}
+			
+			if (e instanceof org.opencoral.idl.InvalidRoleSignal) {
+				throw new edu.utah.nanofab.coralapi.exceptions.InvalidRoleException(message, cause);
+			}
+			
+			if (e instanceof org.opencoral.idl.InvalidMemberSignal) {
+				throw new edu.utah.nanofab.coralapi.exceptions.InvalidMemberException(message, cause);
+			}
+			
+			if (e instanceof org.opencoral.idl.NotAuthorizedSignal) {
+				throw new edu.utah.nanofab.coralapi.exceptions.NotAuthorizedException(message, cause);
+			}
+			
+			throw e;
+		}
+
 	}
 
 	public LabRoles getLabRoles(String username) throws RoleNotFoundSignal {
@@ -472,6 +506,70 @@ public class CoralAPI {
 		return LabRoles.fromIdlPersonaArray(personas);
 	}
 
+	/**
+	 * Creates a new role with the supplied name, description, and type. By default, this will
+	 * set the new role to active and the end date to null.
+	 * 
+	 * @param name The name of the role.
+	 * @param description A short description for the new role.
+	 * @param type The type of role.
+	 * 
+	 * @throws Exception 
+	 */
+	public void createNewRole(String name, String description, String type) throws Exception {
+		this.getResourceManager();
+		
+		Date date = new Date();
+		Timestamp bdate = TimestampConverter.dateToTimestamp(date);
+		Timestamp edate = TimestampConverter.dateToTimestamp(null);
+		
+		// Creates an active new Role with the supplied name, description, and type.
+		org.opencoral.idl.Role r = new org.opencoral.idl.Role(false, name, description, type, true, bdate, edate);
+		try {
+			resourceManager.addRole(r, this.ticketString);
+		} catch (Exception e) {
+			String message = e.getMessage();
+			Throwable cause = e.getCause();
+			
+			if (e instanceof org.opencoral.idl.InvalidTicketSignal) {
+				throw new edu.utah.nanofab.coralapi.exceptions.InvalidTicketException(message, cause);
+			}
+			
+			if (e instanceof org.opencoral.idl.RoleDuplicateSignal) {
+				throw new edu.utah.nanofab.coralapi.exceptions.RoleDuplicateException(message, cause);
+			}
+			
+			if (e instanceof org.opencoral.idl.NotAuthorizedSignal) {
+				throw new edu.utah.nanofab.coralapi.exceptions.NotAuthorizedException(message, cause);
+			}
+			
+			throw e;
+		}
+	}
+	
+	/**
+	 * Gets the given role with the supplied type.
+	 * 
+	 * @param name The name of the role.
+	 * @param type The type of the role.
+	 * 
+	 * @throws InvalidRoleException 
+	 */
+	public edu.utah.nanofab.coralapi.resource.Role getRole(String name, String type) throws InvalidRoleException {
+		this.getResourceManager();
+		try {
+			org.opencoral.idl.Role idlRole = resourceManager.getRole(name, type);
+			edu.utah.nanofab.coralapi.resource.Role r = new edu.utah.nanofab.coralapi.resource.Role();
+			r.populateFromIdlRole(idlRole);
+			return r;
+		} catch (org.opencoral.idl.InvalidRoleSignal e) {
+			String message = e.getMessage();
+			Throwable cause = e.getCause();
+			
+			throw new InvalidRoleException(message, cause);
+		}
+	}
+	
     public void createNewReservation(Reservation r) throws Exception {
         this.getReservationManager();
         Activity a = ActivityFactory.createRunActivity(

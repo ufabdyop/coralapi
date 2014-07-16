@@ -4,13 +4,18 @@ import edu.utah.nanofab.coralapi.CoralAPI;
 import edu.utah.nanofab.coralapi.collections.LabRoles;
 import edu.utah.nanofab.coralapi.collections.Members;
 import edu.utah.nanofab.coralapi.collections.Projects;
+import edu.utah.nanofab.coralapi.exceptions.InvalidRoleException;
+import edu.utah.nanofab.coralapi.exceptions.InvalidTicketException;
+import edu.utah.nanofab.coralapi.exceptions.NotAuthorizedException;
+import edu.utah.nanofab.coralapi.exceptions.RoleDuplicateException;
 import edu.utah.nanofab.coralapi.exceptions.UnknownMemberException;
 import edu.utah.nanofab.coralapi.resource.Account;
 import edu.utah.nanofab.coralapi.resource.LabRole;
 import edu.utah.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.coralapi.resource.Project;
 import edu.utah.nanofab.coralapi.resource.Reservation;
-import edu.utah.nanofab.helper.Utils;
+import edu.utah.nanofab.coralapi.resource.Role;
+import edu.utah.nanofab.coralapi.helper.Utils;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -21,11 +26,12 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
-import org.opencoral.idl.AccountNotFoundSignal;
 import org.opencoral.idl.InvalidAccountSignal;
 import org.opencoral.idl.InvalidTicketSignal;
 import org.opencoral.idl.NotAuthorizedSignal;
 import org.opencoral.idl.ProjectNotFoundSignal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CoralAPITest extends TestCase {
 	
@@ -33,6 +39,7 @@ public class CoralAPITest extends TestCase {
 	String dbuser = "coraldba";
 	String dbpass = "coraldba";
     FixtureHelper data = new FixtureHelper(dbhost, dbuser, dbpass);
+    public static final Logger logger = LoggerFactory.getLogger(CoralAPITest.class);
     
 	private CoralAPI instance;
 	
@@ -59,15 +66,6 @@ public class CoralAPITest extends TestCase {
         String iorUrl = "http://vagrant-coral-dev/IOR/";
         String configUrl = "http://vagrant-coral-dev/coral/lib/config.jar";
     	this.instance = new CoralAPI(coralUser, iorUrl, configUrl);
-    	
-    	Account a = new Account();
-    	a.setName("JUnit Testing Account");
-    	
-    	Project p = new Project();
-    	p.setName("JUnit Testing Project");
-    	p.setAccount("JUnit Testing Account" );
-    	instance.createNewAccountUnlessExists(a);
-    	instance.createNewProjectUnlessExists(p);
     }
     
     @Override
@@ -75,59 +73,93 @@ public class CoralAPITest extends TestCase {
         super.tearDown();
     }
     
-    public void testGetProjects() throws ProjectNotFoundSignal{
-    	System.out.println("Get ALL PROJECTS");
+    /**
+     * Tests the 'getProjects' functionality.
+     * 
+     * @throws Exception 
+     */
+    public void testGetProjects() throws Exception{
+    	String projectName = "JUnit Test Project";
+    	String accountName = "JUnit Test Account";
+    	this.createTestAccount(accountName);
+    	this.createTestProject(projectName, accountName);
+    	
     	int len = instance.getProjects().size();
-    	System.out.println("Number of projects: "+ len);
-    	assertTrue(len > 0);
+    	assertTrue(len >= 1);
     }
     
+    /**
+     * Tests the 'getMemberProjects' functionality.
+     * 
+     * @throws Exception
+     */
     public void testGetMemberProjects() throws Exception {
-    	System.out.println("Get Member PROJECTS");
-    	String memberName = "JUnit Testing Member";
+    	String memberName = "JUnit User";
+    	String projectName1 = "JUnit Test Project 1";
+    	String accountName = "JUnit Test Account 1";
+    	this.createTestAccount(accountName);
+    	this.createTestProject(projectName1, accountName);
+    	
+    	String projectName2 = "JUnit Test Project 2";
+    	this.createTestProject(projectName2, accountName);
+    	
     	data.deleteMember(memberName);
-    	
-    	Project project1 = new Project();
-    	project1.setName("JUnit Testing Project 1");
-    	project1.setAccount("JUnit Testing Account");
-    	instance.createNewProjectUnlessExists(project1);
-    	
-    	Project project2 = new Project();
-    	project2.setName("JUnit Testing Project 2");
-    	project2.setAccount("JUnit Testing Account");
-    	instance.createNewProjectUnlessExists(project2);
-    	
     	Member member = new Member();
     	member.setName(memberName);
-    	member.setProject(project1.getName());
-    	
-    	String[] projectList = {project1.getName(), project2.getName()};
+    	member.setProject(projectName1);
+    	member.setActive(true);
     	instance.createNewMember(member);
-    	System.out.println("Added member: " + memberName);
+    	
+    	String[] projectList = {projectName1, projectName2};
     	instance.addMemberProjects(memberName, projectList);
     	
     	Projects memberProjects = instance.getMemberProjects(memberName);
     	int numProjects = memberProjects.size();
-    	System.out.println("Number of projects: "+ numProjects);
-    	assertTrue(numProjects == 2);
-    }
-
-    public void testGetAccounts() throws AccountNotFoundSignal {
-    	System.out.println("Get ALL accounts");
-    	int len = instance.getAccounts().size();
-    	System.out.println("Number of accounts: "+ len);
-    	assertTrue(len > 0);
+    	assertTrue(numProjects >= 2);
+    	
+    	// Clean up this tests database entries.
+    	this.data.deleteMember(memberName);
+    	this.data.deleteProject(projectName1);
+    	this.data.deleteProject(projectName2);
+    	this.data.deleteAccount(accountName);
     }
 
     /**
-     * Test of CreateNewMember method, of class CoralServices.
+     * Tests the 'getAccounts' functionality.
+     * 
+     * @throws Exception 
+     */
+    public void testGetAccounts() throws Exception {
+    	String accountName1 = "JUnit Test Account 1";
+    	this.createTestAccount(accountName1);
+    	
+    	String accountName2 = "JUnit Test Account 2";
+    	this.createTestAccount(accountName2);
+    	
+    	int len = instance.getAccounts().size();
+    	assertTrue(len >= 2);
+    	
+    	// Clean up this tests database entries.
+    	this.data.deleteAccount(accountName1);
+    	this.data.deleteAccount(accountName2);
+    }
+
+    /**
+     * Tests the 'createNewMember' functionality.
+     * 
+     * @throws Exception
      */
     public void testCreateNewMemberRoundTrip() throws Exception {
-        data.deleteMember("mytest02");
-    	System.out.println("TESTING CREATING NEW MEMBER");
+    	String memberName = "JUnit User";
+    	String projectName = "JUnit Test Project";
+    	String accountName = "JUnit Test Account";
+        this.createTestAccount(accountName);
+        this.createTestProject(projectName, accountName);
+        
+        data.deleteMember(memberName);
     	Member member = new Member();
-    	member.setName("mytest02");
-    	member.setProject( "JUnit Testing Project" );
+    	member.setName(memberName);
+    	member.setProject(projectName);
     	member.setAddress1("a");
     	member.setAddress2("b");
     	member.setAdvisor("c");
@@ -152,7 +184,8 @@ public class CoralAPITest extends TestCase {
     	member.setZipcode("v");
     	member.setActive(true);    	
         instance.createNewMember(member);
-        Member fetched = instance.getMember("mytest02");
+        
+        Member fetched = instance.getMember(memberName);
         assertEquals(member.getAddress1(), fetched.getAddress1());
         assertEquals(member.getAddress2(), fetched.getAddress2());
         assertEquals(member.getAdvisor(), fetched.getAdvisor());
@@ -175,75 +208,130 @@ public class CoralAPITest extends TestCase {
         assertEquals(member.getUrl(), fetched.getUrl());
         assertEquals(member.getZipcode(), fetched.getZipcode());
         assertEquals(member.isActive(), fetched.isActive());
+        
+        // Clean up this tests database entries.
+        data.deleteMember(memberName);
+        data.deleteProject(projectName);
+        data.deleteAccount(accountName);
     }
 
     /**
-     * Test of CreateNewProject method, of class CoralServices.
+     * Tests the 'createNewProject' functionality.
+     * 
      * @throws Exception 
      */
     public void testCreateNewProject() throws Exception {
-        try {
-			data.deleteProject("JUnit Testing Project");
-		} catch (Exception e) {
-			//ignore in test
-		}
-    	System.out.println("Test Create New Project");
-    	
-        Account acct = new Account();
-        acct.setName("JUnit Testing Account");
-        instance.createNewAccountUnlessExists(acct);
+    	String accountName = "JUnit Test Account";
+    	String projectName = "JUnit Test Project";
+        this.createTestAccount(accountName);
         
+        data.deleteProject(projectName);
         Project project = new Project();
-        project.setName("JUnit Testing Project");
-        project.setAccount(acct.getName());
-        project.setDescription("b");
-        project.setDiscipline("c");
-        project.setNickname("e");
-        project.setPi("f");
-        project.setType("g");
+        project.setName(projectName);
+        project.setAccount(accountName);
+        project.setDescription("Short Description");
+        project.setDiscipline("Discipline");
+        project.setNickname("Nickname");
+        project.setPi("PI");
+        project.setType("Type");
+        project.setActive(true);
         instance.createNewProject(project);
         
-        Project fetched = instance.getProject(project.getName());
-        assertEquals(fetched.getName(), project.getName());
+        Project fetched = instance.getProject(projectName);
+        assertEquals(fetched.getName(), projectName);
+        assertEquals(fetched.getAccount(), project.getAccount());
         assertEquals(fetched.getDescription(), project.getDescription());
         assertEquals(fetched.getDiscipline(), project.getDiscipline());
         assertEquals(fetched.getNickname(), project.getNickname());
         assertEquals(fetched.getPi(), project.getPi());
         assertEquals(fetched.getType(), project.getType());
+        
+        // Clean up this tests database entries.
+        this.data.deleteProject(projectName);
+        this.data.deleteAccount(accountName);
     }
     
     public void testCreateProjectThenUpdateIt() throws Exception {
-    	this.testCreateNewProject();
-    	Project project = instance.getProject("JUnit Testing Project");
-    	project.setNickname("new nickname");
+    	String accountName = "JUnit Test Account";
+    	String projectName = "JUnit Test Project";
+    	this.createTestAccount(accountName);
+    	
+    	data.deleteProject(projectName);
+    	Project p = new Project();
+    	p.setName(projectName);
+    	p.setAccount(accountName);
+    	p.setActive(true);
+    	instance.createNewProject(p);
+    	
+    	Project project = instance.getProject(projectName);
+    	project.setNickname("New Nickname");
     	instance.updateProject(project);
-    	Project fetched = instance.getProject("JUnit Testing Project");
-    	assertEquals(fetched.getNickname(), "new nickname");
+    	
+    	Project fetched = instance.getProject(projectName);
+    	assertEquals(fetched.getNickname(), "New Nickname");
+    	
+    	// Clean up this tests database entries.
+    	data.deleteProject(projectName);
+    	data.deleteAccount(accountName);
     }
     
     public void testCreateAccountThenUpdateIt() throws Exception {
-    	this.testCreateNewAccount();
-    	Account a = instance.getAccount("JUnit Testing Account");
-    	a.setDescription("here is a description");
+    	String accountName = "JUnit Test Account";
+    	data.deleteAccount(accountName);
+    	
+    	Account acct = new Account();
+    	acct.setName(accountName);
+    	acct.setActive(true);
+    	instance.createNewAccount(acct);
+    	
+    	Account a = instance.getAccount(accountName);
+    	String description = "Added Description";
+    	a.setDescription(description);
     	instance.updateAccount(a);
-    	Account fetched = instance.getAccount("JUnit Testing Account");
-    	assertEquals(fetched.getDescription(), "here is a description");
+    	
+    	Account fetched = instance.getAccount(accountName);
+    	assertEquals(fetched.getDescription(), description);
+    	
+    	// Clean up this tests database entries.
+    	data.deleteAccount(accountName);
     }
     
     public void testCreateMemberThenUpdateIt() throws Exception {
-    	this.testCreateNewMemberRoundTrip();
-    	Member m = instance.getMember("mytest02");
-    	m.setAddress1("here is an address");
+    	String memberName = "JUnit User";
+    	String projectName = "JUnit Test Project";
+    	String accountName = "JUnit Test Account";
+    	this.createTestAccount(accountName);
+    	this.createTestProject(projectName, accountName);
+    	
+    	data.deleteMember(memberName);
+    	Member mem = new Member();
+    	mem.setName(memberName);
+    	mem.setProject(projectName);
+    	mem.setAddress1("Old Address");
+    	mem.setUnivid("1234");
+    	mem.setActive(true);
+    	instance.createNewMember(mem);
+
+    	Member m = instance.getMember(memberName);
+    	m.setAddress1("New Address");
     	instance.updateMember(m);
-    	Member fetched = instance.getMember("mytest02");
-    	assertEquals(fetched.getAddress1(), "here is an address");
+    	
+    	Member fetched = instance.getMember(memberName);
+    	assertEquals(fetched.getAddress1(), "New Address");
+    	
+    	// Clean up this tests database entries.
+    	data.deleteMember(memberName);
+    	data.deleteProject(projectName);
+    	data.deleteAccount(accountName);
     }
         
     public void testGetProjectThrowsExceptionForMissingProject() throws InvalidTicketSignal, NotAuthorizedSignal, Exception {
+    	String projectName = "JUnit Test Project";
+    	data.deleteProject(projectName);
+    	
     	boolean exceptionThrown = false;
-    	try {
-	    	data.deleteProject("JUnit Testing Project");
-	    	instance.getProject("JUnit Testing Project");
+    	try {	
+	    	instance.getProject(projectName);
     	} catch (ProjectNotFoundSignal e) {
     		exceptionThrown = true;
     	}
@@ -251,10 +339,12 @@ public class CoralAPITest extends TestCase {
     }
 
     public void testGetAccountThrowsExceptionForMissingProject() {
+    	String accountName = "JUnit Test Account";
+    	data.deleteAccount(accountName);
+    	
     	boolean exceptionThrown = false;
     	try {
-	    	data.deleteAccount("JUnit Testing Account");
-	    	instance.getAccount("JUnit Testing Account");
+	    	instance.getAccount(accountName);
     	} catch (InvalidAccountSignal e) {
     		exceptionThrown = true;
 		}
@@ -262,15 +352,16 @@ public class CoralAPITest extends TestCase {
     }
     
     public void testAuthentication() throws Exception {
-    	// Create a new member for this test.
-    	data.deleteMember("user");
-    	Member member = new Member();
-    	member.setName("user");
-    	member.setPassword("pass");
-    	member.setProject("JUnit Testing Project");
-    	member.setActive(true);
-    	instance.createNewMember(member);
+    	String accountName = "JUnit Test Account";
+    	String projectName = "JUnit Test Project";
+    	this.createTestAccount(accountName);
+    	this.createTestProject(projectName, accountName);
     	
+    	// Create a new member for this test.
+    	String username = "user";
+    	String password = "pass";
+    	this.createTestMember(username, password, projectName);
+
     	boolean result1 = instance.authenticate("user", "pass");
     	assertTrue(result1);
         boolean result2 = instance.authenticate("invalid-user", "invalid-pass");
@@ -282,24 +373,31 @@ public class CoralAPITest extends TestCase {
         boolean result5 = instance.authenticate(null, null);
         assertFalse(result5);
         
-        // Delete the created member for cleanup purposes.
-        data.deleteMember("user");
+        // Clean up this tests databases entries.
+        data.deleteMember(username);
+        data.deleteProject(projectName);
+        data.deleteAccount(accountName);
     }
     
     /**
-     * Test of CreateNewAccount method, of class CoralServices.
+     * Tests the createNewAccount functionality.
+     * 
+     * @throws Exception
      */
     public void testCreateNewAccount() throws Exception {
-        data.deleteAccount("JUnit Testing Account");
+    	String accountName = "JUnit Test Account";
+        data.deleteAccount(accountName);
         Account account = new Account();
-        account.setName("JUnit Testing Account");
+        account.setName(accountName);
         instance.createNewAccount(account);
-        Account fetched = instance.getAccount(account.getName());
-        assertEquals(fetched.getName(), account.getName());
+        Account fetched = instance.getAccount(accountName);
+        assertEquals(fetched.getName(), accountName);
     }
     
     /**
-     * Test of createNewReservation method, of class CoralServices.
+     * Tests the 'createNewReservation' functionality.
+     * 
+     * @throws Exception
      */
     public void testCreateNewReservation() throws Exception {
         String accountName = "JUnit Test Account";
@@ -311,7 +409,6 @@ public class CoralAPITest extends TestCase {
         Member member = this.createTestMember(user, pass, projectName);
     	
         data.deleteReservation("TMV Super", "2099-01-01 12:00:00", "2099-01-01 13:00:00");
-
         Reservation r = new Reservation();
         r.setItem("TMV Super");
         r.setBdate(2099,1,1,12,0);
@@ -324,6 +421,41 @@ public class CoralAPITest extends TestCase {
         
         Reservation fetched = instance.getReservation("TMV Super", "2099-01-01 12:00:00", "2099-01-01 13:00:00");
         assertEquals(fetched.getMember().getName(), r.getMember().getName());
+        
+        // Clean up this tests database entries.
+        data.deleteMember(user);
+        data.deleteProject(projectName);
+        data.deleteAccount(accountName);
+    }
+    
+    public void testCreateNewRole() throws InvalidRoleException {
+    	String roleName = "JUnit Test Role";
+    	String description = "Short Description";
+    	String type = "lab";
+    	data.deleteRole(roleName);
+    	
+    	boolean exceptionThrown = false;
+    	
+		// Create a new lab role.
+    	try {
+			instance.createNewRole(roleName, description, type);
+		} catch (InvalidTicketException e) {
+			exceptionThrown = true;
+		} catch (RoleDuplicateException e) {
+			exceptionThrown = true;
+		} catch (NotAuthorizedException e) {
+			exceptionThrown = true;
+		} catch (Exception e) {
+			exceptionThrown = true;
+		}
+    	assertFalse(exceptionThrown);
+    	
+    	Role r = instance.getRole(roleName, type);
+    	assertEquals(roleName, r.getName());
+    	assertEquals(type, r.getType());
+    	
+    	// Clean up this tests database entries.
+    	data.deleteRole(roleName);
     }
     
     public void testAccountDateManipulation() throws Exception {
@@ -333,7 +465,7 @@ public class CoralAPITest extends TestCase {
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     	Date testDate = cal.getTime();
         assertEquals("2013-01-27 13:59:00", format.format(testDate));
-        data.deleteAccount("JUnit Testing Account");
+        
         Account account = new Account();
         account.setBdate(testDate);
         org.opencoral.idl.Account idlAccount = account.convertToIdlAccountForRscMgr();
@@ -348,6 +480,7 @@ public class CoralAPITest extends TestCase {
     
     /**
      * This test only passes with modified opencoral source to allow edates to be set.
+     * 
      * @throws Exception
      */
     public void testProjectDateManipulationRoundTrip() throws Exception {
@@ -357,30 +490,37 @@ public class CoralAPITest extends TestCase {
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     	Date testDate = cal.getTime();
         assertEquals("2099-01-27 13:59:00", format.format(testDate));
-        data.deleteAccount("JUnit Testing Account2");
+        
+        String accountName = "JUnit Test Account";
+        data.deleteAccount(accountName);
         Account account = new Account();
+        account.setName(accountName);
         account.setEdate(testDate);
-        account.setName("JUnit Testing Account2");
         instance.createNewAccount(account);
         
-        data.deleteProject("test project edates");
+        String projectName = "JUnit Test Project";
+        data.deleteProject(projectName);
         Project project = new Project();
-        project.setAccount("JUnit Testing Account2");
-        project.setName("test project edates");
+        project.setName(projectName);
+        project.setAccount(accountName);
         project.setEdate(testDate);
         instance.createNewProject(project);
         
-        Project fetched = instance.getProject(project.getName());
-        assertEquals(fetched.getName(), project.getName());
+        Project fetched = instance.getProject(projectName);
+        assertEquals(projectName, fetched.getName());
         assertEquals(project.getEdate().toString(), fetched.getEdate().toString());
 
-        //test updateProject too
+        // Test updateProject too
     	cal.set(2199, 1, 28, 14, 57, 01);
     	project.setEdate(cal.getTime());
     	instance.updateProject(project);
         fetched = instance.getProject(project.getName());
         assertEquals(fetched.getName(), project.getName());
         assertEquals(project.getEdate().toString(), fetched.getEdate().toString());
+        
+        // Clean up this tests database entries.
+        data.deleteProject(projectName);
+        data.deleteAccount(accountName);
     }
 
     public void testMemberDateManipulationRoundTrip() throws Exception {
@@ -390,16 +530,28 @@ public class CoralAPITest extends TestCase {
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     	Date testDate = cal.getTime();
         assertEquals("2099-01-27 13:59:00", format.format(testDate));
+        
+        String memberName = "JUnit User";
+        String projectName = "JUnit Test Project";
+        String accountName = "JUnit Test Account";
+        this.createTestAccount(accountName);
+        this.createTestProject(projectName, accountName);
+        
+        data.deleteMember(memberName);
         Member member = new Member();
-        member.setProject("JUnit Testing Project");
-        member.setName("testmm01");
-        member.setEdate(testDate);
-        data.deleteMember("testmm01");
+        member.setName(memberName);
+        member.setProject(projectName);
+        member.setEdate(testDate);;
         instance.createNewMember(member);
         
         Member fetched = instance.getMember(member.getName());
-        assertEquals(fetched.getName(), member.getName());
+        assertEquals(memberName, fetched.getName());
         assertEquals(member.getEdate().toString(), fetched.getEdate().toString());
+        
+        // Clean up this tests database entries.
+        data.deleteMember(memberName);
+        data.deleteProject(projectName);
+        data.deleteAccount(accountName);
     }    
     
     public void testAccountEDateIsNullRoundTrip() throws Exception {
@@ -409,95 +561,166 @@ public class CoralAPITest extends TestCase {
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     	Date testDate = cal.getTime();
         assertEquals("2013-01-27 13:59:00", format.format(testDate));
-        data.deleteAccount("JUnit Testing Account2");
+        
+        String accountName = "JUnit Test Account";
+        data.deleteAccount(accountName);
         Account account = new Account();
         account.setEdate(testDate);
-        account.setName("JUnit Testing Account2");
+        account.setName(accountName);
         instance.createNewAccount(account);
-        Account fetched = instance.getAccount(account.getName());
-        assertEquals(fetched.getName(), account.getName());
-        assertEquals("This tests coral's expected behavior (not ideal) that the edate is always set to null", 
-        		null, fetched.getEdate());
+        Account fetched = instance.getAccount(accountName);
+        assertEquals(fetched.getName(), accountName);
+        
+        // This tests coral's expected behavior (not ideal) that the edate is always set to null.
+        assertEquals(null, fetched.getEdate());
+        
+        // Clean up this tests database entries.
+        data.deleteAccount(accountName);
     }
     
     public void testAddProjectMembers() throws Exception {
-    	data.deleteMember("testmem_18");
-    	data.deleteProject("JUnit Testing Project");
-    	data.deleteProject("JUnit Testing Project2");
+    	String memberName = "JUnit User";
+    	String projectName1 = "JUnit Test Project 1";
+    	String projectName2 = "JUnit Test Project 2";
+    	String accountName = "JUnit Test Account";
+    	this.createTestAccount(accountName);
+    	this.createTestProject(projectName1, accountName);
+    	this.createTestProject(projectName2, accountName);
 
-        Project p = new Project();
-        p.setName("JUnit Testing Project");
-        p.setAccount("JUnit Testing Account");    	
-        instance.createNewProject(p);
-
-        Project p2 = new Project();
-        p2.setName("JUnit Testing Project2");
-        p2.setAccount("JUnit Testing Account");    	
-        instance.createNewProject(p2);
-    	
+    	data.deleteMember(memberName);
     	Member member1 = new Member();
-    	member1.setName("testmem_18");
-    	member1.setProject("JUnit Testing Project");
+    	member1.setName(memberName);
+    	member1.setProject(projectName1);
         instance.createNewMember(member1);
     	
-    	String[] members = {"testmem_18"};
-    	instance.addProjectMembers("JUnit Testing Project", members);
-    	instance.addProjectMembers("JUnit Testing Project2", members);
+    	String[] members = {memberName};
+    	instance.addProjectMembers(projectName1, members);
+    	instance.addProjectMembers(projectName2, members);
     	
-    	Members fetchedMembers = instance.getProjectMembers("JUnit Testing Project");
+    	Members fetchedMembers = instance.getProjectMembers(projectName1);
     	assertTrue(fetchedMembers.contains(member1));
     	
-    	fetchedMembers = instance.getProjectMembers("JUnit Testing Project2");
+    	fetchedMembers = instance.getProjectMembers(projectName2);
     	assertTrue(fetchedMembers.contains(member1));
+    	
+    	// Clean up this tests database entries.
+    	data.deleteMember(memberName);
+    	data.deleteProject(projectName1);
+    	data.deleteProject(projectName2);
+    	data.deleteAccount(accountName);
     }
     
     public void testRemoveProjectMembers() throws Exception {
-    	System.out.println("Test Remove Project Members");
-    	String[] members = {"testmem_10"};
-    	try {
-    		instance.removeProjectMembers("JUnit Testing Project", members);
-    	} catch (Exception e) {
-    		System.out.println(e.getMessage());
-    	}
+    	String memberName1 = "JUnit User 1";
+    	String memberName2 = "JUnit User 2";
+    	String projectName1 = "JUnit Test Project 1";
+    	String projectName2 = "JUnit Test Project 2";
+    	String accountName = "JUnit Test Account";
+    	this.createTestAccount(accountName);
+    	this.createTestProject(projectName1, accountName);
+    	this.createTestProject(projectName2, accountName);
+    	
+    	data.deleteMember(memberName1);
+    	Member member1 = new Member();
+    	member1.setName(memberName1);
+    	member1.setProject(projectName1);
+    	member1.setActive(true);
+    	instance.createNewMember(member1);
+    	
+    	data.deleteMember(memberName2);
+    	Member member2 = new Member();
+    	member2.setName(memberName2);
+    	member2.setProject(projectName1);
+    	member2.setActive(true);
+    	instance.createNewMember(member2);
+    	
+    	String[] members = {memberName1, memberName2};
+    	instance.addProjectMembers(projectName2, members);
+    	int sizeBefore = instance.getProjectMembers(projectName2).size();
+    	assertTrue(sizeBefore >= 2);
+
+    	instance.removeProjectMembers(projectName2, members);
+    	int sizeAfter = instance.getProjectMembers(projectName2).size();
+    	int difference = sizeBefore - sizeAfter; 
+    	assertEquals(2, difference);
+    	
+    	// Clean up this tests database entries.
+    	data.deleteMember(memberName1);
+    	data.deleteMember(memberName2);
+    	data.deleteProject(projectName1);
+    	data.deleteAccount(accountName);
     }
     
+    /**
+     * Tests the 'getMember' functionality.
+     * 
+     * @throws Exception
+     */
     public void testGetMember() throws Exception {
-        data.deleteMember("testuser");
-    	System.out.println("Test Get Member");
-    	data.deleteMember("testuser");
-    	
+        String memberName = "JUnit User";
+        String projectName = "JUnit Test Project";
+        String accountName = "JUnit Test Account";
+    	this.createTestAccount(accountName);
+    	this.createTestProject(projectName, accountName);
+        
+    	data.deleteMember(memberName);
     	Member member = new Member();
-    	member.setName("testuser");
-    	member.setProject("JUnit Testing Project");
-        instance.createNewMember(member);  
-        Member mem = instance.getMember("testuser");
-        assertEquals("testuser", mem.getName());
+    	member.setName(memberName);
+    	member.setProject(projectName);
+        instance.createNewMember(member);
+        
+        Member fetched = instance.getMember(memberName);
+        assertEquals(memberName, fetched.getName());
+        
+        // Clean up this tests database entries.
+        data.deleteMember(memberName);
+        data.deleteProject(projectName);
+        data.deleteAccount(accountName);
     }
     
     public void testUnknownMember() throws Exception {
-        boolean exceptionCaught = false;
+        String memberName = "unknown-member";
+        data.deleteMember(memberName);
+        
+    	boolean exceptionThrown = false;
         try {
-            instance.getMember("unknown_member");
+            instance.getMember(memberName);
         } catch (UnknownMemberException ex) {
-            exceptionCaught = true;
+            exceptionThrown = true;
         }
-        assertTrue(exceptionCaught);
+        assertTrue(exceptionThrown);
     }
     
     public void testGetLabRoles() throws Exception {
-        // Create a member for this test.
-    	data.deleteMember("user");
-    	System.out.println("Test Get Member");
+        String memberName = "JUnit User";
+        String projectName = "JUnit Test Project";
+        String accountName = "JUnit Test Account";
+    	this.createTestAccount(accountName);
+    	this.createTestProject(projectName, accountName);
+    	
+        data.deleteMember(memberName);
     	Member member = new Member();
-    	member.setName("user");
-    	member.setProject("JUnit Testing Project");
+    	member.setName(memberName);
+    	member.setProject(projectName);
     	member.setActive(true);
         instance.createNewMember(member);
         
-        LabRole newRole = new LabRole("nano", member.getName(), "staff" );
-        instance.addLabRole(newRole);
+        String labName = "nano";
+        String roleName = "JUnit Test Role"; 
+        String type = "lab";
+        data.deleteRole(roleName);
+        instance.createNewRole(roleName, "Temporary Test Role", type);
+        
+        LabRole newRole = new LabRole(labName, memberName, roleName);
+        instance.addLabRoleToMember(newRole);
         LabRoles roles = instance.getLabRoles(member.getName());
         assertTrue(roles.contains(newRole));
+        
+        // Clean up this tests database entries.
+        data.deleteMember(memberName);
+        data.deleteProject(projectName);
+        data.deleteAccount(accountName);
+        data.deleteRole(roleName);
     }
     
     /**
@@ -551,9 +774,12 @@ public class CoralAPITest extends TestCase {
      * @throws Exception 
      */
     public void testUpdatePassword() throws Exception {
-    	String username = "user";
+    	String username = "JUnit User";
     	String password = "pass";
-    	String project = "JUnit Testing Project";
+    	String project = "JUnit Test Project";
+    	String account = "JUnit Test Account";
+    	this.createTestAccount(account);
+    	this.createTestProject(project, account);
     	this.createTestMember(username, password, project);
     	assertTrue(instance.authenticate(username, password));
     	
@@ -561,6 +787,11 @@ public class CoralAPITest extends TestCase {
     	instance.updatePassword(username, newPassword);
     	assertTrue(instance.authenticate(username, newPassword));	
     	assertFalse(instance.authenticate(username, password));
+    	
+    	// Clean up this tests database entries.
+    	data.deleteMember(username);
+    	data.deleteProject(project);
+    	data.deleteAccount(account);
     }
     
     /**

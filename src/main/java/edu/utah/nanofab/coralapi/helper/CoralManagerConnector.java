@@ -1,4 +1,4 @@
-package edu.utah.nanofab.helper;
+package edu.utah.nanofab.coralapi.helper;
 
 import org.omg.CORBA.ORB;
 import org.opencoral.constants.Constants;

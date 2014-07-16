@@ -1,4 +1,4 @@
-package edu.utah.nanofab.helper;
+package edu.utah.nanofab.coralapi.helper;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
