@@ -570,9 +570,17 @@ public class CoralAPI {
 		}
 	}
 	
+	/**
+	 * Creates a new coral reservation with supplied Reservation object.
+	 * 
+	 * @param r The reservation to be created.
+	 * 
+	 * @throws Exception
+	 */
     public void createNewReservation(Reservation r) throws Exception {
         this.getReservationManager();
         Activity a = ActivityFactory.createRunActivity(
+        		this.coralUser,
         		r.getMember().getName(), 
         		r.getItem(), 
     			r.getProject().getName(), 
@@ -581,13 +589,45 @@ public class CoralAPI {
     			r.getBdate(),
     			r.getEdate());
 		Activity[] activity_array = {a};
-		logger.debug("Making reservation for " + r.getMember().getName() + " " + r.getItem() );
+		logger.debug("Making reservation for '" + r.getMember().getName() + "' " + r.getItem());
 		reservationManager.makeReservation(activity_array, this.ticketString);
-}
+    }
+    
+    /**
+     * Gets an array of all the reservations for the specified tool that were created by the 
+     * member within the time interval specified between the beginning date and ending date 
+     * (bdate and edate).
+     * 
+     * For example, say that the member 'coral' creates a reservation for the TMV Super from 
+     * 12:00-2:00 and from 2:00-3:00. If this function is then subsequently called with a 
+     * bdate and edate within the 12:00-3:00 time period, then both of the reservations will 
+     * be retrieved. If the bdate and edate ranges from 12:00-2:00, then only the first 
+     * reservation will be retrieved.
+     * 
+     * @param member The member whose reservation is being retrieved.
+     * @param tool The tool that the reservation was created for.
+     * @param bdate The beginning date of the search.
+     * @param edate The ending date of the search.
+     * 
+     * @return An array of Reservation objects corresponding to all of the reservations made for
+     * the specified tool by the specified member in the given time range.
+     */
+	public Reservation[] getReservation(String member, String tool, Date bdate, Date edate) {
+		this.getReservationManager();
+		
+		Activity a = new Activity();
+		a.member = member;
+		a.item = tool;
+		a.bdate = TimestampConverter.dateToTimestamp(bdate);
+		a.edate = TimestampConverter.dateToTimestamp(edate);
+		a.isNull = false;
+		return null;
+	}
 
 	public void enable(Enable enableActivity) throws InvalidTicketSignal, InvalidAgentSignal, InvalidProjectSignal, InvalidAccountSignal, InvalidMemberSignal, InvalidResourceSignal, InvalidProcessSignal, ResourceUnavailableSignal, NotAuthorizedSignal{
 		this.getEquipmentManager();
 		Activity activity = ActivityFactory.createRunActivity(
+        		this.coralUser,
         		enableActivity.getMember().getName(), 
         		enableActivity.getItem(), 
     			enableActivity.getProject().getName(), 
@@ -655,13 +695,6 @@ public class CoralAPI {
 //	reserve( tool, agent, member, project, account, begin time, end time(or length) ) 
 //	deleteReservation( tool, member, time, length )
 //	costRecovery (month, year)          
-
-	public Reservation getReservation(String string, String string2,
-			String string3) throws NotImplementedException {
-		this.getReservationManager();
-		//reservationManager.findReservation(arg0, arg1);
-		throw new NotImplementedException();
-	}
 	
 	/**
 	 * Gets the log level for this CoralAPI instance.

@@ -15,6 +15,7 @@ import edu.utah.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.coralapi.resource.Project;
 import edu.utah.nanofab.coralapi.resource.Reservation;
 import edu.utah.nanofab.coralapi.resource.Role;
+import edu.utah.nanofab.coralapi.helper.TimestampConverter;
 import edu.utah.nanofab.coralapi.helper.Utils;
 
 import java.io.BufferedReader;
@@ -408,22 +409,27 @@ public class CoralAPITest extends TestCase {
         Project project = this.createTestProject(projectName, accountName);
         Member member = this.createTestMember(user, pass, projectName);
     	
-        data.deleteReservation("TMV Super", "2099-01-01 12:00:00", "2099-01-01 13:00:00");
+        String tool = "TMV Super";
+        Date bdate = TimestampConverter.dateFromDateComponents(2014, 7, 18, 12, 0, 0);
+        Date edate = TimestampConverter.dateFromDateComponents(2014, 7, 18, 13, 0, 0);
+        data.deleteReservation(tool, bdate.toString(), edate.toString());
         Reservation r = new Reservation();
-        r.setItem("TMV Super");
-        r.setBdate(2099,1,1,12,0);
-        r.setEdate(2099,1,1,13,0);
+        r.setItem(tool);
+        r.setBdate(2014,7,18,12,0);
+        r.setEdate(2014,7,18,13,0);
         r.setMember(member);
         r.setProject(project);
         r.setLab("nano");
         r.setAccount(account);
         instance.createNewReservation(r);
         
-        Reservation fetched = instance.getReservation("TMV Super", "2099-01-01 12:00:00", "2099-01-01 13:00:00");
-        assertEquals(fetched.getMember().getName(), r.getMember().getName());
+        Reservation[] fetched = instance.getReservation(user, tool, bdate, edate);
+        assertTrue(fetched.length == 1);
+        assertEquals(fetched[0].getMember().getName(), r.getMember().getName());
         
         // Clean up this tests database entries.
         data.deleteMember(user);
+        data.deleteReservation(tool, bdate.toString(), edate.toString());
         data.deleteProject(projectName);
         data.deleteAccount(accountName);
     }
