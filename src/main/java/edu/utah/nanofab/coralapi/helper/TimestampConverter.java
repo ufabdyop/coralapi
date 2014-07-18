@@ -5,7 +5,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.opencoral.idl.Timestamp;
-import org.opencoral.util.Tstamp;
 
 public class TimestampConverter {
 

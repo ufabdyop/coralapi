@@ -117,9 +117,6 @@ public class Project {
 	    this.setBdate(this.timestampToDate(idlProject.bdate));
 	    this.setEdate(this.timestampToDate(idlProject.edate));
 	}
-	private Timestamp dateToTimestamp(Date bdate2) {
-		return TimestampConverter.dateToTimestamp(bdate2);
-	}
 	private Date timestampToDate(Timestamp tstamp) {
 		return TimestampConverter.timestampToDate(tstamp);
 	}
