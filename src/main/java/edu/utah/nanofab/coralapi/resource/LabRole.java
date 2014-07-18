@@ -44,10 +44,8 @@ public class LabRole {
 	}
 	
 	public boolean equals(LabRole role) {
-		return this.lab.equals( role.lab) && 
-				this.member.equals(role.member) && 
-				this.role.equals(role.role);
-		
+		return this.lab.equals(role.lab) && this.member.equals(role.member)
+				&& this.role.equals(role.role);
 	}
 	
 	public String toString() {

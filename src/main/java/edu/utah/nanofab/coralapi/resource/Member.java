@@ -314,7 +314,7 @@ public class Member {
 	 */
 	public org.opencoral.idl.Member convertToIDLMemberForRscMgr() throws Exception {
 		 MemberAdapter memAP = this.convertToMemberAdapter();
-         return (org.opencoral.idl.Member)memAP.getObject();
+         return (org.opencoral.idl.Member) memAP.getObject();
 	}
 	
 	/**

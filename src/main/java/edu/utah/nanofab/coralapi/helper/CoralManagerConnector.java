@@ -1,4 +1,4 @@
-package edu.utah.nanofab.helper;
+package edu.utah.nanofab.coralapi.helper;
 
 import org.omg.CORBA.ORB;
 import org.opencoral.constants.Constants;
@@ -8,6 +8,7 @@ import org.opencoral.idl.Auth.AuthManagerHelper;
 import org.opencoral.util.AdminManagerConnection;
 
 public class CoralManagerConnector {
+	
 	private AuthManager authManager;
 	private AdminManager adminManager;
 	private AdminManagerConnection adminManagerConnection;
@@ -26,7 +27,7 @@ public class CoralManagerConnector {
 	}
 
 	
-	/*
+	/**
 	 * Get an arbitrary Manager from coral
 	 * 
 	 * example: 
@@ -36,28 +37,37 @@ public class CoralManagerConnector {
 	 * hardwareManager._release();
 	 * 
 	 */
-	public org.omg.CORBA.Object getManager(String serverName ) {
+	
+	/**
+	 * Gets the supplied server manager fom coral.
+	 * 
+	 * @param serverName The name of the server..
+	 * @return
+	 */
+	public org.omg.CORBA.Object getManager(String serverName) {
 		
 		org.omg.CORBA.Object returnManager;
 		String authIorUrl = null;
 		String costIorUrl = null;
 		
-		// get coral ior
+		
+		// Get the coral IOR.
 		if (this.iorUrl == null) {
 			this.iorUrl = "http://localhost/IOR/";
 		}
 
-		// get default user to communicate with coral
+		// Get default user to communicate with coral.
 		if (this.coralUser == null) {
 			this.coralUser = "coral";
 		}
 
-		// get admin manager via ior
-		adminManager = null;
-		orb = ORB.init((String[]) null, null);
-		adminManagerConnection = new AdminManagerConnection(orb);
-		int maxAttempts = 1;
+		// Get admin manager via the IOR
+		this.adminManager = null;
+		this.orb = ORB.init((String[]) null, null);
+		this.adminManagerConnection = new AdminManagerConnection(this.orb);
 		int attempts = 0;
+		int maxAttempts = 1;
+		
 		while (attempts++ < maxAttempts && adminManager == null) {
 			try {
 				adminManager = adminManagerConnection.connect(iorUrl);

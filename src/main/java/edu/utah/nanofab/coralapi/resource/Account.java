@@ -3,8 +3,6 @@ package edu.utah.nanofab.coralapi.resource;
 import java.util.Date;
 
 import org.opencoral.corba.AccountAdapter;
-import org.opencoral.idl.Timestamp;
-
 import edu.utah.nanofab.coralapi.helper.TimestampConverter;
 
 public class Account {
@@ -65,12 +63,6 @@ public class Account {
 			this.setActive(acct.active);
 			this.setBdate(TimestampConverter.timestampToDate(acct.bdate));
 			this.setEdate(TimestampConverter.timestampToDate(acct.edate));
-		}
-		private Timestamp dateToTimestamp(Date bdate2) {
-			return TimestampConverter.dateToTimestamp(bdate2);
-		}
-		private Date timestampToDate(Timestamp tstamp) {
-			return TimestampConverter.timestampToDate(tstamp);
 		}
 		private org.opencoral.corba.AccountAdapter toAccountAdapter() throws Exception {
 			AccountAdapter proAdapter = new AccountAdapter();

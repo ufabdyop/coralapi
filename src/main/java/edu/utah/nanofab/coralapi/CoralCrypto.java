@@ -11,6 +11,7 @@ import java.util.Scanner;
 import org.opencoral.util.Encryption;
 
 public class CoralCrypto {
+	
 	private String configUrl;
 	private Properties Props;
 	private String CryptoProvider;

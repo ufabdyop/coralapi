@@ -6,14 +6,40 @@ import edu.utah.nanofab.coralapi.helper.TimestampConverter;
 
 public class Reservation {
 	
+	private Member member;
+	private Project project;
+	private Account account;
 	private Date bdate;
 	private Date edate;
 	private String item;
 	private String lab;
-
-	private Member member;
-	private Project project;
-	private Account account;
+	
+	/**
+	 * Creates a new Reservation instance with the supplied information.
+	 * 
+	 * @param member The member this reservation is for.
+	 * @param project The project this reservation is associated with.
+	 * @param account The account this reservation should be billed to.
+	 * @param bdate The beginning date of this reservation.
+	 * @param edate The ending date of this reservation.
+	 * @param item The tool that this reservation is made for.
+	 * @param lab The lab that the supplied item exists in.
+	 */
+	public Reservation(Member member, Project project, Account account,
+			java.util.Date bdate, java.util.Date edate, String item, String lab) {
+		super();
+		this.member = member;
+		this.project = project;
+		this.account = account;
+		this.bdate = bdate;
+		this.edate = edate;
+		this.item = item;
+		this.lab = lab;
+	}
+	
+	public Reservation() {
+		
+	}
 
 	public Date getBdate() {
 		return bdate;

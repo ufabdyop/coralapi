@@ -23,6 +23,7 @@ import org.opencoral.idl.ProjectNotFoundSignal;
 import org.opencoral.idl.Relation;
 import org.opencoral.idl.ResourceUnavailableSignal;
 import org.opencoral.idl.RoleNotFoundSignal;
+import org.opencoral.idl.Timestamp;
 import org.opencoral.idl.Auth.AuthManager;
 import org.opencoral.idl.Auth.AuthManagerHelper;
 import org.opencoral.idl.Equipment.EquipmentManager;
@@ -37,8 +38,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.utah.nanofab.coralapi.resource.Account;
-import edu.utah.nanofab.coralapi.exceptions.NotImplementedException;
+import edu.utah.nanofab.coralapi.exceptions.InvalidAccountException;
+import edu.utah.nanofab.coralapi.exceptions.InvalidAgentException;
+import edu.utah.nanofab.coralapi.exceptions.InvalidDateException;
+import edu.utah.nanofab.coralapi.exceptions.InvalidMemberException;
+import edu.utah.nanofab.coralapi.exceptions.InvalidProcessException;
+import edu.utah.nanofab.coralapi.exceptions.InvalidProjectException;
+import edu.utah.nanofab.coralapi.exceptions.InvalidResourceException;
+import edu.utah.nanofab.coralapi.exceptions.InvalidRoleException;
 import edu.utah.nanofab.coralapi.exceptions.UnknownMemberException;
+import edu.utah.nanofab.coralapi.helper.TimestampConverter;
+import edu.utah.nanofab.coralapi.helper.Utils;
 import edu.utah.nanofab.coralapi.collections.Accounts;
 import edu.utah.nanofab.coralapi.collections.LabRoles;
 import edu.utah.nanofab.coralapi.collections.Machines;
@@ -49,7 +59,7 @@ import edu.utah.nanofab.coralapi.resource.LabRole;
 import edu.utah.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.coralapi.resource.Project;
 import edu.utah.nanofab.coralapi.resource.Reservation;
-import edu.utah.nanofab.helper.CoralManagerConnector;
+import edu.utah.nanofab.coralapi.helper.CoralManagerConnector;
 
 /**
  * The CoralAPI class provides a wrapper for the primary coral services.
@@ -71,8 +81,6 @@ public class CoralAPI {
     private ReservationManager reservationManager = null;
 	private CoralCrypto coralCrypto;
 	public static Logger logger;
-	
-	
            
     public CoralAPI(String coralUser, String iorUrl, String configUrl) {
     	this.coralUser = coralUser;
@@ -84,35 +92,33 @@ public class CoralAPI {
     }
     
     private void reconnectToCoral() {
-		logger.debug("reconnectToCoral called");
+    	logger.debug("Reconnecting to Coral...");
 		connector = new CoralManagerConnector();
 		connector.setCoralUser(this.coralUser);
 		connector.setIorUrl(this.iorUrl);
     }
     
     private void reconnectToResourceManager() {
-		logger.debug("reconnectToResourceManager called");
+    	logger.debug("Reconnecting to Resource Manager");
 		resourceManager = ResourceManagerHelper.narrow(connector.getManager(Constants.RSCMGR_NAME));
     }
     
     private void getReservationManager() {
-		logger.debug("getReservationManager called");
+    	logger.info("Getting Reservation Manager...");
         if (connector == null) {
-            System.out.println("connector is null");
+        	logger.debug("ReservationManager connector is null. Reconnecting to coral...");
             reconnectToCoral();
 	    }    	
 		if (reservationManager == null){
 			reservationManager = ReservationManagerHelper.narrow(connector.getManager(Constants.RESMGR_NAME));
-			System.out.println("resmgr is null? " + (reservationManager == null));
 		}
 		this.ticketString = connector.getTicketString();
 	}
     
     private void getEquipmentManager(){
-    	logger.debug("Entered getEquipmentManager()");
-
+    	logger.info("Getting Equipment Manager");
         if (connector == null) {
-                System.out.println("connector is null");
+        		logger.debug("EquipmentManager connector is null. Reconnecting to coral...");
                 reconnectToCoral();
         }    	
     	if (equipmentManager == null){
@@ -122,9 +128,9 @@ public class CoralAPI {
     }
     
     private void getAuthManager(){
-        System.out.println("Entered getAuthManager()");
+        logger.info("Getting Authentication Manager");
         if (connector == null) {
-                System.out.println("connector is null");
+                logger.debug("AuthManager connector is null. Reconnecting to coral...");
                 reconnectToCoral();
         }    	
     	if (authManager == null){
@@ -134,32 +140,35 @@ public class CoralAPI {
     }
     
     private void getResourceManager() {
-            System.out.println("Entered getResourceManager()");
+    		logger.info("Getting Resource Manager");
             if (connector == null) {
-                    System.out.println("connector is null");
+                    logger.debug("ResourceManager connector is null. Reconnecting to coral...");
                     reconnectToCoral();
             }
             if (resourceManager == null) {
-                    System.out.println("resourceManager is null");
+            		logger.debug("ResourceManaer is null. Attempting to reconnect to the ResourceManager");
                     reconnectToResourceManager();
             }
 
             this.ticketString = connector.getTicketString();
-            System.out.println("this.ticketString = " + this.ticketString );
+            logger.debug("Ticket String: " + this.ticketString);
+            
             try {
                     resourceManager.getAllProjects();
             } catch (org.omg.CORBA.COMM_FAILURE comm) {
-                    System.out.println("orb communication failure ");
+            		logger.debug("ORB Comm Failure");
                     connector = null;
                     resourceManager = null;
             } catch (org.omg.CORBA.OBJECT_NOT_EXIST corbaException ) {
-                    System.out.println("Caught Corba error, probably lost coral connection, trying to reconnect");
+            		logger.debug("Caught CORBA error. This error is probably due to a lost coral connection.");
+            		logger.debug("Trying to reconnect...");
                     reconnectToCoral() ;
                     reconnectToResourceManager() ;
             } catch (ProjectNotFoundSignal e) {
-                    System.out.println("project not found signal!");
+            		logger.debug("Project Not Found!");
             } catch (Exception e) {
-                    System.out.println("General exception found" + e.getMessage());
+                    logger.debug("General Exception was caught. See the stacktrace for more details.");
+                    logger.trace(e.getMessage(), e);
             }
     }
 
@@ -446,25 +455,52 @@ public class CoralAPI {
 		resourceManager.updateMember(member.convertToIDLMemberForRscMgr(), this.ticketString);
 	}
 	public void close() {
-		System.out.println("Close CoralServices Resources");
+		logger.debug("Shutting down Coral Services...");
+		
 		if (resourceManager != null) { resourceManager._release(); }
 		if (authManager != null) { authManager._release(); }
 		if (equipmentManager != null) { equipmentManager._release(); }
+		
 		try {
 			connector.release();
 		} catch (Exception e) {
-			logger.error("could not call release on connector: " + e.getMessage());
+			logger.error("Could not release the connector: " + e.getMessage());
 		}
 	}
 
-	public void addLabRole(LabRole newRole) throws InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
+	public void addLabRoleToMember(LabRole newRole) throws Exception {
 		this.getResourceManager();
-		resourceManager.addRoleToMember(
-				newRole.getMember(), 
-				newRole.getRole(),
-				newRole.getLab(),
-				"lab",
-				this.ticketString);
+		
+		try {
+			resourceManager.addRoleToMember(
+					newRole.getMember(), 
+					newRole.getRole(),
+					newRole.getLab(),
+					"lab",
+					this.ticketString);
+		} catch(Exception e) {
+			String message = e.getMessage();
+			Throwable cause = e.getCause();
+			
+			if (e instanceof org.opencoral.idl.InvalidTicketSignal) {
+				throw new edu.utah.nanofab.coralapi.exceptions.InvalidTicketException(message, cause);
+			}
+			
+			if (e instanceof org.opencoral.idl.InvalidRoleSignal) {
+				throw new edu.utah.nanofab.coralapi.exceptions.InvalidRoleException(message, cause);
+			}
+			
+			if (e instanceof org.opencoral.idl.InvalidMemberSignal) {
+				throw new edu.utah.nanofab.coralapi.exceptions.InvalidMemberException(message, cause);
+			}
+			
+			if (e instanceof org.opencoral.idl.NotAuthorizedSignal) {
+				throw new edu.utah.nanofab.coralapi.exceptions.NotAuthorizedException(message, cause);
+			}
+			
+			throw e;
+		}
+
 	}
 
 	public LabRoles getLabRoles(String username) throws RoleNotFoundSignal {
@@ -473,9 +509,81 @@ public class CoralAPI {
 		return LabRoles.fromIdlPersonaArray(personas);
 	}
 
+	/**
+	 * Creates a new role with the supplied name, description, and type. By default, this will
+	 * set the new role to active and the end date to null.
+	 * 
+	 * @param name The name of the role.
+	 * @param description A short description for the new role.
+	 * @param type The type of role.
+	 * 
+	 * @throws Exception 
+	 */
+	public void createNewRole(String name, String description, String type) throws Exception {
+		this.getResourceManager();
+		
+		Date date = new Date();
+		Timestamp bdate = TimestampConverter.dateToTimestamp(date);
+		Timestamp edate = TimestampConverter.dateToTimestamp(null);
+		
+		// Creates an active new Role with the supplied name, description, and type.
+		org.opencoral.idl.Role r = new org.opencoral.idl.Role(false, name, description, type, true, bdate, edate);
+		try {
+			resourceManager.addRole(r, this.ticketString);
+		} catch (Exception e) {
+			String message = e.getMessage();
+			Throwable cause = e.getCause();
+			
+			if (e instanceof org.opencoral.idl.InvalidTicketSignal) {
+				throw new edu.utah.nanofab.coralapi.exceptions.InvalidTicketException(message, cause);
+			}
+			
+			if (e instanceof org.opencoral.idl.RoleDuplicateSignal) {
+				throw new edu.utah.nanofab.coralapi.exceptions.RoleDuplicateException(message, cause);
+			}
+			
+			if (e instanceof org.opencoral.idl.NotAuthorizedSignal) {
+				throw new edu.utah.nanofab.coralapi.exceptions.NotAuthorizedException(message, cause);
+			}
+			
+			throw e;
+		}
+	}
+	
+	/**
+	 * Gets the given role with the supplied type.
+	 * 
+	 * @param name The name of the role.
+	 * @param type The type of the role.
+	 * 
+	 * @throws InvalidRoleException 
+	 */
+	public edu.utah.nanofab.coralapi.resource.Role getRole(String name, String type) throws InvalidRoleException {
+		this.getResourceManager();
+		try {
+			org.opencoral.idl.Role idlRole = resourceManager.getRole(name, type);
+			edu.utah.nanofab.coralapi.resource.Role r = new edu.utah.nanofab.coralapi.resource.Role();
+			r.populateFromIdlRole(idlRole);
+			return r;
+		} catch (org.opencoral.idl.InvalidRoleSignal e) {
+			String message = e.getMessage();
+			Throwable cause = e.getCause();
+			
+			throw new InvalidRoleException(message, cause);
+		}
+	}
+	
+	/**
+	 * Creates a new coral reservation with supplied Reservation object.
+	 * 
+	 * @param r The reservation to be created.
+	 * 
+	 * @throws Exception
+	 */
     public void createNewReservation(Reservation r) throws Exception {
         this.getReservationManager();
         Activity a = ActivityFactory.createRunActivity(
+        		this.coralUser,
         		r.getMember().getName(), 
         		r.getItem(), 
     			r.getProject().getName(), 
@@ -484,13 +592,93 @@ public class CoralAPI {
     			r.getBdate(),
     			r.getEdate());
 		Activity[] activity_array = {a};
-		logger.debug("Making reservation for " + r.getMember().getName() + " " + r.getItem() );
+		logger.debug("Making reservation for '" + r.getMember().getName() + "' " + r.getItem());
 		reservationManager.makeReservation(activity_array, this.ticketString);
-}
+    }
+    
+    /**
+     * Gets an array of all the reservations for the specified tool that were created by the 
+     * member within the time interval specified between the beginning date and ending date 
+     * (bdate and edate).
+     * 
+     * For example, say that the member 'coral' creates a reservation for the TMV Super from 
+     * 12:00-2:00 and from 2:00-3:00. If this function is then subsequently called with a 
+     * bdate and edate within the 12:00-3:00 time period, then both of the reservations will 
+     * be retrieved. If the bdate and edate ranges from 12:00-2:00, then only the first 
+     * reservation will be retrieved.
+     * 
+     * @param member The member whose reservation is being retrieved.
+     * @param tool The tool that the reservation was created for.
+     * @param bdate The beginning date of the search.
+     * @param edate The ending date of the search.
+     * 
+     * @return An array of Reservation objects corresponding to all of the reservations made for
+     * the specified tool by the specified member in the given time range.
+     * 
+     * @throws Exception 
+     */
+	public Reservation[] getReservations(String member, String tool, Date bdate, Date edate) throws Exception {
+		this.getReservationManager();
+		
+		Activity[] filters = Utils.createReservationSearchFilter(member, tool,
+				bdate, edate);
+		
+		Activity lowerBound = filters[0];
+		Activity upperBound = filters[1];
+		
+		Activity[] activities = null;
+		try {
+			activities = this.reservationManager.findReservation(lowerBound, upperBound);
+		} catch(Exception e) {
+			String message = e.getMessage();
+			Throwable cause = e.getCause();
+			
+			if(e instanceof org.opencoral.idl.InvalidAgentSignal) {
+				throw new InvalidAgentException(message, cause);
+			}
+			
+			if(e instanceof org.opencoral.idl.InvalidProjectSignal) {
+				throw new InvalidProjectException(message, cause);
+			}
+			
+			if(e instanceof org.opencoral.idl.InvalidAccountSignal) {
+				throw new InvalidAccountException(message, cause);
+			}
+			
+			if(e instanceof org.opencoral.idl.InvalidMemberSignal) {
+				throw new InvalidMemberException(message, cause);
+			}
+			
+			if(e instanceof org.opencoral.idl.InvalidResourceSignal) {
+				throw new InvalidResourceException(message, cause);
+			}
+			
+			if(e instanceof org.opencoral.idl.InvalidProcessSignal) {
+				throw new InvalidProcessException(message, cause);
+			}
+			
+			if(e instanceof org.opencoral.idl.InvalidDateSignal) {
+				throw new InvalidDateException(message, cause);
+			}
+			
+			// If non of the exceptions above occurred, just forward the caught
+			// exception onward.
+			throw e;
+		}
+		
+		Reservation[] reservations = new Reservation[activities.length];
+		int i = 0;
+		for (Activity act : activities) {
+			reservations[i++] = ActivityFactory.convertActivityToReservation(act);
+		}
+		
+		return reservations;
+	}
 
 	public void enable(Enable enableActivity) throws InvalidTicketSignal, InvalidAgentSignal, InvalidProjectSignal, InvalidAccountSignal, InvalidMemberSignal, InvalidResourceSignal, InvalidProcessSignal, ResourceUnavailableSignal, NotAuthorizedSignal{
 		this.getEquipmentManager();
 		Activity activity = ActivityFactory.createRunActivity(
+        		this.coralUser,
         		enableActivity.getMember().getName(), 
         		enableActivity.getItem(), 
     			enableActivity.getProject().getName(), 
@@ -558,13 +746,6 @@ public class CoralAPI {
 //	reserve( tool, agent, member, project, account, begin time, end time(or length) ) 
 //	deleteReservation( tool, member, time, length )
 //	costRecovery (month, year)          
-
-	public Reservation getReservation(String string, String string2,
-			String string3) throws NotImplementedException {
-		this.getReservationManager();
-		//reservationManager.findReservation(arg0, arg1);
-		throw new NotImplementedException();
-	}
 	
 	/**
 	 * Gets the log level for this CoralAPI instance.

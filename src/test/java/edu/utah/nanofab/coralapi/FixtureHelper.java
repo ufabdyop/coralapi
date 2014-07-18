@@ -3,17 +3,18 @@ package edu.utah.nanofab.coralapi;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.opencoral.idl.Member;
 import org.opencoral.idl.Project;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FixtureHelper {
 
 	private String dbhost = "";
 	private String dbuser = "";
 	private String dbpass = "";
+	private static final Logger logger = LoggerFactory.getLogger(FixtureHelper.class);
 	
 	/**
 	 * Constructs a FixtureHelper with the supplied connection information.
@@ -38,23 +39,21 @@ public class FixtureHelper {
     public Member newMember(String name) throws Exception{
         Member newMember = new Member();
         newMember.name = name;
-        newMember.project = "Bootstrap project";
+        newMember.project = "JUnit Testing Project";
         return newMember;
     }
     public Project newProject(String name) throws Exception{
     	Project newProject = new Project();
-    	newProject.account = "Bootstrap account";
+    	newProject.account = "JUnit Testing Account";
     	newProject.name = name;
     	return newProject;
     }
     public void deleteMember(String name){
     	String query_ ="DELETE FROM rscmgr.member WHERE name='"+name+"'";
-    	System.out.println(query_);
     	query(query_);
     }
     public void deleteProject(String name){
     	String query_ ="DELETE FROM rscmgr.project WHERE name='"+name+"'";
-    	System.out.println(query_);
     	query(query_);
     }
     
@@ -68,8 +67,7 @@ public class FixtureHelper {
             st.execute(query_);
 
         } catch (SQLException ex) {
-            Logger lgr = Logger.getLogger(FixtureHelper.class.getName());
-            lgr.log(Level.SEVERE, ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
 
         } finally {
             try {
@@ -81,16 +79,19 @@ public class FixtureHelper {
                 }
 
             } catch (SQLException ex) {
-                Logger lgr = Logger.getLogger(FixtureHelper.class.getName());
-                lgr.log(Level.WARNING, ex.getMessage(), ex);
+                logger.warn(ex.getMessage(), ex);
             }
         }
     }
 
 	public void deleteAccount(String name) {
     	String query_ ="DELETE FROM rscmgr.account WHERE name='"+name+"'";
-    	System.out.println(query_);
     	query(query_);
+	}
+	
+	public void deleteRole(String name) {
+		String query_ = "DELETE FROM rscmgr.role WHERE name='" + name + "'";
+		query(query_);
 	}
 
 	public String getDbhost() {
@@ -121,7 +122,6 @@ public class FixtureHelper {
 		String query_ ="DELETE FROM resmgr.reservation WHERE item='"+item+"' "
 				+ "AND (bdate, edate) OVERLAPS ('" + bdate +"'::timestamp, '"
 						+ edate + "'::timestamp)";
-		System.out.println(query_);
 		query(query_);		
 	}
 }

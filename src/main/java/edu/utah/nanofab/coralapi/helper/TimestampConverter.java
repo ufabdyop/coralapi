@@ -9,6 +9,16 @@ import org.opencoral.idl.Timestamp;
 public class TimestampConverter {
 
 	public static Timestamp dateToTimestamp(Date bdate2) {
+		
+		// If the provided date is null then just create a null Timestamp with arbitrary
+		// parameters.
+		if (bdate2 == null) {
+			Timestamp tstamp = new Timestamp();
+			tstamp.isNull = true;
+			
+			return tstamp;
+		}
+		
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(bdate2);
 		Timestamp tstamp = new Timestamp();
