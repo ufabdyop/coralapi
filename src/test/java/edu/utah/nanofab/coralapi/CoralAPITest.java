@@ -423,8 +423,8 @@ public class CoralAPITest extends TestCase {
         r.setAccount(account);
         instance.createNewReservation(r);
         
-        Reservation[] fetched = instance.getReservation(user, tool, bdate, edate);
-        assertTrue(fetched.length == 1);
+        Reservation[] fetched = instance.getReservations(user, tool, bdate, edate);
+        assertTrue(fetched.length == 2); // Reservations are stored in 30 min intervals, so we would expect 2 reservations.
         assertEquals(fetched[0].getMember().getName(), r.getMember().getName());
         
         // Clean up this tests database entries.

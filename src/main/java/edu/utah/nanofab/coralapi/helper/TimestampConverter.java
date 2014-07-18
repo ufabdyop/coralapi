@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.opencoral.idl.Timestamp;
+import org.opencoral.util.Tstamp;
 
 public class TimestampConverter {
 
@@ -14,12 +15,6 @@ public class TimestampConverter {
 		// parameters.
 		if (bdate2 == null) {
 			Timestamp tstamp = new Timestamp();
-			tstamp.year = 3000;
-			tstamp.month = 1;
-			tstamp.day = 1;
-			tstamp.hour = 10;
-			tstamp.minute = 0;
-			tstamp.second = 0;
 			tstamp.isNull = true;
 			
 			return tstamp;

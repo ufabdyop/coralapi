@@ -38,14 +38,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.utah.nanofab.coralapi.resource.Account;
+import edu.utah.nanofab.coralapi.exceptions.InvalidAccountException;
+import edu.utah.nanofab.coralapi.exceptions.InvalidAgentException;
+import edu.utah.nanofab.coralapi.exceptions.InvalidDateException;
 import edu.utah.nanofab.coralapi.exceptions.InvalidMemberException;
+import edu.utah.nanofab.coralapi.exceptions.InvalidProcessException;
+import edu.utah.nanofab.coralapi.exceptions.InvalidProjectException;
+import edu.utah.nanofab.coralapi.exceptions.InvalidResourceException;
 import edu.utah.nanofab.coralapi.exceptions.InvalidRoleException;
-import edu.utah.nanofab.coralapi.exceptions.InvalidTicketException;
-import edu.utah.nanofab.coralapi.exceptions.NotAuthorizedException;
-import edu.utah.nanofab.coralapi.exceptions.NotImplementedException;
-import edu.utah.nanofab.coralapi.exceptions.RoleDuplicateException;
 import edu.utah.nanofab.coralapi.exceptions.UnknownMemberException;
 import edu.utah.nanofab.coralapi.helper.TimestampConverter;
+import edu.utah.nanofab.coralapi.helper.Utils;
 import edu.utah.nanofab.coralapi.collections.Accounts;
 import edu.utah.nanofab.coralapi.collections.LabRoles;
 import edu.utah.nanofab.coralapi.collections.Machines;
@@ -611,17 +614,65 @@ public class CoralAPI {
      * 
      * @return An array of Reservation objects corresponding to all of the reservations made for
      * the specified tool by the specified member in the given time range.
+     * 
+     * @throws Exception 
      */
-	public Reservation[] getReservation(String member, String tool, Date bdate, Date edate) {
+	public Reservation[] getReservations(String member, String tool, Date bdate, Date edate) throws Exception {
 		this.getReservationManager();
 		
-		Activity a = new Activity();
-		a.member = member;
-		a.item = tool;
-		a.bdate = TimestampConverter.dateToTimestamp(bdate);
-		a.edate = TimestampConverter.dateToTimestamp(edate);
-		a.isNull = false;
-		return null;
+		Activity[] filters = Utils.createReservationSearchFilter(member, tool,
+				bdate, edate);
+		
+		Activity lowerBound = filters[0];
+		Activity upperBound = filters[1];
+		
+		Activity[] activities = null;
+		try {
+			activities = this.reservationManager.findReservation(lowerBound, upperBound);
+		} catch(Exception e) {
+			String message = e.getMessage();
+			Throwable cause = e.getCause();
+			
+			if(e instanceof org.opencoral.idl.InvalidAgentSignal) {
+				throw new InvalidAgentException(message, cause);
+			}
+			
+			if(e instanceof org.opencoral.idl.InvalidProjectSignal) {
+				throw new InvalidProjectException(message, cause);
+			}
+			
+			if(e instanceof org.opencoral.idl.InvalidAccountSignal) {
+				throw new InvalidAccountException(message, cause);
+			}
+			
+			if(e instanceof org.opencoral.idl.InvalidMemberSignal) {
+				throw new InvalidMemberException(message, cause);
+			}
+			
+			if(e instanceof org.opencoral.idl.InvalidResourceSignal) {
+				throw new InvalidResourceException(message, cause);
+			}
+			
+			if(e instanceof org.opencoral.idl.InvalidProcessSignal) {
+				throw new InvalidProcessException(message, cause);
+			}
+			
+			if(e instanceof org.opencoral.idl.InvalidDateSignal) {
+				throw new InvalidDateException(message, cause);
+			}
+			
+			// If non of the exceptions above occurred, just forward the caught
+			// exception onward.
+			throw e;
+		}
+		
+		Reservation[] reservations = new Reservation[activities.length];
+		int i = 0;
+		for (Activity act : activities) {
+			reservations[i++] = ActivityFactory.convertActivityToReservation(act);
+		}
+		
+		return reservations;
 	}
 
 	public void enable(Enable enableActivity) throws InvalidTicketSignal, InvalidAgentSignal, InvalidProjectSignal, InvalidAccountSignal, InvalidMemberSignal, InvalidResourceSignal, InvalidProcessSignal, ResourceUnavailableSignal, NotAuthorizedSignal{
