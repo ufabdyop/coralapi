@@ -50,9 +50,6 @@ public final class Machine
 		this.historyURL  = idlMachine.historyURL ;
 		this.hostName  = idlMachine.hostName ;
 		this.port  = idlMachine.port ;
-		this.cardNumber  = idlMachine.cardNumber ;
-		this.evenPort  = idlMachine.evenPort ;
-		this.oddPort  = idlMachine.oddPort ;
 		this.channel  = idlMachine.channel ;
 		this.hidden  = idlMachine.hidden ;
 		this.qualify  = idlMachine.qualify ;
@@ -63,7 +60,6 @@ public final class Machine
 		this.shutdowns  = idlMachine.shutdowns ;
 		this.reqdSupport  = idlMachine.reqdSupport ;
 		this.optSupport  = idlMachine.optSupport ;
-		this.numInterlocks  = idlMachine.numInterlocks ;		
 	}
 	public String getName() {
 		return name;

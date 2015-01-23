@@ -292,7 +292,7 @@ public class CoralAPI {
 			 resourceManager.removeMemberFromProject(member, project, this.ticketString);
 		 }    	
     }
-	public void addEquipmentRoleToMember(String member, String roleName, String resource) throws IOException, InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
+	public void addEquipmentRoleToMember(String member, String roleName, String resource) throws IOException, InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal, InvalidResourceSignal {
 		this.getResourceManager();
    
 		try {
@@ -304,29 +304,29 @@ public class CoralAPI {
 	}
 	public void removeEquipmentRoleFromMember(String member, String roleName,
 			String resource) throws IOException, InvalidTicketSignal,
-			InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
+			InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal, InvalidResourceSignal {
 		this.getResourceManager();
         resourceManager.removeRoleFromMember(member, roleName, resource, ResourceRoles.EQUIPMENT, this.ticketString);
 	}	
 	public void addProjectRoleToMember(String member, String roleName,
 			String resource) throws IOException, InvalidTicketSignal,
-			InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
+			InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal, InvalidResourceSignal {
 		this.getResourceManager();
 		resourceManager.addRoleToMember(member, roleName, resource, ResourceRoles.PROJECT, this.ticketString);
 	}
 
 	public void removeProjectRoleFromMember(String member, String roleName,
 			String resource) throws IOException, InvalidTicketSignal,
-			InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
+			InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal, InvalidResourceSignal {
 		this.getResourceManager();
 		resourceManager.removeRoleFromMember(member, roleName, resource, ResourceRoles.PROJECT, this.ticketString);
 	}
 	
-	public void addSafetyFlagToMember(String member ) throws IOException, InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
+	public void addSafetyFlagToMember(String member ) throws IOException, InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal, InvalidResourceSignal {
 		this.addEquipmentRoleToMember(member, "safety", "Door Access");
 	}
 	
-	public void removeSafetyFlagFromMember(String member) throws IOException, InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal {
+	public void removeSafetyFlagFromMember(String member) throws IOException, InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal, InvalidResourceSignal {
 		this.removeEquipmentRoleFromMember(member, "safety", "Door Access");
 	}
 	
