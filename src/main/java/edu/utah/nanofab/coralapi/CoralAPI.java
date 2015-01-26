@@ -70,7 +70,7 @@ import edu.utah.nanofab.coralapi.helper.CoralManagerConnector;
 public class CoralAPI {
     
 	private String coralUser = "coral";
-    private String iorUrl = "http://vagrant-coral-dev/IOR/";
+    private String iorUrl = "http://coral-dev-box/IOR/";
     private String configUrl = "";
     private String ticketString = "";
     private String logLevel = "DEBUG";

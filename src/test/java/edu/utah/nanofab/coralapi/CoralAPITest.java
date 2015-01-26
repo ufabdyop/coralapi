@@ -64,8 +64,8 @@ public class CoralAPITest extends TestCase {
         guardAgainstRunningOnLive();
         
         String coralUser = "coral";
-        String iorUrl = "http://vagrant-coral-dev/IOR/";
-        String configUrl = "http://vagrant-coral-dev/coral/lib/config.jar";
+        String iorUrl = "http://coral-dev-box/IOR/";
+        String configUrl = "http://coral-dev-box/coral/lib/config.jar";
     	this.instance = new CoralAPI(coralUser, iorUrl, configUrl);
     }
     
