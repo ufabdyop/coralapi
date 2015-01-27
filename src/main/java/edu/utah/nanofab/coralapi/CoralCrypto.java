@@ -112,6 +112,9 @@ public class CoralCrypto {
 
 	      System.out.println("Key loaded: ");
 		InputStream key = classLoader.getResourceAsStream("certs/Coral.key");
+    if (key == null) {
+      System.err.println("Unable to load key certs/Coral.key");
+    }
 		byte[] keyAsBytes = convertStreamToString(key).getBytes(java.nio.charset.Charset.forName("UTF-8"));
 		System.out.println(javax.xml.bind.DatatypeConverter.printBase64Binary(keyAsBytes));
 	      try {
