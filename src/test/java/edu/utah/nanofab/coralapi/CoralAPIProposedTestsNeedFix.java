@@ -248,6 +248,47 @@ public class CoralAPIProposedTestsNeedFix extends TestCase {
         instance.createNewMember(member);
         return member;
     }
+
+    public void testRemoveProjectMembers() throws Exception {
+    	String memberName1 = "JUnit User 1";
+    	String memberName2 = "JUnit User 2";
+    	String projectName1 = "JUnit Test Project 1";
+    	String projectName2 = "JUnit Test Project 2";
+    	String accountName = "JUnit Test Account";
+    	this.createTestAccount(accountName);
+    	this.createTestProject(projectName1, accountName);
+    	this.createTestProject(projectName2, accountName);
+    	
+    	data.deleteMember(memberName1);
+    	Member member1 = new Member();
+    	member1.setName(memberName1);
+    	member1.setProject(projectName1);
+    	member1.setActive(true);
+    	instance.createNewMember(member1);
+    	
+    	data.deleteMember(memberName2);
+    	Member member2 = new Member();
+    	member2.setName(memberName2);
+    	member2.setProject(projectName1);
+    	member2.setActive(true);
+    	instance.createNewMember(member2);
+    	
+    	String[] members = {memberName1, memberName2};
+    	instance.addProjectMembers(projectName2, members);
+    	int sizeBefore = instance.getProjectMembers(projectName2).size();
+    	assertTrue(sizeBefore >= 2);
+
+    	instance.removeProjectMembers(projectName2, members);
+    	int sizeAfter = instance.getProjectMembers(projectName2).size();
+    	int difference = sizeBefore - sizeAfter; 
+    	assertEquals(2, difference);
+    	
+    	// Clean up this tests database entries.
+    	data.deleteMember(memberName1);
+    	data.deleteMember(memberName2);
+    	data.deleteProject(projectName1);
+    	data.deleteAccount(accountName);
+    }
     
     /**
      * Create a project with the supplied project name and account. This project can be used to 
