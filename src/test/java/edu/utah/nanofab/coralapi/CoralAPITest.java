@@ -24,6 +24,8 @@ import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.net.InetAddress
+
 
 import junit.framework.TestCase;
 
@@ -49,13 +51,16 @@ public class CoralAPITest extends TestCase {
     }
     
     protected void guardAgainstRunningOnLive() throws Exception {
-    	String liveHost = "coral.nanofab.utah.edu";
+        String liveHost = "coral.nanofab.utah.edu";
         Process results = Runtime.getRuntime().exec("hostname");
         InputStream stdout = results.getInputStream();
         BufferedReader reader = new BufferedReader (new InputStreamReader(stdout));
         String hostname = reader.readLine();
         
         assertTrue(!hostname.equals(liveHost));
+
+        InetAddress address = InetAddress.getByName("coral-dev-box"); 
+        assertTrue(address.getHostAddress().equals("127.0.0.1")); 
     }
     
     @Override
