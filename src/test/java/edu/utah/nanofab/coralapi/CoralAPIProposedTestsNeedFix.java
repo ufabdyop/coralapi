@@ -230,5 +230,56 @@ public class CoralAPIProposedTestsNeedFix extends TestCase {
         data.deleteProject(projectName);
         data.deleteAccount(accountName);
     }
+
+    /**
+     * Creates a coral user with supplied user, password, and default project. This user can be used 
+     * to test operations on. 
+     * @return 
+     * 
+     * @throws Exception
+     */
+    public Member createTestMember(String username, String password, String project) throws Exception {
+    	data.deleteMember(username);
+    	Member member = new Member();
+    	member.setName(username);
+    	member.setPassword(password);
+    	member.setProject(project);
+    	member.setActive(true);
+        instance.createNewMember(member);
+        return member;
+    }
+    
+    /**
+     * Create a project with the supplied project name and account. This project can be used to 
+     * test operations on.
+     * @return 
+     * 
+     * @throws Exception
+     */
+    public Project createTestProject(String projectName, String account) throws Exception {
+    	data.deleteProject(projectName);
+    	Project project = new Project();
+    	project.setName(projectName);
+    	project.setAccount(account);
+    	project.setActive(true);
+    	instance.createNewProject(project);
+    	return project;
+    }
+    
+    /**
+     * Create an account with the supplied name.This account can be used to test operations on.
+     * 
+     * @throws Exception
+     */
+    public Account createTestAccount(String accountName) throws Exception {
+    	data.deleteAccount(accountName);
+    	Account account = new Account();
+    	account.setName(accountName);
+    	account.setDescription("A JUnit testing account.");
+    	account.setActive(true);
+    	instance.createNewAccount(account);
+    	return account;
+    }
+    
 }
 
