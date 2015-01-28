@@ -395,44 +395,6 @@ public class CoralAPITest extends TestCase {
         assertEquals(fetched.getName(), accountName);
     }
     
-    /**
-     * Tests the 'createNewReservation' functionality.
-     * 
-     * @throws Exception
-     */
-    public void testCreateNewReservation() throws Exception {
-        String accountName = "JUnit Test Account";
-        String projectName = "JUnit Test Project";
-        String user = "user";
-        String pass = "pass";
-    	Account account = this.createTestAccount(accountName);
-        Project project = this.createTestProject(projectName, accountName);
-        Member member = this.createTestMember(user, pass, projectName);
-    	
-        String tool = "TMV Super";
-        Date bdate = TimestampConverter.dateFromDateComponents(2014, 7, 18, 12, 0, 0);
-        Date edate = TimestampConverter.dateFromDateComponents(2014, 7, 18, 13, 0, 0);
-        data.deleteReservation(tool, bdate.toString(), edate.toString());
-        Reservation r = new Reservation();
-        r.setItem(tool);
-        r.setBdate(2014,7,18,12,0);
-        r.setEdate(2014,7,18,13,0);
-        r.setMember(member);
-        r.setProject(project);
-        r.setLab("nano");
-        r.setAccount(account);
-        instance.createNewReservation(r);
-        
-        Reservation[] fetched = instance.getReservations(user, tool, bdate, edate);
-        assertTrue(fetched.length == 2); // Reservations are stored in 30 min intervals, so we would expect 2 reservations.
-        assertEquals(fetched[0].getMember().getName(), r.getMember().getName());
-        
-        // Clean up this tests database entries.
-        data.deleteMember(user);
-        data.deleteReservation(tool, bdate.toString(), edate.toString());
-        data.deleteProject(projectName);
-        data.deleteAccount(accountName);
-    }
     
     public void testCreateNewRole() throws InvalidRoleException {
     	String roleName = "JUnit Test Role";
@@ -484,82 +446,7 @@ public class CoralAPITest extends TestCase {
         assertEquals( bdate, format.format(testDate));
     }
     
-    /**
-     * This test only passes with modified opencoral source to allow edates to be set.
-     * 
-     * @throws Exception
-     */
-    public void testProjectDateManipulationRoundTrip() throws Exception {
-    	Calendar cal = Calendar.getInstance();
-    	cal.set(2099, 0, 27, 13, 59, 00);
-        SimpleDateFormat format = 
-                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    	Date testDate = cal.getTime();
-        assertEquals("2099-01-27 13:59:00", format.format(testDate));
-        
-        String accountName = "JUnit Test Account";
-        data.deleteAccount(accountName);
-        Account account = new Account();
-        account.setName(accountName);
-        account.setEdate(testDate);
-        instance.createNewAccount(account);
-        
-        String projectName = "JUnit Test Project";
-        data.deleteProject(projectName);
-        Project project = new Project();
-        project.setName(projectName);
-        project.setAccount(accountName);
-        project.setEdate(testDate);
-        instance.createNewProject(project);
-        
-        Project fetched = instance.getProject(projectName);
-        assertEquals(projectName, fetched.getName());
-        assertEquals(project.getEdate().toString(), fetched.getEdate().toString());
 
-        // Test updateProject too
-    	cal.set(2199, 1, 28, 14, 57, 01);
-    	project.setEdate(cal.getTime());
-    	instance.updateProject(project);
-        fetched = instance.getProject(project.getName());
-        assertEquals(fetched.getName(), project.getName());
-        assertEquals(project.getEdate().toString(), fetched.getEdate().toString());
-        
-        // Clean up this tests database entries.
-        data.deleteProject(projectName);
-        data.deleteAccount(accountName);
-    }
-
-    public void testMemberDateManipulationRoundTrip() throws Exception {
-    	Calendar cal = Calendar.getInstance();
-    	cal.set(2099, 0, 27, 13, 59, 00);
-        SimpleDateFormat format = 
-                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    	Date testDate = cal.getTime();
-        assertEquals("2099-01-27 13:59:00", format.format(testDate));
-        
-        String memberName = "JUnit User";
-        String projectName = "JUnit Test Project";
-        String accountName = "JUnit Test Account";
-        this.createTestAccount(accountName);
-        this.createTestProject(projectName, accountName);
-        
-        data.deleteMember(memberName);
-        Member member = new Member();
-        member.setName(memberName);
-        member.setProject(projectName);
-        member.setEdate(testDate);;
-        instance.createNewMember(member);
-        
-        Member fetched = instance.getMember(member.getName());
-        assertEquals(memberName, fetched.getName());
-        assertEquals(member.getEdate().toString(), fetched.getEdate().toString());
-        
-        // Clean up this tests database entries.
-        data.deleteMember(memberName);
-        data.deleteProject(projectName);
-        data.deleteAccount(accountName);
-    }    
-    
     public void testAccountEDateIsNullRoundTrip() throws Exception {
     	Calendar cal = Calendar.getInstance();
     	cal.set(2013, 0, 27, 13, 59, 00);
@@ -616,47 +503,6 @@ public class CoralAPITest extends TestCase {
     	data.deleteAccount(accountName);
     }
     
-    public void testRemoveProjectMembers() throws Exception {
-    	String memberName1 = "JUnit User 1";
-    	String memberName2 = "JUnit User 2";
-    	String projectName1 = "JUnit Test Project 1";
-    	String projectName2 = "JUnit Test Project 2";
-    	String accountName = "JUnit Test Account";
-    	this.createTestAccount(accountName);
-    	this.createTestProject(projectName1, accountName);
-    	this.createTestProject(projectName2, accountName);
-    	
-    	data.deleteMember(memberName1);
-    	Member member1 = new Member();
-    	member1.setName(memberName1);
-    	member1.setProject(projectName1);
-    	member1.setActive(true);
-    	instance.createNewMember(member1);
-    	
-    	data.deleteMember(memberName2);
-    	Member member2 = new Member();
-    	member2.setName(memberName2);
-    	member2.setProject(projectName1);
-    	member2.setActive(true);
-    	instance.createNewMember(member2);
-    	
-    	String[] members = {memberName1, memberName2};
-    	instance.addProjectMembers(projectName2, members);
-    	int sizeBefore = instance.getProjectMembers(projectName2).size();
-    	assertTrue(sizeBefore >= 2);
-
-    	instance.removeProjectMembers(projectName2, members);
-    	int sizeAfter = instance.getProjectMembers(projectName2).size();
-    	int difference = sizeBefore - sizeAfter; 
-    	assertEquals(2, difference);
-    	
-    	// Clean up this tests database entries.
-    	data.deleteMember(memberName1);
-    	data.deleteMember(memberName2);
-    	data.deleteProject(projectName1);
-    	data.deleteAccount(accountName);
-    }
-    
     /**
      * Tests the 'getMember' functionality.
      * 
@@ -697,37 +543,6 @@ public class CoralAPITest extends TestCase {
         assertTrue(exceptionThrown);
     }
     
-    public void testGetLabRoles() throws Exception {
-        String memberName = "JUnit User";
-        String projectName = "JUnit Test Project";
-        String accountName = "JUnit Test Account";
-    	this.createTestAccount(accountName);
-    	this.createTestProject(projectName, accountName);
-    	
-        data.deleteMember(memberName);
-    	Member member = new Member();
-    	member.setName(memberName);
-    	member.setProject(projectName);
-    	member.setActive(true);
-        instance.createNewMember(member);
-        
-        String labName = "nano";
-        String roleName = "JUnit Test Role"; 
-        String type = "lab";
-        data.deleteRole(roleName);
-        instance.createNewRole(roleName, "Temporary Test Role", type);
-        
-        LabRole newRole = new LabRole(labName, memberName, roleName);
-        instance.addLabRoleToMember(newRole);
-        LabRoles roles = instance.getLabRoles(member.getName());
-        assertTrue(roles.contains(newRole));
-        
-        // Clean up this tests database entries.
-        data.deleteMember(memberName);
-        data.deleteProject(projectName);
-        data.deleteAccount(accountName);
-        data.deleteRole(roleName);
-    }
     
     /**
      * Tests the 'isValidEmail' functionality for various valid email addresses.
@@ -848,6 +663,47 @@ public class CoralAPITest extends TestCase {
     	account.setActive(true);
     	instance.createNewAccount(account);
     	return account;
+    }
+    
+    public void testRemoveProjectMembers() throws Exception {
+    	String memberName1 = "JUnit User 1";
+    	String memberName2 = "JUnit User 2";
+    	String projectName1 = "JUnit Test Project 1";
+    	String projectName2 = "JUnit Test Project 2";
+    	String accountName = "JUnit Test Account";
+    	this.createTestAccount(accountName);
+    	this.createTestProject(projectName1, accountName);
+    	this.createTestProject(projectName2, accountName);
+    	
+    	data.deleteMember(memberName1);
+    	Member member1 = new Member();
+    	member1.setName(memberName1);
+    	member1.setProject(projectName1);
+    	member1.setActive(true);
+    	instance.createNewMember(member1);
+    	
+    	data.deleteMember(memberName2);
+    	Member member2 = new Member();
+    	member2.setName(memberName2);
+    	member2.setProject(projectName1);
+    	member2.setActive(true);
+    	instance.createNewMember(member2);
+    	
+    	String[] members = {memberName1, memberName2};
+    	instance.addProjectMembers(projectName2, members);
+    	int sizeBefore = instance.getProjectMembers(projectName2).size();
+    	assertTrue(sizeBefore >= 2);
+
+    	instance.removeProjectMembers(projectName2, members);
+    	int sizeAfter = instance.getProjectMembers(projectName2).size();
+    	int difference = sizeBefore - sizeAfter; 
+    	assertEquals(2, difference);
+    	
+    	// Clean up this tests database entries.
+    	data.deleteMember(memberName1);
+    	data.deleteMember(memberName2);
+    	data.deleteProject(projectName1);
+    	data.deleteAccount(accountName);
     }
     
     /*
