@@ -9,6 +9,12 @@ Usage
 ### Create a CoralAPI client
 
 ```
+import edu.utah.nanofab.coralapi.CoralAPI;
+import edu.utah.nanofab.coralapi.resource.Account;
+import edu.utah.nanofab.coralapi.resource.Member;
+import edu.utah.nanofab.coralapi.resource.Project;
+...
+
 String coralUser = "coral";
 String iorUrl = "http://mycoralhostname/IOR/";
 String configUrl = "http://mycoralhostname/coral/lib/config.jar";
