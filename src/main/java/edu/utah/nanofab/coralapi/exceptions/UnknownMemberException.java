@@ -8,10 +8,6 @@ public class UnknownMemberException extends Exception {
     super();
   }
 
-  public UnknownMemberException(String message, Throwable cause,
-      boolean enableSuppression, boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
-  }
 
   public UnknownMemberException(String message, Throwable cause) {
     super(message, cause);

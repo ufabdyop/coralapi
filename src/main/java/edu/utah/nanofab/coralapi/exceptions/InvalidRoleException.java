@@ -19,9 +19,5 @@ public class InvalidRoleException extends Exception {
     super(message, cause);
   }
 
-  public InvalidRoleException(String message, Throwable cause,
-      boolean enableSuppression, boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
-  }
 
 }

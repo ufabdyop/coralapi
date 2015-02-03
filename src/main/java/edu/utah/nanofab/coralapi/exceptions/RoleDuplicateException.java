@@ -8,10 +8,6 @@ public class RoleDuplicateException extends Exception {
     super();
   }
 
-  public RoleDuplicateException(String message, Throwable cause,
-      boolean enableSuppression, boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
-  }
 
   public RoleDuplicateException(String message, Throwable cause) {
     super(message, cause);
