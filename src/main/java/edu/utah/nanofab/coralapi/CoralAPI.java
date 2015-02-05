@@ -1,6 +1,7 @@
 
 package edu.utah.nanofab.coralapi;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Date;
 
 import org.opencoral.constants.Constants;
@@ -83,12 +84,16 @@ public class CoralAPI {
   public static Logger logger;
            
     public CoralAPI(String coralUser, String iorUrl, String configUrl) {
-      this.coralUser = coralUser;
-      this.iorUrl = iorUrl;
-      this.configUrl = configUrl;
-        this.setLogLevel(this.logLevel);
-        logger = LoggerFactory.getLogger(CoralAPI.class);
-        this.coralCrypto = new CoralCrypto(this.configUrl);
+	  this.coralUser = coralUser;
+	  this.iorUrl = iorUrl;
+	  this.configUrl = configUrl;
+		this.setLogLevel(this.logLevel);
+		logger = LoggerFactory.getLogger(CoralAPI.class);
+		logger.debug("configURL: " + configUrl);
+		this.coralCrypto = new CoralCrypto(this.configUrl);
+		if (this.coralCrypto.checkKeyIsValid() == false) {
+			logger.error("Bad Key Detected. Check config.jar for certs/Coral.key");
+		}
     }
     
     private void reconnectToCoral() {
@@ -198,6 +203,7 @@ public class CoralAPI {
       
       String pass = member.getPassword();
       if (pass != "" && pass != null) {
+    	  this.coralCrypto.initialize();
         byte[] encrypted_pass = this.coralCrypto.encrypt(pass);
         authManager.update(member.getName(), encrypted_pass);
       }
@@ -427,6 +433,8 @@ public class CoralAPI {
     if (username == null || password == null) {
       return false;
     }
+    
+    this.coralCrypto.initialize();
 
     boolean result = false;
     this.getAuthManager();
@@ -743,8 +751,13 @@ public class CoralAPI {
       InvalidTicketSignal {
 
     this.getAuthManager();
+    this.coralCrypto.initialize();    
     byte[] pass = this.coralCrypto.encrypt(newPassword);
     this.authManager.update(member, pass);
+  }
+  
+  public boolean checkKeyIsValid() {
+	  return this.coralCrypto.checkKeyIsValid();
   }
   
 //  qualify(tool, member, role)
