@@ -611,7 +611,7 @@ public class CoralAPI {
    */
     public void createNewReservation(Reservation r) throws Exception {
         this.getReservationManager();
-        Activity a = ActivityFactory.createRunActivity(
+        Activity a = ActivityFactory.createReservationActivity(
             this.coralUser,
             r.getMember().getName(), 
             r.getItem(), 

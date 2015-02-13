@@ -143,4 +143,12 @@ public class ActivityFactory {
     return r;
   }
 
+public static Activity createReservationActivity(String agent, String member,
+		String tool, String project, String account, String lab, Date bdate,
+		Date edate) {
+	Activity a = createRunActivity(agent, member, tool, project, account, lab, bdate, edate);
+	a.type = "reservation";
+	return a;
+}
+
 }
