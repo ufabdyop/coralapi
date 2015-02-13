@@ -1,5 +1,6 @@
 package edu.utah.nanofab.coralapi.helper;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -47,6 +48,12 @@ public class TimestampConverter {
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     return format.format(d);
   }
+  
+  public static Date stringToDate(String s) throws ParseException {
+    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    Date d = format.parse(s);
+    return d;
+  }  
   
   public static Date dateFromDateComponents(int y, int m, int d, int h, int minute, int second) {
     Timestamp tstamp = new Timestamp(false, 

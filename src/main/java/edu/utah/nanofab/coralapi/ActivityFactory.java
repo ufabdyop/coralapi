@@ -122,6 +122,9 @@ public class ActivityFactory {
    * @return
    */
   public static Reservation convertActivityToReservation(Activity a) {
+	    Member agent = new Member();
+	    agent.setName(a.agent);
+	    
     Member m = new Member();
     m.setName(a.member);
     
@@ -136,7 +139,7 @@ public class ActivityFactory {
     Date bdate = TimestampConverter.timestampToDate(a.bdate);
     Date edate = TimestampConverter.timestampToDate(a.edate);
     
-    Reservation r = new Reservation(m, p, acct, bdate, edate, item, lab);
+    Reservation r = new Reservation(agent, m, p, acct, bdate, edate, item, lab);
     return r;
   }
 

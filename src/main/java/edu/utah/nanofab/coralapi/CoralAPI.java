@@ -2,6 +2,7 @@
 package edu.utah.nanofab.coralapi;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.Properties;
 
@@ -59,6 +60,7 @@ import edu.utah.nanofab.coralapi.collections.Members;
 import edu.utah.nanofab.coralapi.collections.Projects;
 import edu.utah.nanofab.coralapi.resource.Enable;
 import edu.utah.nanofab.coralapi.resource.LabRole;
+import edu.utah.nanofab.coralapi.resource.Machine;
 import edu.utah.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.coralapi.resource.Project;
 import edu.utah.nanofab.coralapi.resource.Reservation;
@@ -622,6 +624,23 @@ public class CoralAPI {
         logger.debug("Making reservation for '" + r.getMember().getName() + "' " + r.getItem());
         reservationManager.makeReservation(activity_array, this.ticketString);
     }
+
+	public void createNewReservation(String agent, String member,
+			String project, String item, String bdate, int lengthInMinutes) throws UnknownMemberException, ParseException, Exception {
+		Reservation r = new Reservation();
+		r.setAgent(this.getMember(agent));		
+		r.setMember(this.getMember(member));
+		Project p = this.getProject(project);
+		r.setProject(p);
+		r.setItem(item);
+		r.setBdate(bdate);
+		r.setLength(lengthInMinutes);
+		Account a = this.getAccount(p.getAccount());
+		r.setAccount(a);
+		Machine m = this.getMachine(item);
+		r.setLab(m.getLab());
+		this.createNewReservation(r);
+	}
     
     /**
      * Gets an array of all the reservations for the specified tool that were created by the 

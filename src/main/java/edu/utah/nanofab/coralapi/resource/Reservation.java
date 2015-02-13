@@ -1,12 +1,15 @@
 package edu.utah.nanofab.coralapi.resource;
 
+import java.text.ParseException;
 import java.util.Date;
 
+import edu.utah.nanofab.coralapi.exceptions.InvalidCallOrderException;
 import edu.utah.nanofab.coralapi.helper.TimestampConverter;
 
 public class Reservation {
   
-  private Member member;
+	  private Member agent;
+	  private Member member;
   private Project project;
   private Account account;
   private Date bdate;
@@ -17,6 +20,7 @@ public class Reservation {
   /**
    * Creates a new Reservation instance with the supplied information.
    * 
+   * @param agent The member making this reservation.
    * @param member The member this reservation is for.
    * @param project The project this reservation is associated with.
    * @param account The account this reservation should be billed to.
@@ -25,9 +29,10 @@ public class Reservation {
    * @param item The tool that this reservation is made for.
    * @param lab The lab that the supplied item exists in.
    */
-  public Reservation(Member member, Project project, Account account,
+  public Reservation(Member agent, Member member, Project project, Account account,
       java.util.Date bdate, java.util.Date edate, String item, String lab) {
     super();
+    this.agent = agent;
     this.member = member;
     this.project = project;
     this.account = account;
@@ -37,7 +42,15 @@ public class Reservation {
     this.lab = lab;
   }
   
-  public Reservation() {
+  public Member getAgent() {
+	return agent;
+}
+
+public void setAgent(Member agent) {
+	this.agent = agent;
+}
+
+public Reservation() {
     
   }
 
@@ -88,5 +101,29 @@ public class Reservation {
   }
   public void setLab(String lab) {
     this.lab = lab;
-  } 
+  }
+
+  /**
+   * 
+   * @param bdate (YYYY-MM-dd HH:mm:ss
+   * @throws ParseException
+   */
+public void setBdate(String bdate) throws ParseException {
+	this.bdate = TimestampConverter.stringToDate(bdate);
+}
+
+/**
+ * If bdate is set, this will set edate according to the length in minutes
+ * @param lengthInMinutes
+ * @throws InvalidCallOrderException
+ */
+public void setLength(int lengthInMinutes) throws InvalidCallOrderException {
+	if (this.bdate == null) {
+		throw new InvalidCallOrderException("Must call setBdate before setLength");
+	}
+	long bdateMilliseconds = this.bdate.getTime();
+	long lengthInMilliseconds = lengthInMinutes * 60 * 1000;
+	this.edate = new Date();
+	this.edate.setTime(bdateMilliseconds + lengthInMilliseconds); 
+} 
 }
