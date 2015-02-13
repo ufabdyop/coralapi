@@ -3,6 +3,7 @@ package edu.utah.nanofab.coralapi;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Date;
+import java.util.Properties;
 
 import org.opencoral.constants.Constants;
 import org.opencoral.idl.AccountNotFoundSignal;
@@ -39,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.utah.nanofab.coralapi.resource.Account;
+import edu.utah.nanofab.coralapi.exceptions.ConfigLoaderException;
 import edu.utah.nanofab.coralapi.exceptions.InvalidAccountException;
 import edu.utah.nanofab.coralapi.exceptions.InvalidAgentException;
 import edu.utah.nanofab.coralapi.exceptions.InvalidDateException;
@@ -83,10 +85,10 @@ public class CoralAPI {
   private CoralCrypto coralCrypto;
   public static Logger logger;
            
-    public CoralAPI(String coralUser, String iorUrl, String configUrl) {
+    public CoralAPI(String coralUser, String configUrl) {
 	  this.coralUser = coralUser;
-	  this.iorUrl = iorUrl;
 	  this.configUrl = configUrl;
+	  setIorUrl(iorUrl);
 		this.setLogLevel(this.logLevel);
 		logger = LoggerFactory.getLogger(CoralAPI.class);
 		logger.debug("configURL: " + configUrl);
@@ -95,6 +97,17 @@ public class CoralAPI {
 			logger.error("Bad Key Detected. Check config.jar for certs/Coral.key");
 		}
     }
+
+	private void setIorUrl(String iorUrl) {
+		ConfigLoader loader = new ConfigLoader(this.configUrl);
+		Properties props;
+		try {
+			props = loader.load();
+			this.iorUrl = (String) props.get("IOR_URL");
+		} catch (ConfigLoaderException e) {
+			e.printStackTrace();
+		}
+	}
     
     private void reconnectToCoral() {
       logger.debug("Reconnecting to Coral...");
