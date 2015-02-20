@@ -73,7 +73,7 @@ public class ActivityFactory {
 
     try {
       Class<?> activityClass = activity.getClass();
-      activityClass.getField("area").set(activity, "");
+      activityClass.getField("area").set(activity, "*");
     } catch (Exception e) {
 
     }
@@ -106,7 +106,7 @@ public class ActivityFactory {
 
     try {
       Class<?> activityClass = activity.getClass();
-      activityClass.getField("area").set(activity, "");
+      activityClass.getField("area").set(activity, "*");
     } catch (Exception e) {
 
     }

@@ -51,6 +51,7 @@ import edu.utah.nanofab.coralapi.exceptions.InvalidProjectException;
 import edu.utah.nanofab.coralapi.exceptions.InvalidResourceException;
 import edu.utah.nanofab.coralapi.exceptions.InvalidRoleException;
 import edu.utah.nanofab.coralapi.exceptions.UnknownMemberException;
+import edu.utah.nanofab.coralapi.helper.ActivityString;
 import edu.utah.nanofab.coralapi.helper.TimestampConverter;
 import edu.utah.nanofab.coralapi.helper.Utils;
 import edu.utah.nanofab.coralapi.collections.Accounts;
@@ -672,6 +673,12 @@ public class CoralAPI {
     Activity lowerBound = filters[0];
     Activity upperBound = filters[1];
     
+    this.logger.debug("Created filter with Lower Bound: " + TimestampConverter.dateToAdapterString(bdate));
+    this.logger.debug(new ActivityString(lowerBound).toString());
+    
+    this.logger.debug("And Upper Bound:" + TimestampConverter.dateToAdapterString(edate));
+    this.logger.debug(new ActivityString(upperBound).toString());
+    
     Activity[] activities = null;
     try {
       activities = this.reservationManager.findReservation(lowerBound, upperBound);
@@ -719,6 +726,18 @@ public class CoralAPI {
     }
     
     return reservations;
+  }
+  
+  /**
+   * Same as above, but without member filter
+   * @param tool
+   * @param bdate
+   * @param edate
+   * @return
+   * @throws Exception
+   */
+  public Reservation[] getReservations(String tool, Date bdate, Date edate) throws Exception {
+	  return getReservations("*", tool, bdate, edate);
   }
 
   public void enable(Enable enableActivity) throws InvalidTicketSignal, InvalidAgentSignal, InvalidProjectSignal, InvalidAccountSignal, InvalidMemberSignal, InvalidResourceSignal, InvalidProcessSignal, ResourceUnavailableSignal, NotAuthorizedSignal{
