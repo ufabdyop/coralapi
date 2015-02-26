@@ -76,6 +76,16 @@ Once those jars are in your local maven repo (~/.m2/...), you can package this p
 
 Tests are skipped because running the tests requires a specific coral test instance and it could potentially destroy data if run against a live coral instance.
 
+Example Command Line Use
+---
+You can see examples of building a command line tool in src/main/java/edu/utah/nanofab/coralapi/examples
+
+For example, to build a command line tool that changes a coral user's password:
+
+```
+mvn exec:java -Dexec.mainClass=edu.utah.nanofab.coralapi.examples.PasswordChange -Dexec.args="coral coral"
+```
+
 
 Reference Material
 ------------------
