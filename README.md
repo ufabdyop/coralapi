@@ -16,10 +16,9 @@ import edu.utah.nanofab.coralapi.resource.Project;
 ...
 
 String coralUser = "coral";
-String iorUrl = "http://mycoralhostname/IOR/";
 String configUrl = "http://mycoralhostname/coral/lib/config.jar";
 
-CoralAPI coral = new CoralAPI(coralUser, iorUrl, configUrl);
+CoralAPI coral = new CoralAPI(coralUser, configUrl);
 ```
 
 ### Create a new coral account
