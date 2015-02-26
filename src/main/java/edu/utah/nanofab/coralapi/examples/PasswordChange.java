@@ -42,14 +42,21 @@ public class PasswordChange {
                 System.exit(1);
         }
     }
-
+    public void close() {
+        instance.close();
+    }
     public static void main(String[] args) {
         PasswordChange changer = new PasswordChange();
         try {
+                System.out.println("Changing password");
                 changer.change(args[0], args[1]);
+                System.out.println("Changed password");
         } catch (Exception e) {
                 System.err.println("Error.  Usage is PasswordChange username password");
                 System.exit(1);
         }
+        changer.close();
+        System.out.println("Closed Coral Connection");
+        System.exit(0);
     }
 }
