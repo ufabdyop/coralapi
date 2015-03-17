@@ -34,32 +34,32 @@
     <!--proguard libs -->
     <dependency>
               <groupId>org.opencoral</groupId>
-              <artifactId>opencoral-admin.jar</artifactId>
+              <artifactId>opencoral-admin</artifactId>
               <version>3.4.9</version>
     </dependency>
     <dependency>
               <groupId>org.opencoral</groupId>
-              <artifactId>opencoral-client.jar</artifactId>
+              <artifactId>opencoral-client</artifactId>
               <version>3.4.9</version>
     </dependency>
     <dependency>
               <groupId>org.opencoral</groupId>
-              <artifactId>opencoral-common.jar</artifactId>
+              <artifactId>opencoral-common</artifactId>
               <version>3.4.9</version>
     </dependency>
     <dependency>
               <groupId>org.opencoral</groupId>
-              <artifactId>opencoral-idl.jar</artifactId>
+              <artifactId>opencoral-idl</artifactId>
               <version>3.4.9</version>
     </dependency>
     <dependency>
               <groupId>org.opencoral</groupId>
-              <artifactId>opencoral-runtime.jar</artifactId>
+              <artifactId>opencoral-runtime</artifactId>
               <version>3.4.9</version>
     </dependency>
     <dependency>
               <groupId>org.opencoral</groupId>
-              <artifactId>opencoral-server.jar</artifactId>
+              <artifactId>opencoral-server</artifactId>
               <version>3.4.9</version>
     </dependency>
     <dependency>
