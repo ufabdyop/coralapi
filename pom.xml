@@ -62,11 +62,6 @@
               <artifactId>opencoral-server</artifactId>
               <version>3.4.9</version>
     </dependency>
-    <dependency>
-            <groupId>org.opencoral</groupId>
-            <version>3.4.9</version>
-            <artifactId>opencoral-castor-core</artifactId>
-    </dependency>
     <!--END proguard libs -->
 
     <!-- coral.jnlp libs -->
@@ -74,9 +69,14 @@
     <dependency>
             <groupId>org.opencoral</groupId>
             <version>3.4.9</version>
-            <artifactId>opencoral-castor-xml-schema</artifactId>
+            <artifactId>opencoral-castor-core</artifactId>
     </dependency>
 
+    <dependency>
+            <groupId>org.opencoral</groupId>
+            <version>3.4.9</version>
+            <artifactId>opencoral-castor-xml-schema</artifactId>
+    </dependency>
     <dependency>
             <groupId>org.opencoral</groupId>
             <version>3.4.9</version>
