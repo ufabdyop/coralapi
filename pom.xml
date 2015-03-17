@@ -30,183 +30,110 @@
   </build>
 
   <dependencies>
-  <dependency>
+    <dependency>
+            <groupId>org.opencoral</groupId>
+            <version>3.4.9</version>
+            <artifactId>castor-core</artifactId>
+    </dependency>
+
+    <dependency>
+            <groupId>org.opencoral</groupId>
+            <version>3.4.9</version>
+            <artifactId>castor-xml-schema</artifactId>
+    </dependency>
+
+    <dependency>
+            <groupId>org.opencoral</groupId>
+            <version>3.4.9</version>
+            <artifactId>castor-xml</artifactId>
+    </dependency>
+
+    <dependency>
+            <groupId>org.opencoral</groupId>
+            <version>3.4.9</version>
+            <artifactId>config</artifactId>
+    </dependency>
+
+    <dependency>
+            <groupId>org.opencoral</groupId>
+            <version>3.4.9</version>
+            <artifactId>coral</artifactId>
+    </dependency>
+
+    <dependency>
+            <groupId>org.opencoral</groupId>
+            <version>3.4.9</version>
+            <artifactId>jcommon</artifactId>
+    </dependency>
+
+    <dependency>
+            <groupId>org.opencoral</groupId>
+            <version>3.4.9</version>
+            <artifactId>jfreechart</artifactId>
+    </dependency>
+
+    <dependency>
+            <groupId>org.opencoral</groupId>
+            <version>3.4.9</version>
+            <artifactId>log4j</artifactId>
+    </dependency>
+
+    <dependency>
+            <groupId>org.opencoral</groupId>
+            <version>3.4.9</version>
+            <artifactId>logging-api</artifactId>
+    </dependency>
+
+    <dependency>
+            <groupId>org.opencoral</groupId>
+            <version>3.4.9</version>
+            <artifactId>logging</artifactId>
+    </dependency>
+
+    <dependency>
+            <groupId>org.opencoral</groupId>
+            <version>3.4.9</version>
+            <artifactId>provider</artifactId>
+    </dependency>
+
+    <dependency>
+            <groupId>org.opencoral</groupId>
+            <version>3.4.9</version>
+            <artifactId>regexp</artifactId>
+    </dependency>
+
+    <dependency>
+            <groupId>org.opencoral</groupId>
+            <version>3.4.9</version>
+            <artifactId>xacml</artifactId>
+    </dependency>
+
+    <dependency>
+            <groupId>org.opencoral</groupId>
+            <version>3.4.9</version>
+            <artifactId>xalan</artifactId>
+    </dependency>
+
+    <dependency>
+            <groupId>org.opencoral</groupId>
+            <version>3.4.9</version>
+            <artifactId>xerces</artifactId>
+    </dependency>
+
+    <dependency>
+            <groupId>org.opencoral</groupId>
+            <version>3.4.9</version>
+            <artifactId>xml-apis</artifactId>
+    </dependency>
+
+
+    <!-- third party -->
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
-
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-castor-xml</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-logging</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-xerces</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-xdb</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-commons-collections</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-jta</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-jfreechart</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-jcommon</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-castor-xml-schema</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-admin</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-logging-api</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-idl</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-jdbc</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-mail</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-xcrml</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-provider</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-client</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-coral</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-quartz</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-common</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-xacml</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-commons-digester</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-xalan</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-oracleXMLParser</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-server</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-commons-beanutils</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-regexp</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-jaxp</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-oracleCharset</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-xml-apis</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-oro</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-castor-core</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-log4j</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
-  <dependency>
-	  <groupId>org.opencoral</groupId>
-	  <artifactId>opencoral-runtime</artifactId>
-	  <version>3.4.9</version>
-  </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
@@ -217,6 +144,7 @@
       <artifactId>postgresql</artifactId>
       <version>9.3-1102-jdbc3</version>
     </dependency>
+
   </dependencies>
 
   <description>The CoralAPI project aims to wrap up all the boilerplate CORBA stuff for talking to coral.</description>
