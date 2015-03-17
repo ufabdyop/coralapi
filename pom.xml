@@ -30,12 +30,47 @@
   </build>
 
   <dependencies>
+
+    <!--proguard libs -->
+    <dependency>
+              <groupId>org.opencoral</groupId>
+              <artifactId>opencoral-admin.jar</artifactId>
+              <version>3.4.9</version>
+    </dependency>
+    <dependency>
+              <groupId>org.opencoral</groupId>
+              <artifactId>opencoral-client.jar</artifactId>
+              <version>3.4.9</version>
+    </dependency>
+    <dependency>
+              <groupId>org.opencoral</groupId>
+              <artifactId>opencoral-common.jar</artifactId>
+              <version>3.4.9</version>
+    </dependency>
+    <dependency>
+              <groupId>org.opencoral</groupId>
+              <artifactId>opencoral-idl.jar</artifactId>
+              <version>3.4.9</version>
+    </dependency>
+    <dependency>
+              <groupId>org.opencoral</groupId>
+              <artifactId>opencoral-runtime.jar</artifactId>
+              <version>3.4.9</version>
+    </dependency>
+    <dependency>
+              <groupId>org.opencoral</groupId>
+              <artifactId>opencoral-server.jar</artifactId>
+              <version>3.4.9</version>
+    </dependency>
     <dependency>
             <groupId>org.opencoral</groupId>
             <version>3.4.9</version>
             <artifactId>opencoral-castor-core</artifactId>
     </dependency>
+    <!--END proguard libs -->
 
+    <!-- coral.jnlp libs -->
+    <!--
     <dependency>
             <groupId>org.opencoral</groupId>
             <version>3.4.9</version>
@@ -125,6 +160,8 @@
             <version>3.4.9</version>
             <artifactId>opencoral-xml-apis</artifactId>
     </dependency>
+    -->
+    <!--END coral.jnlp libs -->
 
 
     <!-- third party -->
