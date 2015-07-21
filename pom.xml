@@ -186,8 +186,12 @@
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <version>9.3-1102-jdbc3</version>
-    </dependency>
-
+    </dependency>    
+	<dependency>
+		<groupId>org.bouncycastle</groupId>
+		<artifactId>bcprov-jdk15on</artifactId>
+		<version>1.52</version>
+	</dependency>
   </dependencies>
 
   <description>The CoralAPI project aims to wrap up all the boilerplate CORBA stuff for talking to coral.</description>
