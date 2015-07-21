@@ -3,6 +3,8 @@ package edu.utah.nanofab.coralapi;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
 
@@ -34,6 +36,7 @@ import org.opencoral.idl.Equipment.EquipmentManagerHelper;
 import org.opencoral.idl.Equipment.EquipmentManagerPackage.MachineRetrievalFailedSignal;
 import org.opencoral.idl.Reservation.ReservationManager;
 import org.opencoral.idl.Reservation.ReservationManagerHelper;
+import org.opencoral.idl.Reservation.ReservationManagerPackage.ReservationNotFoundSignal;
 import org.opencoral.idl.Resource.ResourceManager;
 import org.opencoral.idl.Resource.ResourceManagerHelper;
 import org.opencoral.util.ResourceRoles;
@@ -44,6 +47,7 @@ import edu.utah.nanofab.coralapi.resource.Account;
 import edu.utah.nanofab.coralapi.exceptions.ConfigLoaderException;
 import edu.utah.nanofab.coralapi.exceptions.InvalidAccountException;
 import edu.utah.nanofab.coralapi.exceptions.InvalidAgentException;
+import edu.utah.nanofab.coralapi.exceptions.InvalidCallOrderException;
 import edu.utah.nanofab.coralapi.exceptions.InvalidDateException;
 import edu.utah.nanofab.coralapi.exceptions.InvalidMemberException;
 import edu.utah.nanofab.coralapi.exceptions.InvalidProcessException;
@@ -628,6 +632,45 @@ public class CoralAPI {
 
 	public void createNewReservation(String agent, String member,
 			String project, String item, String bdate, int lengthInMinutes) throws UnknownMemberException, ParseException, Exception {
+		Reservation r = generateReservationObject(agent, member, project, item,
+				bdate, lengthInMinutes);
+		this.createNewReservation(r);
+	}
+
+	  /**
+	   * Delete a coral reservation with supplied Reservation object.
+	   * 
+	   * @param r The reservation to be deleted.
+	   * 
+	   * @throws Exception
+	   */
+	public void deleteReservation(Reservation r) throws InvalidTicketSignal, NotAuthorizedSignal, ReservationNotFoundSignal {
+		this.getReservationManager();
+		Activity a = ActivityFactory.createReservationActivity(
+	            this.coralUser,
+	            r.getMember().getName(), 
+	            r.getItem(), 
+	          r.getProject().getName(), 
+	          r.getAccount().getName(),
+	          r.getLab(),
+	          r.getBdate(),
+	          r.getEdate());
+		Activity[] activity_array = {a};
+		reservationManager.deleteReservation(activity_array, this.ticketString);
+	}
+
+	public void deleteReservation(String agent, String member,
+			String project, String item, String bdate, int lengthInMinutes) throws ProjectNotFoundSignal, InvalidAccountSignal, MachineRetrievalFailedSignal, UnknownMemberException, ParseException, InvalidCallOrderException, Exception {
+		Reservation r = generateReservationObject(agent, member, project, item,
+				bdate, lengthInMinutes);
+		this.deleteReservation(r);
+	}
+	
+	private Reservation generateReservationObject(String agent, String member,
+			String project, String item, String bdate, int lengthInMinutes)
+			throws UnknownMemberException, Exception, ProjectNotFoundSignal,
+			ParseException, InvalidCallOrderException, InvalidAccountSignal,
+			MachineRetrievalFailedSignal {
 		Reservation r = new Reservation();
 		r.setAgent(this.getMember(agent));		
 		r.setMember(this.getMember(member));
@@ -640,9 +683,10 @@ public class CoralAPI {
 		r.setAccount(a);
 		Machine m = this.getMachine(item);
 		r.setLab(m.getLab());
-		this.createNewReservation(r);
+		return r;
 	}
-    
+	
+	
     /**
      * Gets an array of all the reservations for the specified tool that were created by the 
      * member within the time interval specified between the beginning date and ending date 
