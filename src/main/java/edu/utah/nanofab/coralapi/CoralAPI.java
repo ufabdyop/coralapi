@@ -79,18 +79,18 @@ import edu.utah.nanofab.coralapi.helper.CoralManagerConnector;
  */
 public class CoralAPI {
     
-  private String coralUser = "coral";
-    private String iorUrl = "http://coral-dev-box/IOR/";
-    private String configUrl = "";
-    private String ticketString = "";
-    private String logLevel = "DEBUG";
-  private AuthManager authManager;
-    private CoralManagerConnector connector = null;
-    private ResourceManager resourceManager = null;
-    private EquipmentManager equipmentManager = null;
-    private ReservationManager reservationManager = null;
-  private CoralCrypto coralCrypto;
-  public static Logger logger;
+	private String coralUser = "coral";
+	private String iorUrl = "http://coral-dev-box/IOR/";
+	private String configUrl = "";
+	private String ticketString = "";
+	private String logLevel = "DEBUG";
+	private AuthManager authManager;
+	private CoralManagerConnector connector = null;
+	private ResourceManager resourceManager = null;
+	private EquipmentManager equipmentManager = null;
+	private ReservationManager reservationManager = null;
+	private CoralCrypto coralCrypto;
+	public static Logger logger;
            
     public CoralAPI(String coralUser, String configUrl) {
 	  this.coralUser = coralUser;
@@ -283,6 +283,20 @@ public class CoralAPI {
 
         return mem;
     }
+    
+    /**
+     * Gets the equipment qualifications for a member.
+     * 
+     * @param member The name of the coral member.
+     * @return A a collection of qualifications
+     * @throws UnknownMemberException If the member wasn't found.
+     * @throws Exception If any other error occurs while trying to get the member from the resource manager.
+     */
+    public Member getQualifications(String member) throws UnknownMemberException, Exception {
+        this.getResourceManager();
+		return null;
+    }
+        
     
     /**
      * Gets all the projects that the given member is currently working on.
@@ -858,8 +872,6 @@ public class CoralAPI {
 //  qualify(tool, member, role)
 //  disqualify(tool, member, role)
 //  reserve( tool, agent, member, project, account, begin time, end time(or length) ) 
-//  deleteReservation( tool, member, time, length )
-//  costRecovery (month, year)          
   
   /**
    * Gets the log level for this CoralAPI instance.
