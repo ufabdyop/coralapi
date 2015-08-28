@@ -63,11 +63,11 @@ coral.close()
 Installation
 -----------------
 This project uses maven for packaging and dependency resolution.  Since OpenCoral does not use maven, you will have to package your coral jars and put them into a maven repository.
-You can do this with the following command (assuming opencoral source is in /home/coral/opencoral and you are using opencoral version 3.4.9):
+You can do this with the following command (assuming coral installation is in the default location of /usr/local/coral and you are using opencoral version 3.4.9):
 
     for i in $(find /usr/local/coral/lib -name '*jar') ; do
       FILEBASE=$(basename $i .jar);
-      /usr/local/maven/bin/mvn install:install-file -Dfile=$i -DgroupId=org.opencoral -DartifactId=opencoral-$FILEBASE  -Dversion=3.4.9 -Dpackaging=jar
+      mvn install:install-file -Dfile=$i -DgroupId=org.opencoral -DartifactId=opencoral-$FILEBASE  -Dversion=3.4.9 -Dpackaging=jar
     done
 
 Once those jars are in your local maven repo (~/.m2/...), you can package this project into a jar with:
