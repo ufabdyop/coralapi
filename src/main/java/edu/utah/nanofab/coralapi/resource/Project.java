@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.opencoral.corba.ProjectAdapter;
 import org.opencoral.idl.Timestamp;
+
 import edu.utah.nanofab.coralapi.helper.TimestampConverter;
 
 public class Project {
@@ -19,6 +20,25 @@ public class Project {
     Date bdate;
     Date edate;
     
+  public Project(boolean isNull, String name, String description,
+			String nickname, String type, String discipline, String pi,
+			String account, boolean active, Date bdate, Date edate) {
+		this.isNull = isNull;
+		this.name = name;
+		this.description = description;
+		this.nickname = nickname;
+		this.type = type;
+		this.discipline = discipline;
+		this.pi = pi;
+		this.account = account;
+		this.active = active;
+		this.bdate = bdate;
+		this.edate = edate;
+  }
+  
+  public Project() {
+  }
+  
   public boolean isNull() {
     return isNull;
   }
