@@ -99,6 +99,7 @@ public class CoralAPI {
 		this.setLogLevel(this.logLevel);
 		logger = LoggerFactory.getLogger(CoralAPI.class);
 		logger.debug("configURL: " + configUrl);
+		logger.debug("coralUser: " + coralUser);
 		this.coralCrypto = new CoralCrypto(this.configUrl);
 		if (this.coralCrypto.checkKeyIsValid() == false) {
 			logger.error("Bad Key Detected. Check config.jar for certs/Coral.key");
