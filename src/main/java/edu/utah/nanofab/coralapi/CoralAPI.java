@@ -63,6 +63,7 @@ import edu.utah.nanofab.coralapi.collections.LabRoles;
 import edu.utah.nanofab.coralapi.collections.Machines;
 import edu.utah.nanofab.coralapi.collections.Members;
 import edu.utah.nanofab.coralapi.collections.Projects;
+import edu.utah.nanofab.coralapi.collections.Reservations;
 import edu.utah.nanofab.coralapi.resource.Enable;
 import edu.utah.nanofab.coralapi.resource.LabRole;
 import edu.utah.nanofab.coralapi.resource.Machine;
@@ -723,7 +724,7 @@ public class CoralAPI {
      * 
      * @throws Exception 
      */
-  public Reservation[] getReservations(String member, String tool, Date bdate, Date edate) throws Exception {
+  public Reservations getReservations(String member, String tool, Date bdate, Date edate) throws Exception {
     this.getReservationManager();
     
     Activity[] filters = Utils.createReservationSearchFilter(member, tool,
@@ -778,10 +779,10 @@ public class CoralAPI {
       throw e;
     }
     
-    Reservation[] reservations = new Reservation[activities.length];
+    Reservations reservations = new Reservations();
     int i = 0;
     for (Activity act : activities) {
-      reservations[i++] = ActivityFactory.convertActivityToReservation(act);
+      reservations.add(ActivityFactory.convertActivityToReservation(act));
     }
     
     return reservations;
@@ -795,7 +796,7 @@ public class CoralAPI {
    * @return
    * @throws Exception
    */
-  public Reservation[] getReservations(String tool, Date bdate, Date edate) throws Exception {
+  public Reservations getReservations(String tool, Date bdate, Date edate) throws Exception {
 	  return getReservations("*", tool, bdate, edate);
   }
 

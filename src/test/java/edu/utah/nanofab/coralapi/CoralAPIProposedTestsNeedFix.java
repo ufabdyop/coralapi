@@ -4,6 +4,7 @@ import edu.utah.nanofab.coralapi.CoralAPI;
 import edu.utah.nanofab.coralapi.collections.LabRoles;
 import edu.utah.nanofab.coralapi.collections.Members;
 import edu.utah.nanofab.coralapi.collections.Projects;
+import edu.utah.nanofab.coralapi.collections.Reservations;
 import edu.utah.nanofab.coralapi.exceptions.InvalidRoleException;
 import edu.utah.nanofab.coralapi.exceptions.InvalidTicketException;
 import edu.utah.nanofab.coralapi.exceptions.NotAuthorizedException;
@@ -219,9 +220,9 @@ public class CoralAPIProposedTestsNeedFix extends TestCase {
         r.setAccount(account);
         instance.createNewReservation(r);
         
-        Reservation[] fetched = instance.getReservations(user, tool, bdate, edate);
-        assertTrue(fetched.length == 2); // Reservations are stored in 30 min intervals, so we would expect 2 reservations.
-        assertEquals(fetched[0].getMember().getName(), r.getMember().getName());
+        Reservations fetched = instance.getReservations(user, tool, bdate, edate);
+        assertTrue(fetched.size() == 2); // Reservations are stored in 30 min intervals, so we would expect 2 reservations.
+        assertEquals(fetched.toArray()[0].getMember().getName(), r.getMember().getName());
         
         // Clean up this tests database entries.
         data.deleteMember(user);
