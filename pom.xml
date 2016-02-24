@@ -4,7 +4,7 @@
 
   <groupId>edu.utah.nanofab</groupId>
   <artifactId>CoralAPI</artifactId>
-  <version>0.2.8</version>
+  <version>0.3.0</version>
   <packaging>jar</packaging>
   
   <name>CoralAPI</name>
@@ -26,12 +26,43 @@
 			<target>1.6</target>
 		</configuration>
 	</plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.4.3</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <excludes>
+                  <exclude>junit:junit</exclude>
+                </excludes>
+              </artifactSet>
+              <filters>
+                  <filter>
+                      <artifact>*:*</artifact>
+                      <excludes>
+                          <exclude>META-INF/*.SF</exclude>
+                          <exclude>META-INF/*.DSA</exclude>
+                          <exclude>META-INF/*.RSA</exclude>
+                      </excludes>
+                  </filter>
+              </filters>
+              <finalName>${project.artifactId}-${project.version}-SHADED</finalName>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
    </plugins>
   </build>
 
   <dependencies>
 
-    <!--proguard libs -->
+    <!--opencoral libs -->
     <dependency>
               <groupId>org.opencoral</groupId>
               <artifactId>opencoral-admin</artifactId>
@@ -62,107 +93,7 @@
               <artifactId>opencoral-server</artifactId>
               <version>3.4.9</version>
     </dependency>
-    <!--END proguard libs -->
-
-    <!-- coral.jnlp libs -->
-    <!--
-    <dependency>
-            <groupId>org.opencoral</groupId>
-            <version>3.4.9</version>
-            <artifactId>opencoral-castor-core</artifactId>
-    </dependency>
-
-    <dependency>
-            <groupId>org.opencoral</groupId>
-            <version>3.4.9</version>
-            <artifactId>opencoral-castor-xml-schema</artifactId>
-    </dependency>
-    <dependency>
-            <groupId>org.opencoral</groupId>
-            <version>3.4.9</version>
-            <artifactId>opencoral-castor-xml</artifactId>
-    </dependency>
-
-    <dependency>
-            <groupId>org.opencoral</groupId>
-            <version>3.4.9</version>
-            <artifactId>opencoral-config</artifactId>
-    </dependency>
-
-    <dependency>
-            <groupId>org.opencoral</groupId>
-            <version>3.4.9</version>
-            <artifactId>opencoral-coral</artifactId>
-    </dependency>
-
-    <dependency>
-            <groupId>org.opencoral</groupId>
-            <version>3.4.9</version>
-            <artifactId>opencoral-jcommon</artifactId>
-    </dependency>
-
-    <dependency>
-            <groupId>org.opencoral</groupId>
-            <version>3.4.9</version>
-            <artifactId>opencoral-jfreechart</artifactId>
-    </dependency>
-
-    <dependency>
-            <groupId>org.opencoral</groupId>
-            <version>3.4.9</version>
-            <artifactId>opencoral-log4j</artifactId>
-    </dependency>
-
-    <dependency>
-            <groupId>org.opencoral</groupId>
-            <version>3.4.9</version>
-            <artifactId>opencoral-logging-api</artifactId>
-    </dependency>
-
-    <dependency>
-            <groupId>org.opencoral</groupId>
-            <version>3.4.9</version>
-            <artifactId>opencoral-logging</artifactId>
-    </dependency>
-
-    <dependency>
-            <groupId>org.opencoral</groupId>
-            <version>3.4.9</version>
-            <artifactId>opencoral-provider</artifactId>
-    </dependency>
-
-    <dependency>
-            <groupId>org.opencoral</groupId>
-            <version>3.4.9</version>
-            <artifactId>opencoral-regexp</artifactId>
-    </dependency>
-
-    <dependency>
-            <groupId>org.opencoral</groupId>
-            <version>3.4.9</version>
-            <artifactId>opencoral-xacml</artifactId>
-    </dependency>
-
-    <dependency>
-            <groupId>org.opencoral</groupId>
-            <version>3.4.9</version>
-            <artifactId>opencoral-xalan</artifactId>
-    </dependency>
-
-    <dependency>
-            <groupId>org.opencoral</groupId>
-            <version>3.4.9</version>
-            <artifactId>opencoral-xerces</artifactId>
-    </dependency>
-
-    <dependency>
-            <groupId>org.opencoral</groupId>
-            <version>3.4.9</version>
-            <artifactId>opencoral-xml-apis</artifactId>
-    </dependency>
-    -->
-    <!--END coral.jnlp libs -->
-
+    <!--END opencoral libs -->
 
     <!-- third party -->
     <dependency>
