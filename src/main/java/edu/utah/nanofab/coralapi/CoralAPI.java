@@ -737,6 +737,22 @@ public class CoralAPI {
   }
   
   /**
+   * Alias for above method that parses strings as YYYY-mm-dd HH:ii:ss
+   * 
+   * @param member
+   * @param tool
+   * @param bdateAsString
+   * @param numberOfMinutes
+   * @return
+   * @throws Exception 
+   */
+  public Reservations getReservations(String member, String tool, String bdateAsString, int numberOfMinutes) throws Exception {
+      Date bdate = TimestampConverter.stringToDate(bdateAsString);
+      Date edate = new Date(bdate.getTime() + (numberOfMinutes * 60 * 1000));
+      return this.getReservations(member, tool, bdate, edate);
+  }
+
+  /**
    * Same as above, but without member filter
    * @param tool
    * @param bdate
