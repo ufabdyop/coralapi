@@ -17,6 +17,7 @@ public class CoralAPIPool {
  
 	public CoralAPIPool(String coralConfigUrl) {
             pool = new HashMap<String, CoralAPISynchronized>();
+            accessTimes = new HashMap<String, Date>();
             configUrl = coralConfigUrl;
             logger = LoggerFactory.getLogger(CoralAPIPool.class);
 	}
