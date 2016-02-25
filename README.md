@@ -84,6 +84,10 @@ For example, to build a command line tool that changes a coral user's password:
 
 ```
 mvn exec:java -Dexec.mainClass=edu.utah.nanofab.coralapi.examples.PasswordChange -Dexec.args="coral coral"
+
+or
+
+java -cp target/CoralAPI-0.3.1-SHADED.jar edu.utah.nanofab.coralapi.examples.PasswordChange coral coral
 ```
 
 
