@@ -69,6 +69,7 @@ import edu.utah.nanofab.coralapi.resource.LabRole;
 import edu.utah.nanofab.coralapi.resource.Machine;
 import edu.utah.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.coralapi.resource.Project;
+import edu.utah.nanofab.coralapi.resource.ProjectRole;
 import edu.utah.nanofab.coralapi.resource.Reservation;
 import edu.utah.nanofab.coralapi.helper.CoralManagerConnector;
 
@@ -467,14 +468,33 @@ public class CoralAPI {
   }
 
   public void addLabRoleToMember(LabRole newRole) throws Exception {
-    
+	  this.addGenericRoleToMember(newRole.getMember(),
+			  newRole.getRole(), 
+			  newRole.getLab(),
+			  "lab"
+			  );
+  }
+  
+  public void addProjectRoleToMember(ProjectRole newRole) throws Exception {
+	  this.addGenericRoleToMember(newRole.getMember(),
+			  newRole.getRole(), 
+			  newRole.getProject(),
+			  "project"
+			  );
+  }
+  
+  private void addGenericRoleToMember(String member, 
+		  String role, 
+		  String target,
+		  String type) throws Exception
+  {
     
     try {
       connector.getResourceManager().addRoleToMember(
-          newRole.getMember(), 
-          newRole.getRole(),
-          newRole.getLab(),
-          "lab",
+          member, 
+          role,
+          target,
+          type,
           connector.getTicketString());
     } catch(Exception e) {
       String message = e.getMessage();
