@@ -443,8 +443,16 @@ public class CoralAPI {
     return result;
   }
   
+  public void activateProject(String projectName) throws InvalidTicketSignal, ProjectNotFoundSignal, InvalidNicknameSignal, InvalidAccountSignal, NotAuthorizedSignal, Exception {
+	    Project project = getProject(projectName);
+	    connector.getResourceManager().activateProject(projectName, project.getAccount(), connector.getTicketString());
+  }
+
+  public void deactivateProject(String projectName) throws InvalidTicketSignal, ProjectNotFoundSignal, InvalidNicknameSignal, InvalidAccountSignal, NotAuthorizedSignal, Exception {
+	    connector.getResourceManager().inactivateProject(projectName, connector.getTicketString());
+  }
+  
   public void updateProject(Project project) throws InvalidTicketSignal, ProjectNotFoundSignal, InvalidNicknameSignal, InvalidAccountSignal, NotAuthorizedSignal, Exception {
-    
     connector.getResourceManager().updateProject(project.convertToIdlProjectForRscMgr(), connector.getTicketString());
   }
 
@@ -476,10 +484,10 @@ public class CoralAPI {
   }
   
   public void addProjectRoleToMember(ProjectRole newRole) throws Exception {
-	  this.addGenericRoleToMember(newRole.getMember(),
+	  this.addProjectRoleToMember(
+			  newRole.getMember(),
 			  newRole.getRole(), 
-			  newRole.getProject(),
-			  "project"
+			  newRole.getProject()
 			  );
   }
   
