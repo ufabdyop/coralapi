@@ -442,7 +442,19 @@ public class CoralAPI {
     }
     return result;
   }
-  
+
+  public void activateMember(String memberName) throws UnknownMemberException, Exception {
+	    Member member = getMember(memberName);
+	    connector.getResourceManager().activateMember(
+	    		memberName,
+	    		member.getProject(),
+	    		connector.getTicketString());
+  }
+	
+  public void deactivateMember(String memberName) throws InvalidTicketSignal, MemberNotFoundSignal, NotAuthorizedSignal {
+		    connector.getResourceManager().inactivateMember(memberName, connector.getTicketString());
+  }
+    
   public void activateProject(String projectName) throws InvalidTicketSignal, ProjectNotFoundSignal, InvalidNicknameSignal, InvalidAccountSignal, NotAuthorizedSignal, Exception {
 	    Project project = getProject(projectName);
 	    connector.getResourceManager().activateProject(projectName, project.getAccount(), connector.getTicketString());
