@@ -8,6 +8,8 @@ import java.util.Date;
 import org.opencoral.idl.Timestamp;
 
 public class TimestampConverter {
+ 
+  public static final boolean IGNORE_NULLS = true;
 
   public static Timestamp dateToTimestamp(Date bdate2) {
     
@@ -33,7 +35,9 @@ public class TimestampConverter {
   }
 
   public static Date timestampToDate(Timestamp tstamp) {
-    if (tstamp.isNull) { return null; }
+	if (!IGNORE_NULLS) {
+		if (tstamp.isNull) { return null; }
+	}
     Calendar cal = Calendar.getInstance();
     cal.set(Calendar.YEAR, tstamp.year);
     cal.set(Calendar.MONTH, tstamp.month - 1);

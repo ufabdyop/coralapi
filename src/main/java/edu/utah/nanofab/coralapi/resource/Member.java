@@ -295,11 +295,13 @@ public class Member {
     this.setUrl(idlMember.url);
     this.setZipcode(idlMember.zipcode);
     this.setActive(idlMember.active);
-      this.setEdate(this.timestampToDate(idlMember.edate));
+    this.setEdate(this.timestampToDate(idlMember.edate));
   }
   
+  
   private Date timestampToDate(Timestamp tstamp) {
-    return TimestampConverter.timestampToDate(tstamp);
+	  Date tempDate = TimestampConverter.timestampToDate(tstamp);
+	  return tempDate;
   }
 
   public boolean equals(Member m) {
