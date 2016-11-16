@@ -847,7 +847,7 @@ public class CoralAPI {
   
   public void disable (String agent, String machine) throws InvalidTicketSignal, InvalidAgentSignal, InvalidResourceSignal, ResourceUnavailableSignal, NotAuthorizedSignal {
     
-    connector.getEquipmentManager().disable(agent, machine, false, connector.getTicketString());
+    connector.getEquipmentManager().disable(agent, machine, true, connector.getTicketString());
   }
   
   /**
