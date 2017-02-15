@@ -59,6 +59,7 @@ import edu.utah.nanofab.coralapi.helper.ActivityString;
 import edu.utah.nanofab.coralapi.helper.TimestampConverter;
 import edu.utah.nanofab.coralapi.helper.Utils;
 import edu.utah.nanofab.coralapi.collections.Accounts;
+import edu.utah.nanofab.coralapi.collections.EquipmentRoles;
 import edu.utah.nanofab.coralapi.collections.LabRoles;
 import edu.utah.nanofab.coralapi.collections.Machines;
 import edu.utah.nanofab.coralapi.collections.Members;
@@ -292,8 +293,6 @@ public class CoralAPI {
     }
 
     public void addEquipmentRoleToMember(String member, String roleName, String resource) throws IOException, InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal, InvalidResourceSignal {
-      
-     
       try {
         connector.getResourceManager().addRoleToMember(member, roleName, resource, ResourceRoles.EQUIPMENT, connector.getTicketString());
       } catch (InvalidRoleSignal irs ) {
@@ -451,6 +450,14 @@ public class CoralAPI {
 	    		connector.getTicketString());
   }
 	
+  public void activateMemberWithProject(String memberName, String projectName) 
+          throws InvalidTicketSignal, ProjectNotFoundSignal, MemberNotFoundSignal, InvalidProjectSignal, NotAuthorizedSignal {
+	    connector.getResourceManager().activateMember(
+	    		memberName,
+	    		projectName,
+	    		connector.getTicketString());
+  }
+	
   public void deactivateMember(String memberName) throws InvalidTicketSignal, MemberNotFoundSignal, NotAuthorizedSignal {
 		    connector.getResourceManager().inactivateMember(memberName, connector.getTicketString());
   }
@@ -542,9 +549,14 @@ public class CoralAPI {
   }
 
   public LabRoles getLabRoles(String username) throws RoleNotFoundSignal {
-    
     Persona[] personas = connector.getResourceManager().getPersonas(username, "*", "*", ResourceRoles.LAB, true);
     return LabRoles.fromIdlPersonaArray(personas);
+  }
+
+
+  public EquipmentRoles getEquipmentRoles(String username) throws RoleNotFoundSignal {
+    Persona[] personas = connector.getResourceManager().getPersonas(username, "*", "*", ResourceRoles.LAB, true);
+    return EquipmentRoles.fromIdlPersonaArray(personas);
   }
 
   /**
@@ -923,4 +935,5 @@ public class CoralAPI {
       System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, level);
     }
   }
+
 }

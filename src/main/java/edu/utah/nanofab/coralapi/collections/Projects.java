@@ -32,4 +32,16 @@ public class Projects extends ProxySet<Project> {
     }
     return projectCollection;
   }
+
+  public String[] getNames() 
+  {
+    String[] names = new String[this.size()];
+    int i = 0;
+    for (Project p : this.collection ) {
+      names[i] = p.getName();
+      i++;
+    }
+    return names;
+  }
+  
 }
