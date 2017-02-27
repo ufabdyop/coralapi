@@ -300,12 +300,28 @@ public class CoralAPI {
         
       }
     }
+  
   public void removeEquipmentRoleFromMember(String member, String roleName,
       String resource) throws IOException, InvalidTicketSignal,
       InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal, InvalidResourceSignal {
         
-        connector.getResourceManager().removeRoleFromMember(member, roleName, resource, ResourceRoles.EQUIPMENT, connector.getTicketString());
-  } 
+        removeGenericRoleFromMember(member, roleName, resource, ResourceRoles.EQUIPMENT);
+  }
+  
+  public void removeLabRoleFromMember(String member, String roleName,
+      String lab) throws IOException, InvalidTicketSignal,
+      InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal, InvalidResourceSignal {
+        
+        connector.getResourceManager().removeRoleFromMember(member, roleName, lab, ResourceRoles.LAB, connector.getTicketString());
+  }
+    
+  public void removeGenericRoleFromMember(String member, String roleName,
+      String resource, String roleType) throws IOException, InvalidTicketSignal,
+      InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal, InvalidResourceSignal {
+        
+        connector.getResourceManager().removeRoleFromMember(member, roleName, resource, roleType, connector.getTicketString());
+  }
+  
   public void addProjectRoleToMember(String member, String roleName,
       String resource) throws IOException, InvalidTicketSignal,
       InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal, InvalidResourceSignal {
