@@ -242,6 +242,18 @@ public class CoralAPI {
     }
     
     /**
+     */
+    public Members getAllMembers() throws UnknownMemberException, Exception {
+        
+        org.opencoral.idl.Member[] rscMembers = connector.getResourceManager().getAllMembers();
+        Members members = new Members();
+        for( org.opencoral.idl.Member m : rscMembers) {
+            members.add(new Member(m));
+        }
+        return members;
+    }    
+    
+    /**
      * Gets the equipment qualifications for a member.
      * 
      * @param member The name of the coral member.
