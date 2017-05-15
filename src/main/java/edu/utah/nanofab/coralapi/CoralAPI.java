@@ -73,6 +73,8 @@ import edu.utah.nanofab.coralapi.resource.Project;
 import edu.utah.nanofab.coralapi.resource.ProjectRole;
 import edu.utah.nanofab.coralapi.resource.Reservation;
 import edu.utah.nanofab.coralapi.helper.CoralManagerConnector;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * The CoralAPI class provides a wrapper for the primary coral services.
@@ -162,7 +164,9 @@ public class CoralAPI {
       Projects projectCollection = Projects.fromIdlProjectArray(allProjects); 
       return projectCollection;
     }
-    
+  public Projects getAllProjects() throws ProjectNotFoundSignal{
+      return getProjects();
+  }  
     public Project getProject(String name) throws ProjectNotFoundSignal {
       this.reconnectToCoral();
       Project project = new Project();
@@ -279,6 +283,17 @@ public class CoralAPI {
       Projects projectCollection = Projects.fromIdlProjectArray(memberProjects);
       
       return projectCollection;
+    }
+    
+    public HashMap<String, ArrayList<String>> getAllMemberProjects(String member) {
+        Relation[] memberProjects = new Relation[0];
+        try {
+            memberProjects = connector.getResourceManager().getProjectInfoForAllMembers(true);
+        } catch (ProjectNotFoundSignal ex) {
+        }
+        
+        HashMap<String, ArrayList<String>> map = this.convertMemberProjectsRelationToMap(memberProjects);
+        return map;
     }
     
     public void addMemberProjects(String member, String[] projects) throws InvalidTicketSignal, InvalidMemberSignal, InvalidProjectSignal, NotAuthorizedSignal{
@@ -422,11 +437,14 @@ public class CoralAPI {
   }
   
   public edu.utah.nanofab.coralapi.collections.Accounts getAccounts() throws AccountNotFoundSignal {
-    
     org.opencoral.idl.Account[] allAccounts = connector.getResourceManager().getAllAccounts();
     Accounts accountCollection = Accounts.fromIdlAccountArray(allAccounts); 
     return accountCollection;
   }
+  public edu.utah.nanofab.coralapi.collections.Accounts getAllAccounts() throws AccountNotFoundSignal {
+      return getAccounts();
+  }  
+  
   public void deleteProject(String projectName) throws InvalidTicketSignal, NotAuthorizedSignal, Exception {
     
     Project p = this.getProject(projectName);
@@ -964,4 +982,34 @@ public class CoralAPI {
     }
   }
 
+
+        /**
+	 * Gets all the projects for all members.
+	 * 
+	 * @param activeOnly only return active members.
+	 * @return A map of members to projects
+	 */
+	private HashMap<String, ArrayList<String>> convertMemberProjectsRelationToMap(Relation[] relations) {
+            ArrayList<String> projectsList = new ArrayList<String>();
+            HashMap<String, ArrayList<String>> map = new HashMap<String, ArrayList<String>>();
+                
+            for(Relation r : relations) {
+                String memberName = r.master;
+                String projectName = r.slave;
+                if (map.containsKey(memberName)) {
+                    projectsList = map.get(memberName);
+                } else {
+                    projectsList = new ArrayList<String>();
+                }
+                
+                if (!projectsList.contains(projectName)) {
+                    projectsList.add(projectName);
+                }
+                
+                map.put(memberName, projectsList);
+                
+            }
+            return map;
+	}  
+  
 }
