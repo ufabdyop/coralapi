@@ -285,7 +285,7 @@ public class CoralAPI {
       return projectCollection;
     }
     
-    public HashMap<String, ArrayList<String>> getAllMemberProjects(String member) {
+    public HashMap<String, ArrayList<String>> getAllMemberProjects() {
         Relation[] memberProjects = new Relation[0];
         try {
             memberProjects = connector.getResourceManager().getProjectInfoForAllMembers(true);
