@@ -74,7 +74,9 @@ import edu.utah.nanofab.coralapi.resource.ProjectRole;
 import edu.utah.nanofab.coralapi.resource.Reservation;
 import edu.utah.nanofab.coralapi.helper.CoralManagerConnector;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 /**
  * The CoralAPI class provides a wrapper for the primary coral services.
@@ -248,11 +250,25 @@ public class CoralAPI {
     /**
      */
     public Members getAllMembers() throws UnknownMemberException, Exception {
+        return getAllMembersWithActiveOption(false);
+    }    
+    
+    public Members getAllActiveMembers() throws UnknownMemberException, Exception {
+        return getAllMembersWithActiveOption(true);
+    }    
+    
+    private Members getAllMembersWithActiveOption(boolean activeOnly) throws UnknownMemberException, Exception {
         
         org.opencoral.idl.Member[] rscMembers = connector.getResourceManager().getAllMembers();
         Members members = new Members();
         for( org.opencoral.idl.Member m : rscMembers) {
-            members.add(new Member(m));
+            if (activeOnly) {
+                if (m.active) {
+                    members.add(new Member(m));
+                }
+            } else {
+                members.add(new Member(m));
+            }
         }
         return members;
     }    
@@ -285,11 +301,15 @@ public class CoralAPI {
       return projectCollection;
     }
     
-    public HashMap<String, ArrayList<String>> getAllMemberProjects() {
+    public HashMap<String, ArrayList<String>> getAllMemberProjects(boolean activeOnly) {
         Relation[] memberProjects = new Relation[0];
         try {
-            memberProjects = connector.getResourceManager().getProjectInfoForAllMembers(true);
+            memberProjects = connector.getResourceManager().getProjectInfoForAllMembers(activeOnly);
         } catch (ProjectNotFoundSignal ex) {
+        }
+        
+        if (activeOnly) {
+            memberProjects = this.filterRelationsToOnlyActiveMembers(memberProjects);
         }
         
         HashMap<String, ArrayList<String>> map = this.convertMemberProjectsRelationToMap(memberProjects);
@@ -1011,5 +1031,23 @@ public class CoralAPI {
             }
             return map;
 	}  
+
+    private Relation[] filterRelationsToOnlyActiveMembers(Relation[] memberProjects) {
+        ArrayList<Relation> returnSet = new ArrayList<Relation>();
+        Members activeMembers;
+        
+        try {
+            activeMembers = this.getAllActiveMembers();
+        } catch (Exception ex) {
+            return memberProjects;
+        }
+        
+        for (Relation r : memberProjects) {
+            if ( activeMembers.containsName(r.master) ) {
+                returnSet.add(r);
+            }
+        }
+        return returnSet.toArray(new Relation[0]);
+    }
   
 }

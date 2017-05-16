@@ -15,9 +15,18 @@ public class Members extends ProxySet<Member> {
     }
     return false;
   }
+  
+  public boolean containsName(String member) 
+  {
+    for (Member m : this.collection ) {
+      if (m.getName().equals(member)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   private boolean membersEqual(Member member, Member m) {
-    System.out.println("checking if " + member.getName() + " is equal to " + m.getName());
     return m.equals(member);
   }
 
