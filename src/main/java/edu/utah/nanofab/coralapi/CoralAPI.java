@@ -65,6 +65,7 @@ import edu.utah.nanofab.coralapi.collections.Machines;
 import edu.utah.nanofab.coralapi.collections.Members;
 import edu.utah.nanofab.coralapi.collections.Projects;
 import edu.utah.nanofab.coralapi.collections.Reservations;
+import edu.utah.nanofab.coralapi.exceptions.RequestFailedException;
 import edu.utah.nanofab.coralapi.resource.Enable;
 import edu.utah.nanofab.coralapi.resource.LabRole;
 import edu.utah.nanofab.coralapi.resource.Machine;
@@ -77,6 +78,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Level;
+import org.opencoral.idl.InvalidDateSignal;
+import org.opencoral.idl.Reservation.ReservationManagerPackage.ReservationDuplicateSignal;
 
 /**
  * The CoralAPI class provides a wrapper for the primary coral services.
@@ -696,8 +699,7 @@ public class CoralAPI {
    * 
    * @throws Exception
    */
-    public void createNewReservation(Reservation r) throws Exception {
-        
+    public void createNewReservation(Reservation r) throws RequestFailedException  {
         Activity a = ActivityFactory.createReservationActivity(
             this.coralUser,
             r.getMember().getName(), 
@@ -708,16 +710,36 @@ public class CoralAPI {
           r.getBdate(),
           r.getEdate());
         Activity[] activity_array = {a};
+        
         logger.debug("Making reservation for '" + r.getMember().getName() + "' " + r.getItem());
-        connector.getReservationManager().makeReservation(activity_array, connector.getTicketString());
+        boolean encounteredError = false;
+        String errorMsg = "";
+        RequestFailedException ex = new RequestFailedException();
+
+        try {
+            connector.getReservationManager().makeReservation(activity_array, connector.getTicketString());
+        } catch (NotAuthorizedSignal e) {
+                throw new RequestFailedException(e.reason);
+        } catch (ResourceUnavailableSignal e) {
+                throw new RequestFailedException(e.reason);
+        } catch (ReservationDuplicateSignal e) {
+                errorMsg = "Requested reservation overlaps"
+                                + " a reserved slot.  Please try again.";
+                throw new RequestFailedException(errorMsg);
+        } catch (Exception e) {
+                e.printStackTrace();
+                errorMsg = "Could not make reservation:\n"
+                                + e.getMessage();
+                throw new RequestFailedException(errorMsg);
+        }
     }
 
-	public void createNewReservation(String agent, String member,
-			String project, String item, String bdate, int lengthInMinutes) throws UnknownMemberException, ParseException, Exception {
-		Reservation r = generateReservationObject(agent, member, project, item,
-				bdate, lengthInMinutes);
-		this.createNewReservation(r);
-	}
+    public void createNewReservation(String agent, String member,
+        String project, String item, String bdate, int lengthInMinutes) throws UnknownMemberException, ParseException, Exception {
+        Reservation r = generateReservationObject(agent, member, project, item,
+                        bdate, lengthInMinutes);
+        this.createNewReservation(r);
+    }
 
 	  /**
 	   * Delete a coral reservation with supplied Reservation object.
