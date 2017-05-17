@@ -13,6 +13,7 @@ import edu.utah.nanofab.coralapi.collections.Projects;
 import edu.utah.nanofab.coralapi.collections.Reservations;
 import edu.utah.nanofab.coralapi.exceptions.InvalidCallOrderException;
 import edu.utah.nanofab.coralapi.exceptions.InvalidRoleException;
+import edu.utah.nanofab.coralapi.exceptions.RequestFailedException;
 import edu.utah.nanofab.coralapi.exceptions.UnknownMemberException;
 import edu.utah.nanofab.coralapi.resource.Account;
 import edu.utah.nanofab.coralapi.resource.Enable;
@@ -94,10 +95,10 @@ public class CoralAPISynchronized {
     public synchronized void createNewProjectUnlessExists (Project project)  throws Exception {
 	this.api.createNewProjectUnlessExists( project);
     }
-    public synchronized void createNewReservation (Reservation r)  throws Exception {
+    public synchronized void createNewReservation (Reservation r) throws RequestFailedException  {
 	this.api.createNewReservation( r);
     }
-    public synchronized void createNewReservation (String agent, String member, String project, String item, String bdate, int lengthInMinutes)  throws UnknownMemberException, ParseException, Exception {
+    public synchronized void createNewReservation (String agent, String member, String project, String item, String bdate, int lengthInMinutes) throws RequestFailedException, Exception {
 	this.api.createNewReservation( agent,  member,  project,  item,  bdate,  lengthInMinutes);
     }
     public synchronized void createNewRole (String name, String description, String type)  throws Exception {

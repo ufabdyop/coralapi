@@ -735,7 +735,7 @@ public class CoralAPI {
     }
 
     public void createNewReservation(String agent, String member,
-        String project, String item, String bdate, int lengthInMinutes) throws UnknownMemberException, ParseException, Exception {
+        String project, String item, String bdate, int lengthInMinutes) throws RequestFailedException, Exception  {
         Reservation r = generateReservationObject(agent, member, project, item,
                         bdate, lengthInMinutes);
         this.createNewReservation(r);
