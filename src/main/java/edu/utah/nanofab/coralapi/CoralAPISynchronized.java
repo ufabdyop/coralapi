@@ -116,6 +116,12 @@ public class CoralAPISynchronized {
     public synchronized void deleteReservation (String agent, String member, String project, String item, String bdate, int lengthInMinutes)  throws ProjectNotFoundSignal, InvalidAccountSignal, MachineRetrievalFailedSignal, UnknownMemberException, ParseException, InvalidCallOrderException, Exception {
 	this.api.deleteReservation( agent,  member,  project,  item,  bdate,  lengthInMinutes);
     }
+    public synchronized void deleteReservation(String item, String bdate, int lengthInMinutes) throws ProjectNotFoundSignal, InvalidAccountSignal, MachineRetrievalFailedSignal, UnknownMemberException, ParseException, InvalidCallOrderException, Exception {
+        this.api.deleteReservation( item,  bdate,  lengthInMinutes);
+    }
+    public void deleteReservation(String item, Date bdate, int lengthInMinutes) throws ProjectNotFoundSignal, InvalidAccountSignal, MachineRetrievalFailedSignal, UnknownMemberException, ParseException, InvalidCallOrderException, Exception {
+        this.api.deleteReservation( item,  bdate,  lengthInMinutes);
+    }
     public synchronized void disable (String agent, String machine)  throws InvalidTicketSignal, InvalidAgentSignal, InvalidResourceSignal, ResourceUnavailableSignal, NotAuthorizedSignal {
 	this.api.disable( agent,  machine);
     }
