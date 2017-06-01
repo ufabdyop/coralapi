@@ -74,6 +74,7 @@ import edu.utah.nanofab.coralapi.resource.Project;
 import edu.utah.nanofab.coralapi.resource.ProjectRole;
 import edu.utah.nanofab.coralapi.resource.Reservation;
 import edu.utah.nanofab.coralapi.helper.CoralManagerConnector;
+import static edu.utah.nanofab.coralapi.helper.TimestampConverter.stringToDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -768,6 +769,19 @@ public class CoralAPI {
 		Reservation r = generateReservationObject(agent, member, project, item,
 				bdate, lengthInMinutes);
 		this.deleteReservation(r);
+	}
+        
+	public void deleteReservation(String item, String bdate, int lengthInMinutes) throws ProjectNotFoundSignal, InvalidAccountSignal, MachineRetrievalFailedSignal, UnknownMemberException, ParseException, InvalidCallOrderException, Exception {
+            Date bdateAsDate = stringToDate(bdate);
+            this.deleteReservation(item, bdateAsDate, lengthInMinutes);
+	}
+
+        public void deleteReservation(String item, Date bdate, int lengthInMinutes) throws ProjectNotFoundSignal, InvalidAccountSignal, MachineRetrievalFailedSignal, UnknownMemberException, ParseException, InvalidCallOrderException, Exception {
+            Date edateAsDate = new Date();
+            edateAsDate.setTime(bdate.getTime() + (lengthInMinutes * 60 * 1000));
+            Activity a = ActivityFactory.createReservationActivity("*", "*", item, "*", "*", "*", bdate, edateAsDate );
+            Activity[] activity_array = {a};
+            connector.getReservationManager().deleteReservation(activity_array, connector.getTicketString());
 	}
 	
 	private Reservation generateReservationObject(String agent, String member,
