@@ -1046,8 +1046,8 @@ public class CoralAPI {
   public RunDataProcess[] getRundataProcessesWithDefinitions(String tool) throws NullReturnException, ServerErrorException {
     RunDataProcess[] processes = getRundataProcesses(tool);      
     for (int i = 0; i < processes.length; i++) {
-        String description = getRundataDefinitionForProcess(processes[i].getName());
-        processes[i].setDescription(description);
+        String xmlDefinition = getRundataDefinitionForProcess(processes[i].getName());
+        processes[i].setXmlDefinition(xmlDefinition);
     }
     return processes;
   }
