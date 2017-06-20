@@ -4,7 +4,7 @@
 
   <groupId>edu.utah.nanofab</groupId>
   <artifactId>CoralAPI</artifactId>
-  <version>0.3.23</version>
+  <version>0.3.24</version>
   <packaging>jar</packaging>
   
   <name>CoralAPI</name>

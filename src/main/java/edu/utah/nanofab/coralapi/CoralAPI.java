@@ -75,6 +75,7 @@ import edu.utah.nanofab.coralapi.resource.ProjectRole;
 import edu.utah.nanofab.coralapi.resource.Reservation;
 import edu.utah.nanofab.coralapi.helper.CoralManagerConnector;
 import static edu.utah.nanofab.coralapi.helper.TimestampConverter.stringToDate;
+import edu.utah.nanofab.coralapi.resource.RunDataProcess;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -82,6 +83,9 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import org.opencoral.idl.InvalidDateSignal;
 import org.opencoral.idl.Reservation.ReservationManagerPackage.ReservationDuplicateSignal;
+import org.opencoral.idl.Runtime.NullReturnException;
+import org.opencoral.idl.Runtime.RuntimeManager;
+import org.opencoral.idl.Runtime.ServerErrorException;
 
 /**
  * The CoralAPI class provides a wrapper for the primary coral services.
@@ -466,9 +470,11 @@ public class CoralAPI {
     Accounts accountCollection = Accounts.fromIdlAccountArray(allAccounts); 
     return accountCollection;
   }
+  
   public edu.utah.nanofab.coralapi.collections.Accounts getAllAccounts() throws AccountNotFoundSignal {
       return getAccounts();
-  }  
+  }
+  
   
   public void deleteProject(String projectName) throws InvalidTicketSignal, NotAuthorizedSignal, Exception {
     
@@ -1006,6 +1012,44 @@ public class CoralAPI {
   
   public boolean checkKeyIsValid() {
 	  return this.coralCrypto.checkKeyIsValid();
+  }
+  
+  public String getRundataDefinitionForProcess(String process) throws NullReturnException, ServerErrorException {
+    RuntimeManager runmgr = this.connector.getRuntimeManager();
+    String processDefinition = null;
+    if (runmgr != null) {
+        processDefinition = runmgr.getAugmentedProcessById(process);
+    }
+    return processDefinition;
+  }
+  
+  public RunDataProcess[] getRundataProcesses(String tool) throws NullReturnException, ServerErrorException {
+    RuntimeManager runmgr = this.connector.getRuntimeManager();
+    String[] processNames = {};
+    String[] processDescriptions = {};
+    
+    if (runmgr != null) {
+        processNames = runmgr.getProcessesByCoralToolId(tool);
+        processDescriptions = runmgr.getProcessDescriptionsByCoralToolId(tool);
+    }
+    
+    RunDataProcess[] processes = new RunDataProcess[processNames.length];
+    for (int i = 0; i < processNames.length; i++) {
+        RunDataProcess process = new RunDataProcess();
+        process.setName(processNames[i]);
+        process.setDescription(processDescriptions[i]);
+        processes[i] = process;
+    }
+    return processes;
+  }
+  
+  public RunDataProcess[] getRundataProcessesWithDefinitions(String tool) throws NullReturnException, ServerErrorException {
+    RunDataProcess[] processes = getRundataProcesses(tool);      
+    for (int i = 0; i < processes.length; i++) {
+        String description = getRundataDefinitionForProcess(processes[i].getName());
+        processes[i].setDescription(description);
+    }
+    return processes;
   }
   
 //  qualify(tool, member, role)
