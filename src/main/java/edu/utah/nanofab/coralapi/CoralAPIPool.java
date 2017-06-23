@@ -105,6 +105,7 @@ public class CoralAPIPool {
     }
 
     private void expireConnectionIfOverMax(String user, int seconds, HashMap<String, Date> userAccessTimeMap) {
+        logger.debug("checking if expiration for " + user + " greater than " + seconds);
         if (seconds == -1) {
             return;
         }
@@ -113,11 +114,19 @@ public class CoralAPIPool {
             try {
                 if ( (now.getTime() - userAccessTimeMap.get(user).getTime()) > 
                         (seconds * 1000) ) {
+                        logger.debug("expired connection for api pool for " + user + " was " +
+                                dateToAdapterString(userAccessTimeMap.get(user)));                     
                         closeConnection(user);
+                        userAccessTimeMap.remove(user);
+                } else {
+                        logger.debug("NOT expired connection for api pool for " + user + " was " +
+                                dateToAdapterString(userAccessTimeMap.get(user)));                     
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } else {
+            logger.debug("no connection for " + user);
         }
     }
     
