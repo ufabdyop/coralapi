@@ -83,7 +83,7 @@ public class CoralAPIPool {
         Date now = new Date();
         logger.debug("access to api pool for " + user + " at " +
             dateToAdapterString(now));
-        if (accessTimes.containsKey(user)) {
+        if (userTimeMap.containsKey(user)) {
             logger.debug("Last access to api pool for " + user + " was " +
                     dateToAdapterString(userTimeMap.get(user))); 
         } else {
