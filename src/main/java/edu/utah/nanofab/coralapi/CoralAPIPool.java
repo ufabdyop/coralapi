@@ -10,25 +10,31 @@ import org.slf4j.LoggerFactory;
 public class CoralAPIPool {
  
         private HashMap<String, CoralAPISynchronized> pool;
-        private HashMap<String, Date> accessTimes;
+        private HashMap<String, Date> accessTimes;   //when a connection was last accessed
+        private HashMap<String, Date> creationTimes; //when a connection was created
         private String configUrl;
 	private static CoralAPIPool singletonInstance;
+        private int maxAgeInSeconds = -1;
         public static Logger logger;
  
 	public CoralAPIPool(String coralConfigUrl) {
             pool = new HashMap<String, CoralAPISynchronized>();
             accessTimes = new HashMap<String, Date>();
+            creationTimes = new HashMap<String, Date>();
             configUrl = coralConfigUrl;
             logger = LoggerFactory.getLogger(CoralAPIPool.class);
 	}
         
         public CoralAPISynchronized getConnection(String user) {
-            this.setTimestamp(user);
+            this.setTimestamp(user, this.accessTimes);
+            this.expireConnectionIfOverMax(user, this.maxAgeInSeconds, this.creationTimes);
             if (pool.containsKey(user)) {
                 return pool.get(user);
             } else {
+                logger.debug("Creating new connection for " + user);
                 CoralAPISynchronized newConnection = new CoralAPISynchronized(user, configUrl);
                 pool.put(user, newConnection);
+                this.setTimestamp(user, this.creationTimes);
                 return newConnection;
             }
         }
@@ -54,17 +60,9 @@ public class CoralAPIPool {
         }
         
         public void closeConnectionsOlderThan(int seconds) {
-            Set<String> keys = pool.keySet();
-            Date now = new Date();
-            for(String k : keys) {
-                try {
-                    if ( (now.getTime() - accessTimes.get(k).getTime()) > 
-                            (seconds * 1000) ) {
-                            closeConnection(k);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            Set<String> users = pool.keySet();
+            for(String user : users) {
+                this.expireConnectionIfOverMax(user, seconds, this.accessTimes);
             }
         }
 
@@ -80,16 +78,47 @@ public class CoralAPIPool {
 		return singletonInstance;
 	}
 
-    private void setTimestamp(String user) {
+    private void setTimestamp(String user, HashMap<String, Date> userTimeMap) {
         Date now = new Date();
         logger.debug("access to api pool for " + user + " at " +
             dateToAdapterString(now));
         if (accessTimes.containsKey(user)) {
             logger.debug("Last access to api pool for " + user + " was " +
-                    dateToAdapterString(accessTimes.get(user))); 
+                    dateToAdapterString(userTimeMap.get(user))); 
         } else {
             logger.debug("First access to api pool for " + user );             
         }
-        this.accessTimes.put(user, now);
+        userTimeMap.put(user, now);
     }
+
+    public int getMaxAgeInSeconds() {
+        return maxAgeInSeconds;
+    }
+
+    /**
+     * 
+     * @param maxAgeInSeconds how long should a connection be cached?
+     *                        -1 means no limit
+     */
+    public void setMaxAgeInSeconds(int maxAgeInSeconds) {
+        this.maxAgeInSeconds = maxAgeInSeconds;
+    }
+
+    private void expireConnectionIfOverMax(String user, int seconds, HashMap<String, Date> userAccessTimeMap) {
+        if (seconds == -1) {
+            return;
+        }
+        if (pool.containsKey(user)) {
+            Date now = new Date();
+            try {
+                if ( (now.getTime() - userAccessTimeMap.get(user).getTime()) > 
+                        (seconds * 1000) ) {
+                        closeConnection(user);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
 }
