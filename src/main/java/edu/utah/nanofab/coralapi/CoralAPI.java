@@ -133,9 +133,7 @@ public class CoralAPI {
         logger.debug("checking connection to Coral...");
         if (connector == null) {
             logger.debug("Reconnecting to Coral...");
-            connector = new CoralManagerConnector();
-            connector.setCoralUser(this.coralUser);
-            connector.setIorUrl(this.iorUrl);
+            connector = new CoralManagerConnector(this.coralUser, this.iorUrl);
         }
     }
         

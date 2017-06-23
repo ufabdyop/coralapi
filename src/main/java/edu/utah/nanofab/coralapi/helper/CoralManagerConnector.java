@@ -1,5 +1,6 @@
 package edu.utah.nanofab.coralapi.helper;
 
+import java.util.Date;
 import java.util.HashMap;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.Object;
@@ -31,7 +32,6 @@ import org.opencoral.util.AdminManagerConnection;
 public class CoralManagerConnector {
   
   private AdminManagerConnection adminManagerConnection;
-  private HashMap allServers;
   private final String[] validServers= {
             Constants.ATHMGR_NAME,
             Constants.ADMMGR_NAME,
@@ -63,10 +63,9 @@ public class CoralManagerConnector {
   private String iorUrl;
   private String coralUser;
   private String ticketString;
-
-  public CoralManagerConnector() {
-      allServers = new HashMap();
-  }  
+  
+  private long creationEpochOfTicket = 0; //when a ticket
+  private long TICKET_LIFE = 5 * 60 * 1000; //five minutes of ticket life
 
     public CoralManagerConnector(String coralUser, String iorUrl) {
         this.setCoralUser(coralUser);
@@ -300,10 +299,12 @@ public class CoralManagerConnector {
         }
         return theManager;      
   }
-    
-    
   
   public String getTicketString() {
+    if ( this.ticketExpired()) {
+        System.out.println("Generating new ticket after expiration");
+        this.getTicket();
+    }
     return this.ticketString;
   }
 
@@ -367,11 +368,12 @@ public class CoralManagerConnector {
     }
 
     private String getTicket() {
-        if (this.ticketString != null) {
+        if (this.ticketString != null && (!this.ticketExpired())) {
             return this.ticketString;
         }
         try {
           this.ticketString = authManager.authenticateByUserName(coralUser);
+          this.creationEpochOfTicket = new Date().getTime();
           System.out.println ( "Got ticket: " + this.ticketString);
         } catch (Exception e) {
           System.err
@@ -379,5 +381,15 @@ public class CoralManagerConnector {
                   + e.getMessage());
         }
         return this.ticketString;
-    }  
+    }
+    private boolean ticketExpired() {
+        if (this.ticketString == null) {
+            return true;
+        }
+        long now = new Date().getTime();
+        if (now - creationEpochOfTicket > TICKET_LIFE) {
+            return true;
+        }
+        return false;
+    }
 }
