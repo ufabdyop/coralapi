@@ -45,6 +45,7 @@ public class CoralAPIPool {
                 pool.get(user).close();
                 pool.remove(user);
                 accessTimes.remove(user);
+                creationTimes.remove(user);
             }
         }
 
@@ -112,8 +113,9 @@ public class CoralAPIPool {
         if (pool.containsKey(user)) {
             Date now = new Date();
             try {
-                if ( (now.getTime() - userAccessTimeMap.get(user).getTime()) > 
-                        (seconds * 1000) ) {
+                if ( userAccessTimeMap.containsKey(user) &&
+                        ((now.getTime() - userAccessTimeMap.get(user).getTime()) > 
+                        (seconds * 1000)) ) {
                         logger.debug("expired connection for api pool for " + user + " was " +
                                 dateToAdapterString(userAccessTimeMap.get(user)));                     
                         closeConnection(user);
@@ -123,6 +125,7 @@ public class CoralAPIPool {
                                 dateToAdapterString(userAccessTimeMap.get(user)));                     
                 }
             } catch (Exception e) {
+                logger.debug("exception caught!");
                 e.printStackTrace();
             }
         } else {
