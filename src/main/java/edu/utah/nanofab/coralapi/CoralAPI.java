@@ -130,8 +130,9 @@ public class CoralAPI {
 	}
     
     private void reconnectToCoral() {
-        logger.debug("Reconnecting to Coral...");
+        logger.debug("checking connection to Coral...");
         if (connector == null) {
+            logger.debug("Reconnecting to Coral...");
             connector = new CoralManagerConnector();
             connector.setCoralUser(this.coralUser);
             connector.setIorUrl(this.iorUrl);
@@ -722,10 +723,11 @@ public class CoralAPI {
         logger.debug("Making reservation for '" + r.getMember().getName() + "' " + r.getItem());
         boolean encounteredError = false;
         String errorMsg = "";
-        RequestFailedException ex = new RequestFailedException();
 
         try {
-            connector.getReservationManager().makeReservation(activity_array, connector.getTicketString());
+            this.reconnectToCoral();
+            ReservationManager resMgr = connector.getReservationManager();
+            resMgr.makeReservation(activity_array, connector.getTicketString());
         } catch (NotAuthorizedSignal e) {
                 throw new RequestFailedException(e.reason);
         } catch (ResourceUnavailableSignal e) {
