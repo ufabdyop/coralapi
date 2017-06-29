@@ -13,6 +13,15 @@ public class RunDataProcess {
     public String name = "";
     public String description = "";
     public String xmlDefinition = "";
+    public String version = "";
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
     public String getXmlDefinition() {
         return xmlDefinition;

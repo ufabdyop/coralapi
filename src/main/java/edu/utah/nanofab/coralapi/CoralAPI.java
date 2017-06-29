@@ -1027,10 +1027,12 @@ public class CoralAPI {
     RuntimeManager runmgr = this.connector.getRuntimeManager();
     String[] processNames = {};
     String[] processDescriptions = {};
+    String version = "";
     
     if (runmgr != null) {
         processNames = runmgr.getProcessesByCoralToolId(tool);
         processDescriptions = runmgr.getProcessDescriptionsByCoralToolId(tool);
+        version = runmgr.getInstanceVersion();
     }
     
     RunDataProcess[] processes = new RunDataProcess[processNames.length];
@@ -1038,6 +1040,7 @@ public class CoralAPI {
         RunDataProcess process = new RunDataProcess();
         process.setName(processNames[i]);
         process.setDescription(processDescriptions[i]);
+        process.setVersion(version);
         processes[i] = process;
     }
     return processes;
