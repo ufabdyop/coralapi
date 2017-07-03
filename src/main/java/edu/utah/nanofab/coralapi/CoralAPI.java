@@ -1055,6 +1055,44 @@ public class CoralAPI {
     return processes;
   }
   
+  public String createRunData(String rundata) throws NullReturnException, ServerErrorException {
+    RuntimeManager runmgr = this.connector.getRuntimeManager();
+    
+    if (runmgr != null) {
+        return runmgr.createRunData(rundata);
+    }
+    return "not assigned";
+  }
+  
+  public void updateRunData(String rundata) throws NullReturnException, ServerErrorException {
+    RuntimeManager runmgr = this.connector.getRuntimeManager();
+    
+    if (runmgr != null) {
+        runmgr.updateRunData(rundata);
+    }
+  }
+  
+  public void commitRunData(String id) throws NullReturnException, ServerErrorException {
+    RuntimeManager runmgr = this.connector.getRuntimeManager();
+    
+    if (runmgr != null) {
+        runmgr.commitRunData(id);
+    }
+  }
+  
+  public void createAdjustmentRunData() {
+        //JUST a placeholder for: runmgr.createAdjustmentRunData(...);
+  }
+
+  public void disableWithRundata(String arg1) {
+      //placeholder
+  }
+  
+  public void addActivityToRundata(String arg1, String arg2) {
+      //placeholder
+  }
+  
+  
 //  qualify(tool, member, role)
 //  disqualify(tool, member, role)
 //  reserve( tool, agent, member, project, account, begin time, end time(or length) ) 
