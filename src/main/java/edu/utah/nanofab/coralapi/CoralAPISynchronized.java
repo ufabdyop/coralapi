@@ -23,6 +23,7 @@ import edu.utah.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.coralapi.resource.Project;
 import edu.utah.nanofab.coralapi.resource.Reservation;
 import edu.utah.nanofab.coralapi.resource.Role;
+import edu.utah.nanofab.coralapi.resource.RunDataProcess;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
@@ -44,6 +45,8 @@ import org.opencoral.idl.ProjectNotFoundSignal;
 import org.opencoral.idl.Reservation.ReservationManagerPackage.ReservationNotFoundSignal;
 import org.opencoral.idl.ResourceUnavailableSignal;
 import org.opencoral.idl.RoleNotFoundSignal;
+import org.opencoral.idl.Runtime.NullReturnException;
+import org.opencoral.idl.Runtime.ServerErrorException;
 
 public class CoralAPISynchronized {
     private CoralAPI api;
@@ -213,4 +216,39 @@ public class CoralAPISynchronized {
 	this.api.updateProject( project);
     }
    
+    
+    
+    
+  public synchronized RunDataProcess[] getRundataProcessesWithDefinitions(String tool) throws NullReturnException, ServerErrorException {
+    return this.api.getRundataProcessesWithDefinitions(tool);
+  }
+  
+  public String createRunData(String rundata) throws NullReturnException, ServerErrorException {
+    return this.api.createRunData(rundata);
+  }
+  
+  public void updateRunData(String rundata) throws NullReturnException, ServerErrorException {
+    this.api.updateRunData(rundata);
+  }
+  
+  public void commitRunData(String id) throws NullReturnException, ServerErrorException {
+    this.api.commitRunData(id);
+  }
+  
+  public void createAdjustmentRunData() {
+        //JUST a placeholder for: runmgr.createAdjustmentRunData(...);
+  }
+
+  public void disableWithRundata(String arg1) {
+      //placeholder
+  }    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }
