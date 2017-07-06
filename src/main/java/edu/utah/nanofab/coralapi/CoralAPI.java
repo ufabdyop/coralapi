@@ -81,11 +81,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Level;
+import org.opencoral.corba.RundataAdapter;
 import org.opencoral.idl.InvalidDateSignal;
 import org.opencoral.idl.Reservation.ReservationManagerPackage.ReservationDuplicateSignal;
 import org.opencoral.idl.Runtime.NullReturnException;
 import org.opencoral.idl.Runtime.RuntimeManager;
 import org.opencoral.idl.Runtime.ServerErrorException;
+import org.opencoral.util.XMLType;
 
 /**
  * The CoralAPI class provides a wrapper for the primary coral services.
@@ -1080,6 +1082,27 @@ public class CoralAPI {
     }
   }
   
+  public String createAndCommitRunData(String xmlDefinition) throws NullReturnException, ServerErrorException, Exception {
+      //CREATE
+      String id = this.createRunData(xmlDefinition);
+      RundataAdapter ra = new RundataAdapter(new XMLType(xmlDefinition));
+      
+      //UPDATE
+      ra.setValue("id", id);
+      String xmlWithID = ra.getValue("document");
+      this.updateRunData(xmlWithID);
+      
+      //COMMIT
+      this.commitRunData(id);
+      return id;
+  }
+
+  
+  public RundataAdapter rundataFromXml(String xml) {
+      RundataAdapter ra = new RundataAdapter(new XMLType(xml));
+      return ra;
+  }
+  
   public void createAdjustmentRunData() {
         //JUST a placeholder for: runmgr.createAdjustmentRunData(...);
   }
@@ -1190,5 +1213,6 @@ public class CoralAPI {
         }
         return returnSet.toArray(new Relation[0]);
     }
+
   
 }

@@ -27,6 +27,7 @@ import edu.utah.nanofab.coralapi.resource.RunDataProcess;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
+import org.opencoral.corba.RundataAdapter;
 import org.opencoral.idl.AccountNotFoundSignal;
 import org.opencoral.idl.Equipment.EquipmentManagerPackage.MachineRetrievalFailedSignal;
 import org.opencoral.idl.InvalidAccountSignal;
@@ -235,6 +236,10 @@ public class CoralAPISynchronized {
     this.api.commitRunData(id);
   }
   
+  public RundataAdapter rundataFromXml(String xml) {
+      return this.api.rundataFromXml(xml);
+  }
+  
   public void createAdjustmentRunData() {
         //JUST a placeholder for: runmgr.createAdjustmentRunData(...);
   }
@@ -242,6 +247,10 @@ public class CoralAPISynchronized {
   public void disableWithRundata(String arg1) {
       //placeholder
   }    
+
+  public String createAndCommitRunData(String xmlDefinition) throws NullReturnException, ServerErrorException, Exception {
+      return this.api.createAndCommitRunData(xmlDefinition);
+  }
     
     
     
