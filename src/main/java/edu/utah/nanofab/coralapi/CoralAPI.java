@@ -1092,6 +1092,7 @@ public class CoralAPI {
       //RundataAdapter ra = new RundataAdapter(xmlType);
       RmRunData rundata = (RmRunData) (RmUtil.xmlStringToObject(xmlDefinition));
       rundata.setId(id);
+      rundata.setActive(true);
 
       //UPDATE
       String xmlWithID = RmUtil.objectToXMLString(rundata);
