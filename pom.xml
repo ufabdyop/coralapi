@@ -93,6 +93,30 @@
               <artifactId>opencoral-server</artifactId>
               <version>3.4.9</version>
     </dependency>
+    <dependency>
+              <groupId>org.opencoral</groupId>
+              <artifactId>opencoral-castor-core</artifactId>
+              <version>3.4.9</version>
+    </dependency>
+    <dependency>
+              <groupId>org.opencoral</groupId>
+              <artifactId>opencoral-castor-xml-schema</artifactId>
+              <version>3.4.9</version>
+    </dependency>
+    <dependency>
+              <groupId>org.opencoral</groupId>
+              <artifactId>opencoral-castor-xml</artifactId>
+              <version>3.4.9</version>
+    </dependency>
+    <dependency>
+              <groupId>org.opencoral</groupId>
+              <artifactId>opencoral-xerces</artifactId>
+              <version>3.4.9</version>
+    </dependency>
+    
+    
+    
+    
     <!--END opencoral libs -->
 
     <!-- third party -->

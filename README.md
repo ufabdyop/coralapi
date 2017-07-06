@@ -81,6 +81,15 @@ for i in idl common client server admin runtime; do
 done
 ```
 
+Also some for the client side:
+```
+for i in castor-core castor-xml-schema castor-xml xerces; do
+	docker cp opencoral-utah-container:/usr/local/coral/ext/$i.jar /tmp/$i.jar
+	mvn install:install-file -Dfile=/tmp/$i.jar -DgroupId=org.opencoral -DartifactId=opencoral-$i  -Dversion=3.4.9 -Dpackaging=jar
+done
+
+```
+
 Once those jars are in your local maven repo (~/.m2/...), you can package this project into a jar with:
 
     mvn package -Dmaven.test.skip=true
