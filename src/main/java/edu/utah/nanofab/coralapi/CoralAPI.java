@@ -87,6 +87,8 @@ import org.opencoral.idl.Reservation.ReservationManagerPackage.ReservationDuplic
 import org.opencoral.idl.Runtime.NullReturnException;
 import org.opencoral.idl.Runtime.RuntimeManager;
 import org.opencoral.idl.Runtime.ServerErrorException;
+import org.opencoral.runtime.xml.RmRunData;
+import org.opencoral.util.RmUtil;
 import org.opencoral.util.XMLType;
 
 /**
@@ -1085,12 +1087,14 @@ public class CoralAPI {
   public String createAndCommitRunData(String xmlDefinition) throws NullReturnException, ServerErrorException, Exception {
       //CREATE
       String id = this.createRunData(xmlDefinition);
-      XMLType xmlType = new XMLType(xmlDefinition);
-      RundataAdapter ra = new RundataAdapter(xmlType);
       
+      //XMLType xmlType = new XMLType(xmlDefinition);
+      //RundataAdapter ra = new RundataAdapter(xmlType);
+      RmRunData rundata = (RmRunData) (RmUtil.xmlStringToObject(xmlDefinition));
+      rundata.setId(id);
+
       //UPDATE
-      ra.setValue("id", id);
-      String xmlWithID = ra.getValue("document");
+      String xmlWithID = RmUtil.objectToXMLString(rundata);
       this.updateRunData(xmlWithID);
       
       //COMMIT
