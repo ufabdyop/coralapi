@@ -1085,7 +1085,8 @@ public class CoralAPI {
   public String createAndCommitRunData(String xmlDefinition) throws NullReturnException, ServerErrorException, Exception {
       //CREATE
       String id = this.createRunData(xmlDefinition);
-      RundataAdapter ra = new RundataAdapter(new XMLType(xmlDefinition));
+      XMLType xmlType = new XMLType(xmlDefinition);
+      RundataAdapter ra = new RundataAdapter(xmlType);
       
       //UPDATE
       ra.setValue("id", id);
