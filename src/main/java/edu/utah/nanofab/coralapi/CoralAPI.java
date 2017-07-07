@@ -948,7 +948,7 @@ public class CoralAPI {
 	  return getReservations("*", tool, bdate, edate);
   }
 
-  public void enable(Enable enableActivity) throws InvalidTicketSignal, InvalidAgentSignal, InvalidProjectSignal, InvalidAccountSignal, InvalidMemberSignal, InvalidResourceSignal, InvalidProcessSignal, ResourceUnavailableSignal, NotAuthorizedSignal{
+  public String enable(Enable enableActivity) throws InvalidTicketSignal, InvalidAgentSignal, InvalidProjectSignal, InvalidAccountSignal, InvalidMemberSignal, InvalidResourceSignal, InvalidProcessSignal, ResourceUnavailableSignal, NotAuthorizedSignal{
     
     Activity activity = ActivityFactory.createRunActivity(
             this.coralUser,
@@ -960,10 +960,10 @@ public class CoralAPI {
           enableActivity.getBdate(),
           enableActivity.getEdate());   
     activity.agent = enableActivity.getAgent().getName();
-    connector.getEquipmentManager().enable(activity, false, connector.getTicketString());
+    return connector.getEquipmentManager().enable(activity, false, connector.getTicketString());
   }
   
-  public void enable(String agent, String member, String project, String account, String machineName) throws UnknownMemberException, Exception {
+  public String enable(String agent, String member, String project, String account, String machineName) throws UnknownMemberException, Exception {
     Enable enableActivity = new Enable();
     enableActivity.setAgent(this.getMember(agent));
     enableActivity.setMember(this.getMember(member));
@@ -980,18 +980,17 @@ public class CoralAPI {
     Account a =  this.getAccount(account);
     enableActivity.setAccount(a);
     
-    this.enable(enableActivity);
+    return this.enable(enableActivity);
   }
   
-  public void enable(String agent, String member, String project, String machineName) throws UnknownMemberException, Exception {
+  public String enable(String agent, String member, String project, String machineName) throws UnknownMemberException, Exception {
     Project p = this.getProject(project);
     Account account = this.getAccount(p.getAccount());
-    this.enable(agent, member, project, account.getName(), machineName);
+    return this.enable(agent, member, project, account.getName(), machineName);
   }
   
-  public void disable (String agent, String machine) throws InvalidTicketSignal, InvalidAgentSignal, InvalidResourceSignal, ResourceUnavailableSignal, NotAuthorizedSignal {
-    
-    connector.getEquipmentManager().disable(agent, machine, true, connector.getTicketString());
+  public String disable (String agent, String machine) throws InvalidTicketSignal, InvalidAgentSignal, InvalidResourceSignal, ResourceUnavailableSignal, NotAuthorizedSignal {
+    return connector.getEquipmentManager().disable(agent, machine, true, connector.getTicketString());
   }
   
   /**

@@ -126,17 +126,17 @@ public class CoralAPISynchronized {
     public void deleteReservation(String item, Date bdate, int lengthInMinutes) throws ProjectNotFoundSignal, InvalidAccountSignal, MachineRetrievalFailedSignal, UnknownMemberException, ParseException, InvalidCallOrderException, Exception {
         this.api.deleteReservation( item,  bdate,  lengthInMinutes);
     }
-    public synchronized void disable (String agent, String machine)  throws InvalidTicketSignal, InvalidAgentSignal, InvalidResourceSignal, ResourceUnavailableSignal, NotAuthorizedSignal {
-	this.api.disable( agent,  machine);
+    public synchronized String disable (String agent, String machine)  throws InvalidTicketSignal, InvalidAgentSignal, InvalidResourceSignal, ResourceUnavailableSignal, NotAuthorizedSignal {
+	return this.api.disable( agent,  machine);
     }
-    public synchronized void enable (Enable enableActivity)  throws InvalidTicketSignal, InvalidAgentSignal, InvalidProjectSignal, InvalidAccountSignal, InvalidMemberSignal, InvalidResourceSignal, InvalidProcessSignal, ResourceUnavailableSignal, NotAuthorizedSignal {
-	this.api.enable( enableActivity);
+    public synchronized String enable (Enable enableActivity)  throws InvalidTicketSignal, InvalidAgentSignal, InvalidProjectSignal, InvalidAccountSignal, InvalidMemberSignal, InvalidResourceSignal, InvalidProcessSignal, ResourceUnavailableSignal, NotAuthorizedSignal {
+	return this.api.enable( enableActivity);
     }
-    public synchronized void enable (String agent, String member, String project, String account, String machineName)  throws UnknownMemberException, Exception {
-	this.api.enable( agent,  member,  project,  account,  machineName);
+    public synchronized String enable (String agent, String member, String project, String account, String machineName)  throws UnknownMemberException, Exception {
+	return this.api.enable( agent,  member,  project,  account,  machineName);
     }
-    public synchronized void enable (String agent, String member, String project, String machineName)  throws UnknownMemberException, Exception {
-	this.api.enable( agent,  member,  project,  machineName);
+    public synchronized String enable (String agent, String member, String project, String machineName)  throws UnknownMemberException, Exception {
+	return this.api.enable( agent,  member,  project,  machineName);
     }
     public synchronized Account getAccount (String name)  throws InvalidAccountSignal {
 	return this.api.getAccount( name);
