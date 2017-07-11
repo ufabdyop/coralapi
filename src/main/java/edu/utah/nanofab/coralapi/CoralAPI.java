@@ -994,6 +994,31 @@ public class CoralAPI {
   }
   
   /**
+   * 
+   * @param agent : who is disabling
+   * @param machine : what to disable
+   * @param rundataId : ID of rundata that has already been entered
+   * @return
+   * @throws InvalidTicketSignal
+   * @throws InvalidAgentSignal
+   * @throws InvalidResourceSignal
+   * @throws ResourceUnavailableSignal
+   * @throws NotAuthorizedSignal 
+   */
+  public String disableWithRundata(String agent, String machine, String rundataId) throws InvalidTicketSignal, InvalidAgentSignal, InvalidResourceSignal, ResourceUnavailableSignal, NotAuthorizedSignal {
+      String activityId = disable(agent, machine);
+      RuntimeManager runmgr = this.connector.getRuntimeManager();
+    
+      if (runmgr != null) {
+        runmgr.addActivityToRundata(activityId, rundataId, agent);
+        return activityId;
+      } else {
+        return "not assigned";
+      }
+  }
+  
+  
+  /**
    * Updates a member's remote password.
    * 
    * @param member
@@ -1110,10 +1135,6 @@ public class CoralAPI {
   
   public void createAdjustmentRunData() {
         //JUST a placeholder for: runmgr.createAdjustmentRunData(...);
-  }
-
-  public void disableWithRundata(String arg1) {
-      //placeholder
   }
   
   public void addActivityToRundata(String arg1, String arg2) {

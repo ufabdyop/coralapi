@@ -244,20 +244,12 @@ public class CoralAPISynchronized {
         //JUST a placeholder for: runmgr.createAdjustmentRunData(...);
   }
 
-  public void disableWithRundata(String arg1) {
-      //placeholder
-  }    
+  public String disableWithRundata(String agent, String machine, String rundataId) throws InvalidTicketSignal, InvalidAgentSignal, InvalidResourceSignal, ResourceUnavailableSignal, NotAuthorizedSignal {
+      return this.api.disableWithRundata(agent, machine, rundataId);
+  }
 
   public String createAndCommitRunData(String xmlDefinition) throws NullReturnException, ServerErrorException, Exception {
       return this.api.createAndCommitRunData(xmlDefinition);
   }
-    
-    
-    
-    
-    
-    
-    
-    
     
 }
