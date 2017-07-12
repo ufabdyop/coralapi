@@ -252,12 +252,20 @@ public class CoralManagerConnector {
     
     public RuntimeManager getRuntimeManager() {
         this.ensureConnection();
-        if (runtimeManager != null) {
-            return runtimeManager;
+        
+        
+        if (runtimeManager == null) {
+            System.out.println("runtimeManager was null, connecting");
+            org.omg.CORBA.Object managerGeneric = getArbitraryManager(Constants.RUNMGR_NAME);
+            runtimeManager = RuntimeManagerHelper.narrow(managerGeneric);
+        }
+        System.out.println("runtimeManager non existent? " + runtimeManager._non_existent());
+        if (runtimeManager._non_existent()) {
+            System.out.println("reconnecting runmgr");
+            org.omg.CORBA.Object managerGeneric = getArbitraryManager(Constants.RUNMGR_NAME);
+            runtimeManager = RuntimeManagerHelper.narrow(managerGeneric);
         }
 
-        org.omg.CORBA.Object managerGeneric = getArbitraryManager(Constants.RUNMGR_NAME);
-        runtimeManager = RuntimeManagerHelper.narrow(managerGeneric);
         return runtimeManager;
     }
 
