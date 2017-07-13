@@ -159,25 +159,29 @@ public class CoralManagerConnector {
         return this.adminManager;
     }
        
-    AdminManagerConnection adminConnection = this.getAdminManagerConnection();
-    int attempts = 0;
-    int maxAttempts = 1;
-    
-    while (attempts++ < maxAttempts && adminManager == null) {
-      try {
-        adminManager = adminManagerConnection.connect(iorUrl);
-      } catch (Exception e) {
-        try {
-          Thread.sleep(3000);
-        } catch (Exception e2) {
-          System.err
-              .println("CoralManagerConnector Unable to connect to Coral admin manager.  "
-                  + e2.getMessage());
-        }
-      }
-    }
-    return adminManager;
+    return getAdminManagerNoCache();
   }
+
+    private AdminManager getAdminManagerNoCache() {
+        AdminManagerConnection adminConnection = this.getAdminManagerConnection();
+        int attempts = 0;
+        int maxAttempts = 1;
+        
+        while (attempts++ < maxAttempts && adminManager == null) {
+            try {
+                adminManager = adminManagerConnection.connect(iorUrl);
+            } catch (Exception e) {
+                try {
+                    Thread.sleep(3000);
+                } catch (Exception e2) {
+                    System.err
+                            .println("CoralManagerConnector Unable to connect to Coral admin manager.  "
+                                    + e2.getMessage());
+                }
+            }
+        }
+        return adminManager;
+    }
     
     public AuthManager getAuthManager() {
         if (authManager != null) {
@@ -273,13 +277,13 @@ public class CoralManagerConnector {
             this.logger.error("Caught exception trying to figure out if runmgr exists: " + ex.getClass().getCanonicalName());
             ex.printStackTrace();
             this.logger.debug("Reconnecting");
-            org.omg.CORBA.Object managerGeneric = getArbitraryManager(Constants.RUNMGR_NAME);
+            org.omg.CORBA.Object managerGeneric = getArbitraryManager(Constants.RUNMGR_NAME, false);
             runtimeManager = RuntimeManagerHelper.narrow(managerGeneric);
         }
         
         if (runtimeManager._non_existent()) {
             this.logger.debug("reconnecting runmgr");
-            org.omg.CORBA.Object managerGeneric = getArbitraryManager(Constants.RUNMGR_NAME);
+            org.omg.CORBA.Object managerGeneric = getArbitraryManager(Constants.RUNMGR_NAME, false);
             runtimeManager = RuntimeManagerHelper.narrow(managerGeneric);
         }
 
@@ -309,12 +313,22 @@ public class CoralManagerConnector {
     }
 
   public org.omg.CORBA.Object getArbitraryManager(String serverName) {
+      return getArbitraryManager(serverName, true);
+  }
+  
+  public org.omg.CORBA.Object getArbitraryManager(String serverName, boolean useCache) {
         int attempts = 0;
         int maxAttempts = 1;
         org.omg.CORBA.Object theManager = null;
         while (attempts++ < maxAttempts && theManager == null) {
             try {
-                String authIorUrl = getAdminManager().getServerIOR(serverName);
+                AdminManager tempAdminManager;
+                if (useCache) {
+                    tempAdminManager = getAdminManager();
+                } else {
+                    tempAdminManager = getAdminManagerNoCache();
+                }
+                String authIorUrl = tempAdminManager.getServerIOR(serverName);
                 theManager = orb.string_to_object(authIorUrl);
             } catch (Exception e) {
                 System.err
