@@ -221,9 +221,6 @@ public class CoralAPISynchronized implements CoralAPIInterface {
     public synchronized void updateProject (Project project)  throws InvalidTicketSignal, ProjectNotFoundSignal, InvalidNicknameSignal, InvalidAccountSignal, NotAuthorizedSignal, Exception {
 	this.api.updateProject( project);
     }
-   
-    
-    
     
   public synchronized RunDataProcess[] getRundataProcessesWithDefinitions(String tool) throws NullReturnException, ServerErrorException {
     return this.api.getRundataProcessesWithDefinitions(tool);

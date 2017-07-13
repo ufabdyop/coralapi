@@ -111,6 +111,10 @@ public class CoralAPI implements CoralAPIInterface {
 	public static Logger logger;
            
     public CoralAPI(String coralUser, String configUrl) throws CoralConnectionException {
+        setup(coralUser, configUrl);
+    }
+
+    public void setup(String coralUser, String configUrl) throws CoralConnectionException {
         this.coralUser = coralUser;
         this.configUrl = configUrl;
         setIorUrl(iorUrl);
@@ -120,7 +124,7 @@ public class CoralAPI implements CoralAPIInterface {
         logger.debug("coralUser: " + coralUser);
         this.coralCrypto = new CoralCrypto(this.configUrl);
         if (this.coralCrypto.checkKeyIsValid() == false) {
-                logger.error("Bad Key Detected. Check config.jar for certs/Coral.key");
+            logger.error("Bad Key Detected. Check config.jar for certs/Coral.key");
         }
         connector = new CoralManagers(this.coralUser, this.iorUrl);
     }
@@ -533,6 +537,12 @@ public class CoralAPI implements CoralAPIInterface {
     } catch (Exception e) {
       logger.error("Could not release the connector: " + e.getMessage());
     }
+  }
+  
+  public void reInitialize() throws CoralConnectionException {
+      this.close();
+      connector = null; // allow GC
+      this.setup(this.coralUser, this.configUrl);
   }
 
   public void addLabRoleToMember(LabRole newRole) throws Exception {
