@@ -120,6 +120,25 @@
     <!--END opencoral libs -->
 
     <!-- third party -->
+    
+    
+    <!-- https://mvnrepository.com/artifact/org.jboss.forge.roaster/roaster-api -->
+<dependency>
+    <groupId>org.jboss.forge.roaster</groupId>
+    <artifactId>roaster-api</artifactId>
+    <version>2.20.0.Final</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.jboss.forge.roaster/roaster-distribution -->
+<dependency>
+    <groupId>org.jboss.forge.roaster</groupId>
+    <artifactId>roaster-distribution</artifactId>
+    <version>2.20.1.Final</version>
+</dependency>
+
+
+
+    
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>javax.mail-api</artifactId>

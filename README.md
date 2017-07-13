@@ -110,6 +110,14 @@ or
 java -cp target/CoralAPI-0.3.1-SHADED.jar edu.utah.nanofab.coralapi.examples.PasswordChange coral coral
 ```
 
+Run a Code Generator to Create Some Decorators:
+---
+
+```
+mvn exec:java -Dexec.mainClass=edu.utah.nanofab.coralapi.codegeneration.CreateDecorator -Dexec.args="src/main/java/edu/utah/nanofab/coralapi/CoralAPI.java"
+```
+
+
 
 Reference Material
 ------------------
