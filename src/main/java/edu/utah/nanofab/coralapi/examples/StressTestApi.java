@@ -5,6 +5,7 @@ import edu.utah.nanofab.coralapi.CoralAPIPool;
 import edu.utah.nanofab.coralapi.CoralAPISynchronized;
 import edu.utah.nanofab.coralapi.collections.Machines;
 import edu.utah.nanofab.coralapi.collections.Reservations;
+import edu.utah.nanofab.coralapi.exceptions.CoralConnectionException;
 import static edu.utah.nanofab.coralapi.helper.TimestampConverter.dateToAdapterString;
 import static edu.utah.nanofab.coralapi.helper.TimestampConverter.stringToDate;
 import edu.utah.nanofab.coralapi.resource.Machine;
@@ -67,7 +68,7 @@ public class StressTestApi {
         }
     }
 
-    private static void createReservation(int i) {
+    private static void createReservation(int i) throws CoralConnectionException {
         CoralAPISynchronized instance = apiPool.getConnection(member);
         try {
             Date resStartDate = new Date(stringToDate(reservationStart).getTime() + (30 * 1000 * i * 60));
@@ -81,7 +82,7 @@ public class StressTestApi {
         }
     }
 
-    private static void deleteReservation(int i) {
+    private static void deleteReservation(int i) throws CoralConnectionException {
         CoralAPISynchronized instance = apiPool.getConnection(member);
         try {
             Date resStartDate = new Date(stringToDate(reservationStart).getTime() + (30 * 1000 * i * 60));
