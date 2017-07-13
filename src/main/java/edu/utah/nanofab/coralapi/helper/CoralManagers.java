@@ -15,6 +15,7 @@ import org.opencoral.idl.Equipment.EquipmentManagerHelper;
 import org.opencoral.idl.Hardware.HardwareManager;
 import org.opencoral.idl.Hardware.HardwareManagerHelper;
 import org.opencoral.idl.Reservation.ReservationManager;
+import org.opencoral.idl.Reservation.ReservationManagerHelper;
 import org.opencoral.idl.Resource.EventManager;
 import org.opencoral.idl.Resource.EventManagerHelper;
 import org.opencoral.idl.Resource.ResourceManager;
@@ -43,6 +44,8 @@ public class CoralManagers implements CoralConnectorInterface {
     private RuntimeManager runMgr;
     private ServiceManager svcMgr;
     private HardwareManager hwrMgr;
+    private ReservationManager resMgr;
+    
     private String ticketString;
     private long creationEpochOfTicket;
     private long TICKET_LIFE = 5 * 60 * 1000; //five minutes of ticket life
@@ -61,27 +64,27 @@ public class CoralManagers implements CoralConnectorInterface {
 
     @Override
     public AuthManager getAuthManager() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.athMgr;
     }
 
     @Override
     public EquipmentManager getEquipmentManager() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.eqMgr;
     }
 
     @Override
     public ReservationManager getReservationManager() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.resMgr;
     }
 
     @Override
     public ResourceManager getResourceManager() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.rscMgr;
     }
 
     @Override
     public RuntimeManager getRuntimeManager() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.runMgr;
     }
 
     @Override
@@ -227,6 +230,19 @@ public class CoralManagers implements CoralConnectorInterface {
 
         System.out.println("Runtime Manager contacted.");
 
+
+        try {
+                ior = this.admMgr.getServerIOR(Constants.RESMGR_NAME);
+                obj = this.orb.string_to_object(ior);
+                this.resMgr = ReservationManagerHelper.narrow(obj);
+        } catch (Exception e) {
+                System.err.println(e);
+                displayError("Reservation Manager is not responding.");
+                throw new CoralConnectionException("Reservation Manager is not responding.");
+        }
+
+        System.out.println("Reservation Manager contacted.");
+        
         try {
                 ior = this.admMgr.getServerIOR(Constants.SVCMGR_NAME);
                 obj = this.orb.string_to_object(ior);
