@@ -28,6 +28,8 @@ import org.opencoral.idl.Service.ServiceManagerHelper;
 import org.opencoral.idl.Staff.StaffManagerHelper;
 
 import org.opencoral.util.AdminManagerConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CoralManagerConnector {
   
@@ -66,10 +68,13 @@ public class CoralManagerConnector {
   
   private long creationEpochOfTicket = 0; //when a ticket
   private long TICKET_LIFE = 5 * 60 * 1000; //five minutes of ticket life
+    private final Logger logger;
+
 
     public CoralManagerConnector(String coralUser, String iorUrl) {
         this.setCoralUser(coralUser);
         this.setIorUrl(iorUrl);
+        this.logger = LoggerFactory.getLogger(CoralManagerConnector.class);
     }
   
   public void setIorUrl(String iorUrl) {
@@ -255,13 +260,13 @@ public class CoralManagerConnector {
         
         
         if (runtimeManager == null) {
-            System.out.println("runtimeManager was null, connecting");
+            this.logger.debug("runtimeManager was null, connecting");
             org.omg.CORBA.Object managerGeneric = getArbitraryManager(Constants.RUNMGR_NAME);
             runtimeManager = RuntimeManagerHelper.narrow(managerGeneric);
         }
-        System.out.println("runtimeManager non existent? " + runtimeManager._non_existent());
+        this.logger.debug("runtimeManager non existent? " + runtimeManager._non_existent());
         if (runtimeManager._non_existent()) {
-            System.out.println("reconnecting runmgr");
+            this.logger.debug("reconnecting runmgr");
             org.omg.CORBA.Object managerGeneric = getArbitraryManager(Constants.RUNMGR_NAME);
             runtimeManager = RuntimeManagerHelper.narrow(managerGeneric);
         }
@@ -310,14 +315,14 @@ public class CoralManagerConnector {
   
   public String getTicketString() {
     if ( this.ticketExpired()) {
-        System.out.println("Generating new ticket after expiration");
+        this.logger.debug("Generating new ticket after expiration");
         this.getTicket();
     }
     return this.ticketString;
   }
 
   public void release() {
-    System.out.println("CoralManagerConnector release called");
+    this.logger.debug("CoralManagerConnector release called");
     
     if (authManager != null) {
       authManager._release();
@@ -358,7 +363,7 @@ public class CoralManagerConnector {
     if (orb != null) {
       orb.destroy();
     }
-    System.out.println("CoralManagerConnector release finished");
+    this.logger.debug("CoralManagerConnector release finished");
   }
 
     private AdminManagerConnection getAdminManagerConnection() {
