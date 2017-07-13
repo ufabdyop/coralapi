@@ -100,7 +100,7 @@ import org.opencoral.util.XMLType;
  * @author University of Utah Nanofab
  * @contact nanofab-support@eng.utah.edu
  */
-public class CoralAPI {
+public class CoralAPI implements CoralAPIInterface {
     
 	private String coralUser = "coral";
 	private String iorUrl = "http://coral-dev-box/IOR/";
@@ -136,56 +136,16 @@ public class CoralAPI {
         }
     }
     
-    private void reconnectToCoral() {
-        logger.debug("checking connection to Coral...");
-        if (connector == null) {
-            logger.debug("Reconnecting to Coral...");
-            connector = new CoralManagerConnector(this.coralUser, this.iorUrl);
-        }
-    }
-        
-    private void testResourceManagerConnection() {
-        logger.info("Getting Resource Manager");
-        if (connector == null) {
-                logger.debug("ResourceManager connector is null. Reconnecting to coral...");
-                reconnectToCoral();
-        }
-        ResourceManager mgr = connector.getResourceManager();
-
-        connector.getTicketString();
-        logger.debug("Ticket String: " + connector.getTicketString());
-
-        try {
-                mgr.getAllProjects();
-                logger.debug("Got all projects.");
-        } catch (org.omg.CORBA.COMM_FAILURE comm) {
-            logger.debug("ORB Comm Failure");
-            connector.release();
-            connector = null;
-            mgr = null;
-        } catch (org.omg.CORBA.OBJECT_NOT_EXIST corbaException ) {
-            logger.debug("Caught CORBA error. This error is probably due to a lost coral connection.");
-            logger.debug("Trying to reconnect...");
-            reconnectToCoral() ;
-        } catch (ProjectNotFoundSignal e) {
-            logger.debug("Project Not Found!");
-        } catch (Exception e) {
-            logger.debug("General Exception was caught. See the stacktrace for more details.");
-            logger.trace(e.getMessage(), e);
-        }
-    }
-
   public Projects getProjects() throws ProjectNotFoundSignal{
-      this.reconnectToCoral();
       org.opencoral.idl.Project[] allProjects = connector.getResourceManager().getAllProjects();
       Projects projectCollection = Projects.fromIdlProjectArray(allProjects); 
       return projectCollection;
     }
   public Projects getAllProjects() throws ProjectNotFoundSignal{
       return getProjects();
-  }  
+  }
+  
     public Project getProject(String name) throws ProjectNotFoundSignal {
-      this.reconnectToCoral();
       Project project = new Project();
       try {
         project.populateFromIdlProject(connector.getResourceManager().getProject(name));
@@ -197,8 +157,6 @@ public class CoralAPI {
     }
     
     public void createNewMember(Member member) throws MemberDuplicateSignal, InvalidProjectSignal, Exception {
-      this.reconnectToCoral();
-
       member.setActive(true);
       connector.getResourceManager().addMember(member.convertToIDLMemberForRscMgr(), connector.getTicketString());
       
@@ -730,7 +688,6 @@ public class CoralAPI {
         String errorMsg = "";
 
         try {
-            this.reconnectToCoral();
             ReservationManager resMgr = connector.getReservationManager();
             resMgr.makeReservation(activity_array, connector.getTicketString());
         } catch (NotAuthorizedSignal e) {

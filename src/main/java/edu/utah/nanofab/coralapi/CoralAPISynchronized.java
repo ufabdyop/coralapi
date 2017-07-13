@@ -1,16 +1,18 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
+
+
  * and open the template in the editor.
  */
 package edu.utah.nanofab.coralapi;
 
 import edu.utah.nanofab.coralapi.collections.Accounts;
+import edu.utah.nanofab.coralapi.collections.EquipmentRoles;
 import edu.utah.nanofab.coralapi.collections.LabRoles;
 import edu.utah.nanofab.coralapi.collections.Machines;
 import edu.utah.nanofab.coralapi.collections.Members;
 import edu.utah.nanofab.coralapi.collections.Projects;
 import edu.utah.nanofab.coralapi.collections.Reservations;
+import edu.utah.nanofab.coralapi.exceptions.CoralConnectionException;
 import edu.utah.nanofab.coralapi.exceptions.InvalidCallOrderException;
 import edu.utah.nanofab.coralapi.exceptions.InvalidRoleException;
 import edu.utah.nanofab.coralapi.exceptions.RequestFailedException;
@@ -21,12 +23,15 @@ import edu.utah.nanofab.coralapi.resource.LabRole;
 import edu.utah.nanofab.coralapi.resource.Machine;
 import edu.utah.nanofab.coralapi.resource.Member;
 import edu.utah.nanofab.coralapi.resource.Project;
+import edu.utah.nanofab.coralapi.resource.ProjectRole;
 import edu.utah.nanofab.coralapi.resource.Reservation;
 import edu.utah.nanofab.coralapi.resource.Role;
 import edu.utah.nanofab.coralapi.resource.RunDataProcess;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import org.opencoral.corba.RundataAdapter;
 import org.opencoral.idl.AccountNotFoundSignal;
 import org.opencoral.idl.Equipment.EquipmentManagerPackage.MachineRetrievalFailedSignal;
@@ -49,9 +54,9 @@ import org.opencoral.idl.RoleNotFoundSignal;
 import org.opencoral.idl.Runtime.NullReturnException;
 import org.opencoral.idl.Runtime.ServerErrorException;
 
-public class CoralAPISynchronized {
+public class CoralAPISynchronized implements CoralAPIInterface {
     private CoralAPI api;
-    public CoralAPISynchronized(String coralUser, String configUrl) {
+    public CoralAPISynchronized(String coralUser, String configUrl) throws CoralConnectionException {
         api = new CoralAPI(coralUser, configUrl);
     }
     public synchronized void addEquipmentRoleToMember(String member, String roleName, String resource) throws IOException, InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal, InvalidResourceSignal {
@@ -251,5 +256,90 @@ public class CoralAPISynchronized {
   public String createAndCommitRunData(String xmlDefinition) throws NullReturnException, ServerErrorException, Exception {
       return this.api.createAndCommitRunData(xmlDefinition);
   }
+
+    @Override
+    public Projects getAllProjects() throws ProjectNotFoundSignal {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Members getAllMembers() throws UnknownMemberException, Exception {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Members getAllActiveMembers() throws UnknownMemberException, Exception {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public HashMap<String, ArrayList<String>> getAllMemberProjects(boolean activeOnly) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void removeLabRoleFromMember(String member, String roleName, String lab) throws IOException, InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal, InvalidResourceSignal {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void removeGenericRoleFromMember(String member, String roleName, String resource, String roleType) throws IOException, InvalidTicketSignal, InvalidRoleSignal, InvalidMemberSignal, NotAuthorizedSignal, InvalidResourceSignal {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Accounts getAllAccounts() throws AccountNotFoundSignal {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void activateMember(String memberName) throws UnknownMemberException, Exception {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void activateMemberWithProject(String memberName, String projectName) throws InvalidTicketSignal, ProjectNotFoundSignal, MemberNotFoundSignal, InvalidProjectSignal, NotAuthorizedSignal {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void deactivateMember(String memberName) throws InvalidTicketSignal, MemberNotFoundSignal, NotAuthorizedSignal {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void activateProject(String projectName) throws InvalidTicketSignal, ProjectNotFoundSignal, InvalidNicknameSignal, InvalidAccountSignal, NotAuthorizedSignal, Exception {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void deactivateProject(String projectName) throws InvalidTicketSignal, ProjectNotFoundSignal, InvalidNicknameSignal, InvalidAccountSignal, NotAuthorizedSignal, Exception {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void addProjectRoleToMember(ProjectRole newRole) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public EquipmentRoles getEquipmentRoles(String username) throws RoleNotFoundSignal {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public String getRundataDefinitionForProcess(String process) throws NullReturnException, ServerErrorException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public RunDataProcess[] getRundataProcesses(String tool) throws NullReturnException, ServerErrorException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void addActivityToRundata(String arg1, String arg2) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
     
 }

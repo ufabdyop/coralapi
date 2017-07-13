@@ -3,6 +3,7 @@ package edu.utah.nanofab.coralapi.examples;
 import edu.utah.nanofab.coralapi.CoralAPI;
 import edu.utah.nanofab.coralapi.collections.Machines;
 import edu.utah.nanofab.coralapi.collections.Reservations;
+import edu.utah.nanofab.coralapi.exceptions.CoralConnectionException;
 import edu.utah.nanofab.coralapi.resource.Machine;
 import edu.utah.nanofab.coralapi.resource.Reservation;
 import java.util.logging.Level;
@@ -10,7 +11,7 @@ import java.util.logging.Logger;
 import java.util.Date;
 
 public class RunApiMethodsThenWait {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws CoralConnectionException {
         checkParameters(args);
         String url = args[0];        
         getMachines(url);
@@ -21,7 +22,7 @@ public class RunApiMethodsThenWait {
         waitForInterrupt();
     }
 
-    private static void deleteReservation(String url) {
+    private static void deleteReservation(String url) throws CoralConnectionException {
         CoralAPI instance = new CoralAPI("coral", url);
         try {
             instance.deleteReservation("coral", "coral", "Maintenance", "Oxford Plasmalab 80", "2016-02-25 01:00:00", 120);
@@ -31,7 +32,7 @@ public class RunApiMethodsThenWait {
         instance.close();
     }
 
-    private static void createReservation(String url) {
+    private static void createReservation(String url) throws CoralConnectionException {
         CoralAPI instance = new CoralAPI("coral", url);
         try {
             instance.createNewReservation("coral", "coral", "Maintenance", "Oxford Plasmalab 80", "2016-02-25 01:00:00", 120);
@@ -51,7 +52,7 @@ public class RunApiMethodsThenWait {
         }
     }
 
-    private static void getReservations(String url) {
+    private static void getReservations(String url) throws CoralConnectionException {
         CoralAPI instance2 = new CoralAPI("coral", url);
         Date bdate = new Date(2016, 1, 1);
         Date edate = new Date(2016, 3, 1);
@@ -67,7 +68,7 @@ public class RunApiMethodsThenWait {
         instance2.close();
     }
 
-    private static void getMachines(String url) {
+    private static void getMachines(String url) throws CoralConnectionException {
         CoralAPI instance = new CoralAPI("coral", url);
         Machines machines = instance.getAllMachines();
         for (Machine m : machines) {
