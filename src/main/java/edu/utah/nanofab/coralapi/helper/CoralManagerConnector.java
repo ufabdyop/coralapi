@@ -31,7 +31,7 @@ import org.opencoral.util.AdminManagerConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CoralManagerConnector {
+public class CoralManagerConnector implements CoralConnectorInterface {
   
   private AdminManagerConnection adminManagerConnection;
   private final String[] validServers= {
@@ -72,9 +72,13 @@ public class CoralManagerConnector {
 
 
     public CoralManagerConnector(String coralUser, String iorUrl) {
-        this.setCoralUser(coralUser);
-        this.setIorUrl(iorUrl);
         this.logger = LoggerFactory.getLogger(CoralManagerConnector.class);
+        setup(coralUser, iorUrl);
+    }
+
+    public void setup(String coralUser1, String iorUrl1) {
+        this.setCoralUser(coralUser1);
+        this.setIorUrl(iorUrl1);
     }
   
   public void setIorUrl(String iorUrl) {
@@ -91,7 +95,7 @@ public class CoralManagerConnector {
    * @param serverName The name of the server..
    * @return
    */
-  public org.omg.CORBA.Object getManager(String serverName) {
+  private org.omg.CORBA.Object getManager(String serverName) {
     
     org.omg.CORBA.Object returnManager;
     String authIorUrl;
@@ -339,14 +343,6 @@ public class CoralManagerConnector {
         return theManager;      
   }
   
-  public String getTicketString() {
-    if ( this.ticketExpired()) {
-        this.logger.debug("Generating new ticket after expiration");
-        this.getTicket();
-    }
-    return this.ticketString;
-  }
-
   public void release() {
     this.logger.debug("CoralManagerConnector release called");
     
@@ -421,6 +417,17 @@ public class CoralManagerConnector {
         }
         return this.ticketString;
     }
+
+  public String getTicketString() {
+    if ( this.ticketExpired()) {
+        this.logger.debug("Generating new ticket after expiration");
+        this.getTicket();
+    }
+    return this.ticketString;
+  }
+
+    
+    
     private boolean ticketExpired() {
         if (this.ticketString == null) {
             return true;

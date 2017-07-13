@@ -65,7 +65,9 @@ import edu.utah.nanofab.coralapi.collections.Machines;
 import edu.utah.nanofab.coralapi.collections.Members;
 import edu.utah.nanofab.coralapi.collections.Projects;
 import edu.utah.nanofab.coralapi.collections.Reservations;
+import edu.utah.nanofab.coralapi.exceptions.CoralConnectionException;
 import edu.utah.nanofab.coralapi.exceptions.RequestFailedException;
+import edu.utah.nanofab.coralapi.helper.CoralConnectorInterface;
 import edu.utah.nanofab.coralapi.resource.Enable;
 import edu.utah.nanofab.coralapi.resource.LabRole;
 import edu.utah.nanofab.coralapi.resource.Machine;
@@ -74,6 +76,7 @@ import edu.utah.nanofab.coralapi.resource.Project;
 import edu.utah.nanofab.coralapi.resource.ProjectRole;
 import edu.utah.nanofab.coralapi.resource.Reservation;
 import edu.utah.nanofab.coralapi.helper.CoralManagerConnector;
+import edu.utah.nanofab.coralapi.helper.CoralManagers;
 import static edu.utah.nanofab.coralapi.helper.TimestampConverter.stringToDate;
 import edu.utah.nanofab.coralapi.resource.RunDataProcess;
 import java.util.ArrayList;
@@ -103,35 +106,35 @@ public class CoralAPI {
 	private String iorUrl = "http://coral-dev-box/IOR/";
 	private String configUrl = "";
 	private String logLevel = "DEBUG";
-	private CoralManagerConnector connector = null;
+	private CoralConnectorInterface connector = null;
 	private CoralCrypto coralCrypto;
 	public static Logger logger;
            
-    public CoralAPI(String coralUser, String configUrl) {
-	  this.coralUser = coralUser;
-	  this.configUrl = configUrl;
-	  setIorUrl(iorUrl);
-            this.setLogLevel(this.logLevel);
-            logger = LoggerFactory.getLogger(CoralAPI.class);
-            logger.debug("configURL: " + configUrl);
-            logger.debug("coralUser: " + coralUser);
-            this.coralCrypto = new CoralCrypto(this.configUrl);
-            if (this.coralCrypto.checkKeyIsValid() == false) {
-                    logger.error("Bad Key Detected. Check config.jar for certs/Coral.key");
-            }
-            connector = new CoralManagerConnector(this.coralUser, this.iorUrl);
+    public CoralAPI(String coralUser, String configUrl) throws CoralConnectionException {
+        this.coralUser = coralUser;
+        this.configUrl = configUrl;
+        setIorUrl(iorUrl);
+        this.setLogLevel(this.logLevel);
+        logger = LoggerFactory.getLogger(CoralAPI.class);
+        logger.debug("configURL: " + configUrl);
+        logger.debug("coralUser: " + coralUser);
+        this.coralCrypto = new CoralCrypto(this.configUrl);
+        if (this.coralCrypto.checkKeyIsValid() == false) {
+                logger.error("Bad Key Detected. Check config.jar for certs/Coral.key");
+        }
+        connector = new CoralManagers(this.coralUser, this.iorUrl);
     }
 
-	private void setIorUrl(String iorUrl) {
-		ConfigLoader loader = new ConfigLoader(this.configUrl);
-		Properties props;
-		try {
-			props = loader.load();
-			this.iorUrl = (String) props.get("IOR_URL");
-		} catch (ConfigLoaderException e) {
-			e.printStackTrace();
-		}
-	}
+    private void setIorUrl(String iorUrl) {
+        ConfigLoader loader = new ConfigLoader(this.configUrl);
+        Properties props;
+        try {
+            props = loader.load();
+            this.iorUrl = (String) props.get("IOR_URL");
+        } catch (ConfigLoaderException e) {
+            e.printStackTrace();
+        }
+    }
     
     private void reconnectToCoral() {
         logger.debug("checking connection to Coral...");
