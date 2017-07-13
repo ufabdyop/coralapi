@@ -264,7 +264,19 @@ public class CoralManagerConnector {
             org.omg.CORBA.Object managerGeneric = getArbitraryManager(Constants.RUNMGR_NAME);
             runtimeManager = RuntimeManagerHelper.narrow(managerGeneric);
         }
-        this.logger.debug("runtimeManager non existent? " + runtimeManager._non_existent());
+        
+        try {
+            this.logger.debug("checking if runtimeManager exists.");
+            boolean exists = !runtimeManager._non_existent();
+            this.logger.debug("checking runtimeManager existent? : " + exists);
+        } catch (Exception ex) {
+            this.logger.error("Caught exception trying to figure out if runmgr exists: " + ex.getClass().getCanonicalName());
+            ex.printStackTrace();
+            this.logger.debug("Reconnecting");
+            org.omg.CORBA.Object managerGeneric = getArbitraryManager(Constants.RUNMGR_NAME);
+            runtimeManager = RuntimeManagerHelper.narrow(managerGeneric);
+        }
+        
         if (runtimeManager._non_existent()) {
             this.logger.debug("reconnecting runmgr");
             org.omg.CORBA.Object managerGeneric = getArbitraryManager(Constants.RUNMGR_NAME);
