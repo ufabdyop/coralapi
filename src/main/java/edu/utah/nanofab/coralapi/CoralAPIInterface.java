@@ -10,6 +10,7 @@ import edu.utah.nanofab.coralapi.collections.LabRoles;
 import edu.utah.nanofab.coralapi.collections.Members;
 import edu.utah.nanofab.coralapi.collections.Projects;
 import edu.utah.nanofab.coralapi.collections.Reservations;
+import edu.utah.nanofab.coralapi.exceptions.CoralConnectionException;
 import edu.utah.nanofab.coralapi.exceptions.InvalidCallOrderException;
 import edu.utah.nanofab.coralapi.exceptions.InvalidRoleException;
 import edu.utah.nanofab.coralapi.exceptions.RequestFailedException;
@@ -132,4 +133,11 @@ public interface CoralAPIInterface {
 	public void addActivityToRundata(String arg1, String arg2) ;
 	public String getLogLevel() ;
 	public void setLogLevel(String logLevel) ;
+        public void removeProjectRoleFromMember(java.lang.String member,
+			java.lang.String roleName, java.lang.String resource)
+			throws IOException, InvalidTicketSignal, InvalidRoleSignal,
+			InvalidMemberSignal, NotAuthorizedSignal, InvalidResourceSignal        ;
+        
+        public void setup(String c1, String c2) throws CoralConnectionException ;
+        public void reInitialize() throws CoralConnectionException ;
 }

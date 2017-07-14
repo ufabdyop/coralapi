@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 public class CoralAPIPool {
  
-    private HashMap<String, CoralAPISynchronized> pool;
+    private HashMap<String, CoralAPIInterface> pool;
     private HashMap<String, Date> accessTimes;   //when a connection was last accessed
     private HashMap<String, Date> creationTimes; //when a connection was created
     private String configUrl;
@@ -19,22 +19,25 @@ public class CoralAPIPool {
     public static Logger logger;
 
     public CoralAPIPool(String coralConfigUrl) {
-        pool = new HashMap<String, CoralAPISynchronized>();
+        pool = new HashMap<String, CoralAPIInterface>();
         accessTimes = new HashMap<String, Date>();
         creationTimes = new HashMap<String, Date>();
         configUrl = coralConfigUrl;
         logger = LoggerFactory.getLogger(CoralAPIPool.class);
     }
 
-    public CoralAPISynchronized getConnection(String user) throws CoralConnectionException {
+    public CoralAPIInterface getConnection(String user) throws CoralConnectionException {
         this.setTimestamp(user, this.accessTimes);
         this.expireConnectionIfOverMax(user, this.maxAgeInSeconds, this.creationTimes);
         if (pool.containsKey(user)) {
             return pool.get(user);
         } else {
             logger.debug("Creating new connection for " + user);
-            CoralAPISynchronized newConnection = new CoralAPISynchronized(user, configUrl);
-            pool.put(user, newConnection);
+            CoralAPI newConnection = new CoralAPI(user, configUrl);
+            CoralAPISynchronizedDecorator synced = new CoralAPISynchronizedDecorator(newConnection);
+            CoralAPIRetryDecorator retry = new CoralAPIRetryDecorator(synced);
+            
+            pool.put(user, retry);
             this.setTimestamp(user, this.creationTimes);
             return newConnection;
         }
