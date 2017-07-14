@@ -34,10 +34,10 @@ public class CoralAPIPool {
         } else {
             logger.debug("Creating new connection for " + user);
             CoralAPI newConnection = new CoralAPI(user, configUrl);
-            CoralAPISynchronizedDecorator synced = new CoralAPISynchronizedDecorator(newConnection);
-            CoralAPIRetryDecorator retry = new CoralAPIRetryDecorator(synced);
+            CoralAPIRetryDecorator retry = new CoralAPIRetryDecorator(newConnection);
+            CoralAPISynchronizedDecorator synced = new CoralAPISynchronizedDecorator(retry);
             
-            pool.put(user, retry);
+            pool.put(user, synced);
             this.setTimestamp(user, this.creationTimes);
             return newConnection;
         }

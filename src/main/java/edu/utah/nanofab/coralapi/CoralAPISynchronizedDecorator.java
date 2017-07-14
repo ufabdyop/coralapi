@@ -96,10 +96,10 @@ import edu.utah.nanofab.coralapi.resource.Role;
 
 public class CoralAPISynchronizedDecorator implements CoralAPIInterface {
 
-	private final CoralAPI delegate;
+	private final CoralAPIInterface delegate;
 
 	public CoralAPISynchronizedDecorator(
-			edu.utah.nanofab.coralapi.CoralAPI delegate) {
+			edu.utah.nanofab.coralapi.CoralAPIInterface delegate) {
 		this.delegate = delegate;
 	}
 
