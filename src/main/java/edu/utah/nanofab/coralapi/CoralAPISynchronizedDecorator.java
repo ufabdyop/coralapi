@@ -1,5 +1,6 @@
 package edu.utah.nanofab.coralapi;
 
+import edu.utah.nanofab.coralapi.CoralAPIInterface;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.ParseException;
@@ -93,16 +94,6 @@ import org.opencoral.util.RmUtil;
 import org.opencoral.util.XMLType;
 import edu.utah.nanofab.coralapi.resource.Role;
 
-/**
- * Decorator of the CoralAPI class.  Each method is synchronized
- * 
- * Automatically generated using:
- * mvn exec:java -Dexec.mainClass=edu.utah.nanofab.coralapi.codegeneration.CreateSynchronizedDecorator \
- *     -Dexec.args="src/main/java/edu/utah/nanofab/coralapi/CoralAPI.java" \
- *    | grep -v '^\[INFO\]' > src/main/java/edu/utah/nanofab/coralapi/CoralAPISynchronizedDecorator.java
- * 
- * @author ryant
- */
 public class CoralAPISynchronizedDecorator implements CoralAPIInterface {
 
 	private final CoralAPI delegate;

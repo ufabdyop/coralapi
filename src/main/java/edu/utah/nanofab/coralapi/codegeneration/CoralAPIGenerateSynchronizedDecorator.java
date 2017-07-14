@@ -1,5 +1,6 @@
 package edu.utah.nanofab.coralapi.codegeneration;
 
+import edu.utah.nanofab.coralapi.CoralAPIInterface;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class CoralAPIGenerateSynchronizedDecorator
       String decoratorClassName = javaSource.getName() + "SynchronizedDecorator";
       JavaClassSource decoratorClass = Roaster.create(JavaClassSource.class)
                .setName(decoratorClassName)
-               .setPackage(javaSource.getPackage());
+               .setPackage(javaSource.getPackage()).addInterface(CoralAPIInterface.class);
       if (javaSource instanceof Importer)
       {
          List<Import> imports = ((Importer) javaSource).getImports();

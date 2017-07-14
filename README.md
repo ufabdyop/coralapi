@@ -114,7 +114,10 @@ Run a Code Generator to Create Some Decorators:
 ---
 
 ```
-mvn exec:java -Dexec.mainClass=edu.utah.nanofab.coralapi.codegeneration.CreateDecorator -Dexec.args="src/main/java/edu/utah/nanofab/coralapi/CoralAPI.java"
+mvn exec:java -Dexec.mainClass=edu.utah.nanofab.coralapi.codegeneration.CreateRetryDecorator -Dexec.args="src/main/java/edu/utah/nanofab/coralapi/CoralAPI.java" | grep -v '^\[INFO\]' > src/main/java/edu/utah/nanofab/coralapi/CoralAPIRetryDecorator.java
+
+mvn exec:java -Dexec.mainClass=edu.utah.nanofab.coralapi.codegeneration.CreateSynchronizedDecorator -Dexec.args="src/main/java/edu/utah/nanofab/coralapi/CoralAPI.java" | grep -v '^\[INFO\]' > src/main/java/edu/utah/nanofab/coralapi/CoralAPISynchronizedDecorator.java
+
 ```
 
 
