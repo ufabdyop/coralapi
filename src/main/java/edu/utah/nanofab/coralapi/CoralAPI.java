@@ -1209,6 +1209,4 @@ public class CoralAPI implements CoralAPIInterface {
         }
         return returnSet.toArray(new Relation[0]);
     }
-
-  
 }

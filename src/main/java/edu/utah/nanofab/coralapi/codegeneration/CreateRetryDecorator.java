@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.utah.nanofab.coralapi.codegeneration;
 
 import edu.utah.nanofab.coralapi.CoralAPI;
@@ -14,7 +9,6 @@ import java.io.FileNotFoundException;
 import org.jboss.forge.roaster.Roaster;
 import org.jboss.forge.roaster.model.JavaType;
 import org.jboss.forge.roaster.model.source.JavaClassSource;
-//import org.jboss.forge.roaster.model.util.DesignPatterns;
 
 /**
  *
